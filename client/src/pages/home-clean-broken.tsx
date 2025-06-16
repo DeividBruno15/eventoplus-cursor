@@ -27,18 +27,28 @@ export default function HomeClean() {
                 <span className="text-xl font-bold text-black">Evento+</span>
               </div>
             </div>
-            <div className="flex items-center space-x-8">
-              <a href="#pricing" className="text-gray-600 hover:text-black">Preços</a>
-              <a href="#" className="text-gray-600 hover:text-black">Recursos</a>
-              <a href="#" className="text-gray-600 hover:text-black">Contato</a>
+            
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#features" className="text-gray-600 hover:text-black font-medium">
+                Recursos
+              </a>
+              <a href="#pricing" className="text-gray-600 hover:text-black font-medium">
+                Preços
+              </a>
+              <a href="#about" className="text-gray-600 hover:text-black font-medium">
+                Sobre
+              </a>
+            </div>
+            
+            <div className="flex items-center space-x-4">
               <Link href="/login">
-                <Button variant="outline" className="border-gray-300">
+                <Button variant="ghost" className="text-gray-600 hover:text-black">
                   Entrar
                 </Button>
               </Link>
               <Link href="/register">
-                <Button className="bg-[#3C5BFA] hover:bg-[#2C46E8]">
-                  Começar grátis
+                <Button className="bg-[#3C5BFA] hover:bg-blue-700 text-white">
+                  Começar
                 </Button>
               </Link>
             </div>
@@ -47,27 +57,32 @@ export default function HomeClean() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-20 pb-16 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-6">
-            Conecte. Organize.
-            <br />
-            <span className="text-[#3C5BFA]">Celebre.</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            A plataforma completa que conecta organizadores de eventos com os melhores prestadores de serviços e espaços únicos.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/register">
-              <Button size="lg" className="bg-[#3C5BFA] hover:bg-[#2C46E8] px-8 py-4 text-lg">
-                Começar gratuitamente
-                <ArrowRight className="ml-2 h-5 w-5" />
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-6 leading-tight">
+              Conecte seu evento
+              <br />
+              <span className="text-[#3C5BFA]">ao sucesso</span>
+            </h1>
+            
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+              A plataforma completa que conecta organizadores com prestadores de serviços 
+              e espaços para eventos únicos e memoráveis.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+              <Link href="/register">
+                <Button size="lg" className="bg-[#3C5BFA] hover:bg-blue-700 text-white px-8 py-4 text-lg">
+                  Começar gratuitamente
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Button variant="outline" size="lg" className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-4 text-lg">
+                <Play className="mr-2 h-5 w-5" />
+                Ver demonstração
               </Button>
-            </Link>
-            <Button variant="outline" size="lg" className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-4 text-lg">
-              <Play className="mr-2 h-5 w-5" />
-              Ver demonstração
-            </Button>
+            </div>
           </div>
         </div>
       </section>
@@ -139,7 +154,7 @@ export default function HomeClean() {
         </div>
       </section>
 
-      {/* Tudo para seu evento perfeito */}
+      {/* Todo para seu evento perfeito */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -299,7 +314,7 @@ export default function HomeClean() {
           {/* Prestadores Plans */}
           {activeUserType === 'prestadores' && (
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {/* Essencial */}
+              {/* Essencial - Gratuito */}
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
                 <div className="text-center mb-8">
                   <h4 className="text-xl font-bold text-black mb-2">Essencial</h4>
@@ -308,35 +323,29 @@ export default function HomeClean() {
                 </div>
                 
                 <ul className="space-y-3 mb-8">
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Perfil público básico</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">1 serviço ativo</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Suporte via FAQ</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Avaliações de clientes</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-white text-xs">✓</span>
-                    </div>
-                    <span className="text-gray-700">Acesso limitado às oportunidades</span>
                   </li>
                 </ul>
                 
@@ -345,7 +354,7 @@ export default function HomeClean() {
                 </Button>
               </div>
 
-              {/* Profissional */}
+              {/* Profissional - Recomendado */}
               <div className="bg-[#3C5BFA] rounded-2xl p-8 shadow-lg relative">
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                   <div className="bg-[#FFA94D] text-white px-4 py-2 rounded-full text-sm font-semibold">
@@ -360,29 +369,29 @@ export default function HomeClean() {
                 </div>
                 
                 <ul className="space-y-3 mb-8">
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
                       <span className="text-[#3C5BFA] text-xs">✓</span>
                     </div>
                     <span className="text-white">Até 5 serviços ativos</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
                       <span className="text-[#3C5BFA] text-xs">✓</span>
                     </div>
-                    <span className="text-white">Prioridade no ranking de busca</span>
+                    <span className="text-white">Prioridade no ranking</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
                       <span className="text-[#3C5BFA] text-xs">✓</span>
                     </div>
-                    <span className="text-white">Métricas básicas (visitas, contatos)</span>
+                    <span className="text-white">Métricas básicas</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
                       <span className="text-[#3C5BFA] text-xs">✓</span>
                     </div>
-                    <span className="text-white">Suporte via chat comercial</span>
+                    <span className="text-white">Suporte via chat</span>
                   </li>
                 </ul>
                 
@@ -400,35 +409,29 @@ export default function HomeClean() {
                 </div>
                 
                 <ul className="space-y-3 mb-8">
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Serviços ilimitados</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Destaque nas categorias</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
-                    <span className="text-gray-700">Painel completo de performance</span>
+                    <span className="text-gray-700">Painel completo</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
-                    <span className="text-gray-700">Agendamento com cliente</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-white text-xs">✓</span>
-                    </div>
-                    <span className="text-gray-700">Suporte prioritário + grupo WhatsApp</span>
+                    <span className="text-gray-700">Suporte prioritário</span>
                   </li>
                 </ul>
                 
@@ -437,12 +440,19 @@ export default function HomeClean() {
                 </Button>
               </div>
             </div>
+          </div>
           )}
 
           {/* Contratantes Plans */}
           {activeUserType === 'contratantes' && (
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {/* Descubra */}
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold text-black mb-2">Para Contratantes</h3>
+              <p className="text-gray-600">Organize eventos incríveis encontrando os melhores prestadores</p>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {/* Descubra - Gratuito */}
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
                 <div className="text-center mb-8">
                   <h4 className="text-xl font-bold text-black mb-2">Descubra</h4>
@@ -451,26 +461,26 @@ export default function HomeClean() {
                 </div>
                 
                 <ul className="space-y-3 mb-8">
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Busca ilimitada</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Favoritar perfis</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Avaliar prestadores</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Histórico básico</span>
@@ -482,7 +492,7 @@ export default function HomeClean() {
                 </Button>
               </div>
 
-              {/* Conecta */}
+              {/* Conecta - Recomendado */}
               <div className="bg-[#3C5BFA] rounded-2xl p-8 shadow-lg relative">
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                   <div className="bg-[#FFA94D] text-white px-4 py-2 rounded-full text-sm font-semibold">
@@ -497,26 +507,26 @@ export default function HomeClean() {
                 </div>
                 
                 <ul className="space-y-3 mb-8">
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
                       <span className="text-[#3C5BFA] text-xs">✓</span>
                     </div>
-                    <span className="text-white">Contato direto sem limite</span>
+                    <span className="text-white">Contato direto ilimitado</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
                       <span className="text-[#3C5BFA] text-xs">✓</span>
                     </div>
                     <span className="text-white">Briefings personalizados</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
                       <span className="text-[#3C5BFA] text-xs">✓</span>
                     </div>
                     <span className="text-white">Agendamento e lembretes</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
                       <span className="text-[#3C5BFA] text-xs">✓</span>
                     </div>
                     <span className="text-white">Suporte via chat</span>
@@ -537,29 +547,29 @@ export default function HomeClean() {
                 </div>
                 
                 <ul className="space-y-3 mb-8">
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
-                    <span className="text-gray-700">Histórico completo com exportação</span>
+                    <span className="text-gray-700">Histórico completo</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Requisições múltiplas</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Dashboard de controle</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
-                    <span className="text-gray-700">Suporte premium + atendimento exclusivo</span>
+                    <span className="text-gray-700">Suporte premium</span>
                   </li>
                 </ul>
                 
@@ -568,12 +578,19 @@ export default function HomeClean() {
                 </Button>
               </div>
             </div>
+          </div>
           )}
 
           {/* Anunciantes Plans */}
           {activeUserType === 'anunciantes' && (
+          <div>
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold text-black mb-2">Para Anunciantes de Espaços</h3>
+              <p className="text-gray-600">Divulgue seu espaço e receba solicitações de aluguel</p>
+            </div>
+            
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {/* Divulgue */}
+              {/* Divulgue - Gratuito */}
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
                 <div className="text-center mb-8">
                   <h4 className="text-xl font-bold text-black mb-2">Divulgue</h4>
@@ -582,35 +599,29 @@ export default function HomeClean() {
                 </div>
                 
                 <ul className="space-y-3 mb-8">
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
-                    <span className="text-gray-700">Cadastro de 1 local com fotos</span>
+                    <span className="text-gray-700">Cadastro de 1 local</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
-                    <span className="text-gray-700">Aparecimento no diretório básico</span>
+                    <span className="text-gray-700">Diretório básico</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
-                    <span className="text-gray-700">Até 3 leads por mês</span>
+                    <span className="text-gray-700">Até 3 leads/mês</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Estatísticas simples</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-white text-xs">✓</span>
-                    </div>
-                    <span className="text-gray-700">Visibilidade geográfica limitada</span>
                   </li>
                 </ul>
                 
@@ -619,7 +630,7 @@ export default function HomeClean() {
                 </Button>
               </div>
 
-              {/* Alcance */}
+              {/* Alcance - Recomendado */}
               <div className="bg-[#3C5BFA] rounded-2xl p-8 shadow-lg relative">
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                   <div className="bg-[#FFA94D] text-white px-4 py-2 rounded-full text-sm font-semibold">
@@ -634,33 +645,27 @@ export default function HomeClean() {
                 </div>
                 
                 <ul className="space-y-3 mb-8">
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
                       <span className="text-[#3C5BFA] text-xs">✓</span>
                     </div>
-                    <span className="text-white">Cadastro de até 5 locais</span>
+                    <span className="text-white">Até 5 locais</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
                       <span className="text-[#3C5BFA] text-xs">✓</span>
                     </div>
-                    <span className="text-white">Destaque intermediário nas buscas</span>
+                    <span className="text-white">Destaque nas buscas</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
                       <span className="text-[#3C5BFA] text-xs">✓</span>
                     </div>
                     <span className="text-white">Leads ilimitados</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
                       <span className="text-[#3C5BFA] text-xs">✓</span>
-                    </div>
-                    <span className="text-white">Visibilidade segmentada por categoria</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-white">Estatísticas completas</span>
                   </li>
@@ -680,35 +685,29 @@ export default function HomeClean() {
                 </div>
                 
                 <ul className="space-y-3 mb-8">
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Locais ilimitados</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
-                    <span className="text-gray-700">Posição de destaque + selo</span>
+                    <span className="text-gray-700">Selo 'Destaque'</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-white text-xs">✓</span>
-                    </div>
-                    <span className="text-gray-700">Exibição em páginas de eventos</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <span className="text-gray-700">Vídeos e tours virtuais</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white text-xs">✓</span>
                     </div>
-                    <span className="text-gray-700">Suporte prioritário + consultoria</span>
+                    <span className="text-gray-700">Consultoria mensal</span>
                   </li>
                 </ul>
                 
@@ -717,6 +716,7 @@ export default function HomeClean() {
                 </Button>
               </div>
             </div>
+          </div>
           )}
         </div>
       </section>
