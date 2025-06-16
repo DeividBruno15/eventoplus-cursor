@@ -54,13 +54,16 @@ passport.deserializeUser(async (id: number, done) => {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Trust proxy for Replit environment
+  app.set('trust proxy', 1);
+
   // Session configuration
   app.use(session({
     secret: process.env.SESSION_SECRET || 'evento-plus-session-secret-key-2025',
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Set to false for Replit development
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
@@ -75,7 +78,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || "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";
   const replatDomain = process.env.REPLIT_DEV_DOMAIN || "d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev";
   
-  // Always use HTTPS for Replit domains (Google OAuth requires HTTPS)
+  // Use HTTPS for callback URL as required by Google OAuth
   const callbackURL = `https://${replatDomain}/auth/google/callback`;
   
   console.log("=== Google OAuth Configuration ===");
@@ -181,18 +184,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Google OAuth routes with HTTPS enforcement
+  // Google OAuth routes
   app.get("/auth/google", (req, res, next) => {
     console.log("=== Starting Google OAuth ===");
     console.log("Request URL:", `${req.protocol}://${req.get('host')}${req.originalUrl}`);
-    
-    // Force HTTPS for Google OAuth on Replit
-    if (req.get('host')?.includes('replit.dev') && req.protocol !== 'https') {
-      console.log("Redirecting to HTTPS for Google OAuth");
-      return res.redirect(`https://${req.get('host')}${req.originalUrl}`);
-    }
-    
-    console.log("Proceeding with Google OAuth authentication...");
     
     passport.authenticate("google", {
       scope: ["profile", "email"]

@@ -1,0 +1,219 @@
+
+> rest-express@1.0.0 dev
+=== Google OAuth Configuration ===index.ts
+Client ID: 190052814958-tsi43i1...
+Callback URL: https://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google/callback
+Domain: d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev
+7:26:39 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 8 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+7:26:43 PM [express] GET /api/user 401 in 2ms :: {"message":"Não autenticado"}
+7:26:56 PM [express] GET /api/user 401 in 1ms :: {"message":"Não autenticado"}
+7:26:58 PM [express] GET /api/user 401 in 1ms :: {"message":"Não autenticado"}
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+7:27:26 PM [express] GET /api/user 401 in 1ms :: {"message":"Não autenticado"}
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+=== Starting Google OAuth ===
+Request URL: http://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google
+Redirecting to HTTPS for Google OAuth
+^A
