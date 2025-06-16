@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
+import Layout from "@/components/layout/layout";
 import Home from "@/pages/home";
 import Login from "@/pages/auth/login";
 import Register from "@/pages/auth/register";
@@ -24,68 +25,70 @@ import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
-      <Route path="/select-user-type" component={SelectUserType} />
-      <Route path="/pricing" component={Pricing} />
-      
-      {/* Protected Routes */}
-      <Route path="/dashboard">
-        <AuthGuard>
-          <Dashboard />
-        </AuthGuard>
-      </Route>
-      <Route path="/events">
-        <AuthGuard>
-          <Events />
-        </AuthGuard>
-      </Route>
-      <Route path="/events/create">
-        <AuthGuard>
-          <CreateEvent />
-        </AuthGuard>
-      </Route>
-      <Route path="/events/:id">
-        <AuthGuard>
-          <EventDetail />
-        </AuthGuard>
-      </Route>
-      <Route path="/services">
-        <AuthGuard>
-          <Services />
-        </AuthGuard>
-      </Route>
-      <Route path="/venues">
-        <AuthGuard>
-          <Venues />
-        </AuthGuard>
-      </Route>
-      <Route path="/analytics">
-        <AuthGuard>
-          <Analytics />
-        </AuthGuard>
-      </Route>
-      <Route path="/chat">
-        <AuthGuard>
-          <Chat />
-        </AuthGuard>
-      </Route>
-      <Route path="/subscribe">
-        <AuthGuard>
-          <Subscribe />
-        </AuthGuard>
-      </Route>
-      <Route path="/subscription">
-        <AuthGuard>
-          <SubscriptionManagement />
-        </AuthGuard>
-      </Route>
-      
-      {/* Fallback to 404 */}
-      <Route component={NotFound} />
-    </Switch>
+    <Layout>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <Route path="/select-user-type" component={SelectUserType} />
+        <Route path="/pricing" component={Pricing} />
+        
+        {/* Protected Routes */}
+        <Route path="/dashboard">
+          <AuthGuard>
+            <Dashboard />
+          </AuthGuard>
+        </Route>
+        <Route path="/events">
+          <AuthGuard>
+            <Events />
+          </AuthGuard>
+        </Route>
+        <Route path="/events/create">
+          <AuthGuard>
+            <CreateEvent />
+          </AuthGuard>
+        </Route>
+        <Route path="/events/:id">
+          <AuthGuard>
+            <EventDetail />
+          </AuthGuard>
+        </Route>
+        <Route path="/services">
+          <AuthGuard>
+            <Services />
+          </AuthGuard>
+        </Route>
+        <Route path="/venues">
+          <AuthGuard>
+            <Venues />
+          </AuthGuard>
+        </Route>
+        <Route path="/analytics">
+          <AuthGuard>
+            <Analytics />
+          </AuthGuard>
+        </Route>
+        <Route path="/chat">
+          <AuthGuard>
+            <Chat />
+          </AuthGuard>
+        </Route>
+        <Route path="/subscribe">
+          <AuthGuard>
+            <Subscribe />
+          </AuthGuard>
+        </Route>
+        <Route path="/subscription">
+          <AuthGuard>
+            <SubscriptionManagement />
+          </AuthGuard>
+        </Route>
+        
+        {/* Fallback to 404 */}
+        <Route component={NotFound} />
+      </Switch>
+    </Layout>
   );
 }
 
