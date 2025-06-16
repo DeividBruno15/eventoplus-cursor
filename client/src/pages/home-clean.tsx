@@ -74,43 +74,6 @@ export default function HomeClean() {
                 Ver demonstração
               </Button>
             </div>
-
-            {/* Hero Image/Cards */}
-            <div className="relative max-w-4xl mx-auto">
-              <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100">
-                <div className="grid md:grid-cols-3 gap-6">
-                  <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="w-12 h-12 bg-[#3C5BFA] rounded-xl flex items-center justify-center mb-4">
-                        <Calendar className="w-6 h-6 text-white" />
-                      </div>
-                      <h3 className="font-semibold text-black mb-2">Organize</h3>
-                      <p className="text-gray-600 text-sm">Crie e gerencie eventos com facilidade</p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="w-12 h-12 bg-[#FFA94D] rounded-xl flex items-center justify-center mb-4">
-                        <Users className="w-6 h-6 text-white" />
-                      </div>
-                      <h3 className="font-semibold text-black mb-2">Conecte</h3>
-                      <p className="text-gray-600 text-sm">Encontre prestadores qualificados</p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mb-4">
-                        <Zap className="w-6 h-6 text-white" />
-                      </div>
-                      <h3 className="font-semibold text-black mb-2">Execute</h3>
-                      <p className="text-gray-600 text-sm">Realize eventos incríveis</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -187,7 +150,7 @@ export default function HomeClean() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-black mb-6">
-              Todo para seu evento perfeito
+              Tudo para seu evento perfeito
             </h2>
           </div>
 
