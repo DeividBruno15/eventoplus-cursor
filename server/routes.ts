@@ -56,9 +56,26 @@ passport.deserializeUser(async (id: number, done) => {
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Configure Google OAuth strategy - using hardcoded values for now since env vars not loading
-  const googleClientId = "190052814958-tsi43i10m25irafgqvn7hnqike3f3eql.apps.googleusercontent.com";
-  const googleClientSecret = "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";
+  // Session configuration
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key-here',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+  }));
+
+  // Initialize Passport
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  // Configure Google OAuth strategy
+  const googleClientId = process.env.GOOGLE_CLIENT_ID || "190052814958-tsi43i10m25irafgqvn7hnqike3f3eql.apps.googleusercontent.com";
+  const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || "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";
+  
+  console.log("Configuring Google OAuth with Client ID:", googleClientId);
   
   if (googleClientId && googleClientSecret) {
     passport.use(
@@ -66,15 +83,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         {
           clientID: googleClientId,
           clientSecret: googleClientSecret,
-          callbackURL: "https://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google/callback"
+          callbackURL: `https://${process.env.REPLIT_DEV_DOMAIN}/auth/google/callback`
         },
         async (accessToken, refreshToken, profile, done) => {
           try {
+            console.log("Google OAuth callback received, processing profile:", profile.id);
             const email = profile.emails?.[0]?.value;
             if (!email) {
+              console.error("No email found in Google profile");
               return done(new Error("No email found in Google profile"));
             }
 
+            console.log("Processing Google login for email:", email);
             // Check if user already exists
             let user = await storage.getUserByEmail(email);
             
@@ -100,19 +120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     );
   }
 
-  // Session middleware
-  app.use(session({
-    secret: process.env.SESSION_SECRET || 'dev-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
-  }));
 
-  app.use(passport.initialize());
-  app.use(passport.session());
 
   // Auth routes
   app.post("/api/register", async (req, res) => {
