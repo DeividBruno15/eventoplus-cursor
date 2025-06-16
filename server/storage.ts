@@ -1,3 +1,6 @@
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { eq, and, or } from "drizzle-orm";
 import { 
   users, 
   events, 
@@ -21,6 +24,9 @@ import {
   type Review,
   type InsertReview
 } from "@shared/schema";
+
+const client = postgres(process.env.DATABASE_URL!);
+const db = drizzle(client);
 
 export interface IStorage {
   // Users
@@ -58,203 +64,163 @@ export interface IStorage {
   createReview(review: InsertReview): Promise<Review>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private events: Map<number, Event>;
-  private eventApplications: Map<number, EventApplication>;
-  private services: Map<number, Service>;
-  private venues: Map<number, Venue>;
-  private chatMessages: Map<number, ChatMessage>;
-  private reviews: Map<number, Review>;
-  private currentId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.events = new Map();
-    this.eventApplications = new Map();
-    this.services = new Map();
-    this.venues = new Map();
-    this.chatMessages = new Map();
-    this.reviews = new Map();
-    this.currentId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
   // Users
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.email === email);
+    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    return result[0];
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user: User = { 
-      ...insertUser, 
-      id,
-      planType: "free",
-      createdAt: new Date(),
-      stripeCustomerId: null,
-      stripeSubscriptionId: null,
-    };
-    this.users.set(id, user);
-    return user;
+    const result = await db.insert(users).values({
+      ...insertUser,
+      planType: "free"
+    }).returning();
+    return result[0];
   }
 
   async updateStripeCustomerId(userId: number, customerId: string): Promise<User> {
-    const user = this.users.get(userId);
-    if (!user) throw new Error("User not found");
+    const result = await db.update(users)
+      .set({ stripeCustomerId: customerId })
+      .where(eq(users.id, userId))
+      .returning();
     
-    const updatedUser = { ...user, stripeCustomerId: customerId };
-    this.users.set(userId, updatedUser);
-    return updatedUser;
+    if (!result[0]) throw new Error("User not found");
+    return result[0];
   }
 
   async updateUserStripeInfo(userId: number, customerId: string, subscriptionId: string): Promise<User> {
-    const user = this.users.get(userId);
-    if (!user) throw new Error("User not found");
+    const result = await db.update(users)
+      .set({ 
+        stripeCustomerId: customerId,
+        stripeSubscriptionId: subscriptionId,
+        planType: "professional"
+      })
+      .where(eq(users.id, userId))
+      .returning();
     
-    const updatedUser = { 
-      ...user, 
-      stripeCustomerId: customerId,
-      stripeSubscriptionId: subscriptionId,
-      planType: "professional"
-    };
-    this.users.set(userId, updatedUser);
-    return updatedUser;
+    if (!result[0]) throw new Error("User not found");
+    return result[0];
   }
 
   // Events
   async getEvents(): Promise<Event[]> {
-    return Array.from(this.events.values());
+    return await db.select().from(events);
   }
 
   async getEvent(id: number): Promise<Event | undefined> {
-    return this.events.get(id);
+    const result = await db.select().from(events).where(eq(events.id, id)).limit(1);
+    return result[0];
   }
 
   async createEvent(eventData: InsertEvent & { organizerId: number }): Promise<Event> {
-    const id = this.currentId++;
-    const event: Event = {
+    const result = await db.insert(events).values({
       ...eventData,
-      id,
-      status: "active",
-      createdAt: new Date(),
-    };
-    this.events.set(id, event);
-    return event;
+      status: "active"
+    }).returning();
+    return result[0];
   }
 
   async updateEvent(id: number, eventData: Partial<Event>): Promise<Event> {
-    const event = this.events.get(id);
-    if (!event) throw new Error("Event not found");
+    const result = await db.update(events)
+      .set(eventData)
+      .where(eq(events.id, id))
+      .returning();
     
-    const updatedEvent = { ...event, ...eventData };
-    this.events.set(id, updatedEvent);
-    return updatedEvent;
+    if (!result[0]) throw new Error("Event not found");
+    return result[0];
   }
 
   // Event Applications
   async getEventApplications(eventId: number): Promise<EventApplication[]> {
-    return Array.from(this.eventApplications.values()).filter(app => app.eventId === eventId);
+    return await db.select().from(eventApplications).where(eq(eventApplications.eventId, eventId));
   }
 
   async createEventApplication(applicationData: InsertEventApplication): Promise<EventApplication> {
-    const id = this.currentId++;
-    const application: EventApplication = {
+    const result = await db.insert(eventApplications).values({
       ...applicationData,
-      id,
-      status: "pending",
-      createdAt: new Date(),
-    };
-    this.eventApplications.set(id, application);
-    return application;
+      status: "pending"
+    }).returning();
+    return result[0];
   }
 
   async updateEventApplication(id: number, applicationData: Partial<EventApplication>): Promise<EventApplication> {
-    const application = this.eventApplications.get(id);
-    if (!application) throw new Error("Application not found");
+    const result = await db.update(eventApplications)
+      .set(applicationData)
+      .where(eq(eventApplications.id, id))
+      .returning();
     
-    const updatedApplication = { ...application, ...applicationData };
-    this.eventApplications.set(id, updatedApplication);
-    return updatedApplication;
+    if (!result[0]) throw new Error("Application not found");
+    return result[0];
   }
 
   // Services
   async getServices(providerId?: number): Promise<Service[]> {
-    const allServices = Array.from(this.services.values());
-    return providerId 
-      ? allServices.filter(service => service.providerId === providerId)
-      : allServices;
+    if (providerId) {
+      return await db.select().from(services).where(eq(services.providerId, providerId));
+    }
+    return await db.select().from(services);
   }
 
   async createService(serviceData: InsertService & { providerId: number }): Promise<Service> {
-    const id = this.currentId++;
-    const service: Service = {
+    const result = await db.insert(services).values({
       ...serviceData,
-      id,
-      active: true,
-      createdAt: new Date(),
-    };
-    this.services.set(id, service);
-    return service;
+      active: true
+    }).returning();
+    return result[0];
   }
 
   // Venues
   async getVenues(ownerId?: number): Promise<Venue[]> {
-    const allVenues = Array.from(this.venues.values());
-    return ownerId 
-      ? allVenues.filter(venue => venue.ownerId === ownerId)
-      : allVenues;
+    if (ownerId) {
+      return await db.select().from(venues).where(eq(venues.ownerId, ownerId));
+    }
+    return await db.select().from(venues);
   }
 
   async createVenue(venueData: InsertVenue & { ownerId: number }): Promise<Venue> {
-    const id = this.currentId++;
-    const venue: Venue = {
+    const result = await db.insert(venues).values({
       ...venueData,
-      id,
-      active: true,
-      createdAt: new Date(),
-    };
-    this.venues.set(id, venue);
-    return venue;
+      active: true
+    }).returning();
+    return result[0];
   }
 
   // Chat Messages
   async getChatMessages(senderId: number, receiverId: number): Promise<ChatMessage[]> {
-    return Array.from(this.chatMessages.values()).filter(
-      msg => (msg.senderId === senderId && msg.receiverId === receiverId) ||
-             (msg.senderId === receiverId && msg.receiverId === senderId)
+    return await db.select().from(chatMessages).where(
+      or(
+        and(
+          eq(chatMessages.senderId, senderId),
+          eq(chatMessages.receiverId, receiverId)
+        ),
+        and(
+          eq(chatMessages.senderId, receiverId),
+          eq(chatMessages.receiverId, senderId)
+        )
+      )
     );
   }
 
   async createChatMessage(messageData: InsertChatMessage): Promise<ChatMessage> {
-    const id = this.currentId++;
-    const message: ChatMessage = {
-      ...messageData,
-      id,
-      createdAt: new Date(),
-    };
-    this.chatMessages.set(id, message);
-    return message;
+    const result = await db.insert(chatMessages).values(messageData).returning();
+    return result[0];
   }
 
   // Reviews
   async getReviews(reviewedId: number): Promise<Review[]> {
-    return Array.from(this.reviews.values()).filter(review => review.reviewedId === reviewedId);
+    return await db.select().from(reviews).where(eq(reviews.reviewedId, reviewedId));
   }
 
   async createReview(reviewData: InsertReview): Promise<Review> {
-    const id = this.currentId++;
-    const review: Review = {
-      ...reviewData,
-      id,
-      createdAt: new Date(),
-    };
-    this.reviews.set(id, review);
-    return review;
+    const result = await db.insert(reviews).values(reviewData).returning();
+    return result[0];
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
