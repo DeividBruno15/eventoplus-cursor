@@ -70,10 +70,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Configure Google OAuth strategy with error handling
+  // Configure Google OAuth strategy with protocol detection
   const googleClientId = process.env.GOOGLE_CLIENT_ID || "190052814958-tsi43i10m25irafgqvn7hnqike3f3eql.apps.googleusercontent.com";
   const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || "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";
   const replatDomain = process.env.REPLIT_DEV_DOMAIN || "d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev";
+  
+  // Always use HTTPS for Replit domains (Google OAuth requires HTTPS)
   const callbackURL = `https://${replatDomain}/auth/google/callback`;
   
   console.log("=== Google OAuth Configuration ===");
@@ -122,11 +124,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           console.log("New user created successfully:", newUser.email);
           return done(null, newUser);
-        } catch (error) {
+        } catch (error: any) {
           console.error("=== Google OAuth Strategy Error ===");
-          console.error("Error type:", error.constructor.name);
-          console.error("Error message:", error.message);
-          console.error("Full error:", error);
+          console.error("Error:", error);
           return done(error);
         }
       }
@@ -181,15 +181,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Google OAuth routes
+  // Google OAuth routes with HTTPS enforcement
   app.get("/auth/google", (req, res, next) => {
     console.log("=== Starting Google OAuth ===");
     console.log("Request URL:", `${req.protocol}://${req.get('host')}${req.originalUrl}`);
-    console.log("User Agent:", req.get('User-Agent'));
-    console.log("Referer:", req.get('Referer'));
     
-    // Test if Google strategy is properly configured
-    console.log("Google strategy configured, proceeding with authentication...");
+    // Force HTTPS for Google OAuth on Replit
+    if (req.get('host')?.includes('replit.dev') && req.protocol !== 'https') {
+      console.log("Redirecting to HTTPS for Google OAuth");
+      return res.redirect(`https://${req.get('host')}${req.originalUrl}`);
+    }
+    
+    console.log("Proceeding with Google OAuth authentication...");
     
     passport.authenticate("google", {
       scope: ["profile", "email"]
