@@ -1,0 +1,82 @@
+Planos para Prestadores de Serviços
+1. Essencial (Gratuito)
+Preço: R$ 0,00/mês
+Funcionalidades:
+Perfil público básico
+1 serviço ativo
+Suporte via FAQ
+Avaliações de clientes
+Acesso limitado às oportunidades
+2. Profissional (Recomendado)
+Preço: R$ 14,90/mês
+Funcionalidades:
+Até 5 serviços ativos
+Prioridade no ranking de busca
+Métricas básicas (visitas, contatos)
+Suporte via chat comercial
+3. Premium
+Preço: R$ 29,90/mês
+Funcionalidades:
+Serviços ilimitados
+Destaque nas categorias
+Painel completo de performance
+Agendamento com cliente
+Suporte prioritário + grupo exclusivo no WhatsApp
+Planos para Contratantes
+1. Descubra (Gratuito)
+Preço: R$ 0,00/mês
+Funcionalidades:
+Busca ilimitada
+Favoritar perfis
+Avaliar prestadores
+Histórico básico
+2. Conecta (Recomendado)
+Preço: R$ 14,90/mês
+Funcionalidades:
+Contato direto sem limite
+Briefings personalizados
+Agendamento e lembretes
+Suporte via chat
+3. Gestão
+Preço: R$ 29,90/mês
+Funcionalidades:
+Histórico completo com exportação
+Requisições múltiplas
+Dashboard de controle
+Suporte premium + atendimento exclusivo
+Planos para Anunciantes de Espaços
+1. Divulgue (Gratuito)
+Preço: R$ 0,00/mês
+Funcionalidades:
+Cadastro de 1 local com fotos, descrição e localização
+Aparecimento no diretório básico de locais
+Recebimento de até 3 leads por mês
+Estatísticas simples (visualizações do local)
+Visibilidade geográfica limitada (prioriza buscas locais)
+2. Alcance (Recomendado)
+Preço: R$ 14,90/mês
+Funcionalidades:
+Cadastro de até 5 locais
+Destaque intermediário nas buscas por espaço
+Leads ilimitados (via formulário ou contato direto)
+Visibilidade segmentada por categoria de evento
+Estatísticas completas (cliques, leads e perfil de quem visualizou)
+Suporte via e-mail
+3. Vitrine
+Preço: R$ 29,90/mês
+Funcionalidades:
+Locais ilimitados
+Posição de destaque nas buscas com selo 'Espaço em destaque'
+Exibição em páginas de eventos compatíveis
+Adição de vídeos e tours virtuais no perfil do local
+Insights de comportamento dos organizadores (quem viu, clicou, etc)
+Suporte prioritário + consultoria mensal de otimização
+Características Gerais
+Período de cobrança: Mensal
+Moeda: Real (BRL)
+Pagamento: Stripe (cartão de crédito)
+Cancelamento: A qualquer momento
+Upgrade/Downgrade: Imediato
+Plano gratuito: Disponível para todos os tipos de usuário
+Plano recomendado: Sempre o plano intermediário de cada categoria
+Os planos são específicos para cada tipo de usuário e não há planos híbridos. Cada usuário deve escolher o plano adequado ao seu perfil (Prestador, Contratante ou Anunciante) definido durante o onboarding.

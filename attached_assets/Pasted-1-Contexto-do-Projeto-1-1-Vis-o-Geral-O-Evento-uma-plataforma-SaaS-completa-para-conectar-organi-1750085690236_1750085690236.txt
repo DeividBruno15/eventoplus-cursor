@@ -1,0 +1,227 @@
+1. Contexto do Projeto
+1.1 Visão Geral
+O Evento+ é uma plataforma SaaS completa para conectar organizadores de eventos com prestadores de serviços e proprietários de espaços. A plataforma atua como um marketplace que facilita a descoberta, contratação e gestão de todos os elementos necessários para a realização de eventos.
+
+1.2 Justificativa
+O mercado de eventos enfrenta desafios de fragmentação, onde organizadores têm dificuldade em encontrar e contratar prestadores qualificados, enquanto fornecedores lutam para alcançar seu público-alvo. A plataforma resolve essa lacuna criando um ecossistema integrado.
+
+1.3 Tecnologias Utilizadas
+Frontend: React.js com TypeScript
+Backend: Supabase (PostgreSQL + Edge Functions)
+Autenticação: Supabase Auth
+Pagamentos: Stripe
+UI/UX: Tailwind CSS + shadcn/ui
+Comunicação: Sistema de chat em tempo real
+Notificações: WhatsApp + Push notifications
+2. Objetivo Principal
+2.1 Problema
+Dificuldade dos organizadores em encontrar prestadores qualificados
+Falta de visibilidade dos prestadores de serviços
+Processo manual e fragmentado de cotação e contratação
+Ausência de ferramenta centralizada para gestão de eventos
+2.2 Solução
+Plataforma que centraliza todo o ecossistema de eventos, oferecendo:
+
+Descoberta inteligente de prestadores e espaços
+Sistema de cotações automatizado
+Gestão completa do ciclo de vida dos eventos
+Comunicação integrada entre todos os stakeholders
+2.3 Impacto Esperado
+Redução em 60% do tempo de planejamento de eventos
+Aumento de 40% na eficiência de contratações
+Crescimento de 200% na visibilidade dos prestadores
+Melhoria na qualidade e satisfação dos eventos
+3. Público-Alvo
+3.1 Personas Primárias
+3.1.1 Contratantes/Organizadores
+Perfil: Empresas, agências de eventos, pessoas físicas
+Necessidades: Encontrar prestadores, gerenciar eventos, controlar orçamentos
+Dores: Tempo gasto em pesquisa, dificuldade de comparação, falta de garantias
+3.1.2 Prestadores de Serviços
+Perfil: Fotógrafos, músicos, decoradores, buffets, etc.
+Necessidades: Visibilidade, leads qualificados, gestão de propostas
+Dores: Baixa visibilidade, concorrência desleal, gestão manual
+3.1.3 Anunciantes de Espaços
+Perfil: Proprietários de salões, espaços corporativos, venues
+Necessidades: Ocupação máxima, gestão de reservas, marketing
+Dores: Sazonalidade, gestão manual de agenda, baixa ocupação
+4. Escopo Funcional
+4.1 Módulo de Autenticação e Onboarding
+Sistema de registro com múltiplos perfis
+Onboarding personalizado por tipo de usuário
+Verificação de email e documentos
+Integração com Google OAuth
+4.2 Módulo de Perfis e Empresas
+Criação e gestão de perfis detalhados
+Sistema de empresas/portfolios
+Upload de documentos e certificações
+Avaliações e ratings
+4.3 Módulo de Eventos
+Criação e publicação de eventos
+Sistema de candidaturas e aplicações
+Gestão de aprovações/rejeições
+Timeline e marcos do evento
+4.4 Módulo de Espaços/Venues
+Cadastro de espaços com galeria
+Sistema de reservas e disponibilidade
+Filtros avançados por localização e características
+Visualização em mapa
+4.5 Módulo de Comunicação
+Chat em tempo real entre usuários
+Notificações push e por email
+Integração com WhatsApp
+Histórico de conversas
+4.6 Módulo de Pagamentos
+Múltiplos planos de assinatura
+Processamento via Stripe
+Sistema de reembolsos
+Histórico financeiro
+4.7 Dashboard e Analytics
+Dashboard personalizado por perfil
+Métricas de performance
+Relatórios de atividade
+Insights de mercado
+5. Regras de Negócio
+5.1 Regras de Acesso
+Usuários devem completar onboarding obrigatório
+Perfis incompletos têm funcionalidades limitadas
+Verificação de documentos para prestadores profissionais
+5.2 Regras de Negociação
+Contratantes podem solicitar múltiplas cotações
+Prestadores podem se candidatar a eventos compatíveis
+Sistema de aprovação/rejeição transparente
+5.3 Regras de Pagamento
+Planos diferenciados por tipo de usuário
+Período de teste gratuito
+Cancelamento e reembolso conforme política
+5.4 Regras de Qualidade
+Sistema de avaliações obrigatório pós-evento
+Moderação de conteúdo inadequado
+Penalidades por comportamento inadequado
+5.5 Regras de Comunicação
+Chat disponível apenas após aprovação mútua
+Notificações configuráveis por usuário
+Privacidade e proteção de dados
+6. Fluxos de Uso (User Flows)
+6.1 Fluxo de Registro - Contratante
+Acessa página inicial → Clica "Cadastrar"
+Modal de onboarding → Seleciona "Contratante"
+Preenche dados básicos → Confirma email
+Completa perfil → Acessa dashboard
+Pode criar primeiro evento
+6.2 Fluxo de Registro - Prestador
+Acessa página inicial → Clica "Cadastrar"
+Modal de onboarding → Seleciona "Prestador"
+Preenche dados → Seleciona serviços oferecidos
+Confirma email → Completa portfolio
+Pode se candidatar a eventos
+6.3 Fluxo de Criação de Evento
+Dashboard → "Criar Evento"
+Preenche informações básicas
+Seleciona categoria de serviços
+Define localização e orçamento
+Publica evento → Recebe candidaturas
+6.4 Fluxo de Candidatura - Prestador
+Navega eventos disponíveis
+Filtra por categoria/localização
+Visualiza detalhes do evento
+Envia proposta com valores
+Aguarda aprovação/negociação
+6.5 Fluxo de Aprovação - Contratante
+Recebe notificação de candidatura
+Analisa perfil do prestador
+Compara propostas recebidas
+Aprova candidatura preferida
+Inicia conversa para detalhes
+6.6 Fluxo de Reserva de Espaço
+Acessa página de venues
+Filtra por localização/características
+Visualiza galeria e informações
+Verifica disponibilidade
+Solicita reserva → Confirma pagamento
+7. Critérios de Aceite
+7.1 Funcionalidades Core
+✅ Sistema de autenticação completo
+✅ Onboarding personalizado por perfil
+✅ CRUD completo de eventos
+✅ Sistema de candidaturas funcionando
+✅ Chat em tempo real operacional
+✅ Pagamentos Stripe integrados
+7.2 Performance
+Tempo de carregamento < 3 segundos
+Responsividade em todas as telas
+Funcionalidade offline básica
+99.9% de uptime
+7.3 Usabilidade
+Interface intuitiva sem necessidade de treinamento
+Fluxos completos em máximo 5 cliques
+Feedback visual em todas as ações
+Acessibilidade WCAG 2.1 AA
+7.4 Segurança
+Autenticação robusta
+Dados criptografados
+Conformidade LGPD
+Backup automático
+8. Restrições e Dependências
+8.1 Restrições Técnicas
+Dependência do Supabase para backend
+Limitações de upload do Stripe
+Capacidade de storage para imagens
+Rate limits das APIs externas
+8.2 Restrições de Negócio
+Regulamentações locais para eventos
+Políticas de pagamento
+Questões tributárias por região
+Sazonalidade do mercado de eventos
+8.3 Dependências Externas
+API do Google Maps
+Serviços de WhatsApp Business
+Gateway de pagamento Stripe
+Serviços de email transacional
+8.4 Recursos Humanos
+Equipe de desenvolvimento dedicada
+Suporte ao cliente especializado
+Moderação de conteúdo
+Marketing digital
+9. Métricas de Sucesso
+9.1 Métricas de Produto
+MAU (Monthly Active Users): Meta 10.000 usuários/mês
+Retenção: 70% em 30 dias, 40% em 90 dias
+NPS: Score acima de 50
+Time to Value: Primeira ação em < 10 minutos
+9.2 Métricas de Negócio
+Revenue per User: R$ 150/mês por usuário premium
+Conversion Rate: 15% freemium → premium
+Churn Rate: < 5% mensal
+LTV/CAC: Razão > 3:1
+9.3 Métricas Operacionais
+Eventos criados: 1.000/mês
+Matches realizados: 500/mês
+Satisfação pós-evento: > 4.5/5
+Tempo médio de resposta: < 2 horas
+9.4 Métricas de Qualidade
+Bug rate: < 1% das sessões
+Performance score: > 90 (Lighthouse)
+Disponibilidade: 99.9%
+Segurança: 0 incidentes críticos
+10. Roadmap e Próximos Passos
+10.1 Fase Atual (MVP)
+✅ Core platform funcionando
+✅ Principais user flows implementados
+✅ Sistema de pagamentos ativo
+🔄 Refinamentos de UX/UI
+10.2 Próximos 3 meses
+App mobile (React Native)
+IA para matching inteligente
+Sistema de contratos digitais
+Analytics avançados
+10.3 Próximos 6 meses
+Marketplace de produtos
+Sistema de reviews ampliado
+Integração com redes sociais
+Expansão geográfica
+10.4 Visão de 1 ano
+Ecossistema completo de eventos
+API pública para integrações
+Ferramentas de marketing integradas
+Certificação e qualificação de prestadores
