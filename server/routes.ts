@@ -70,20 +70,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Configure Google OAuth strategy
+  // Configure Google OAuth strategy with error handling
   const googleClientId = process.env.GOOGLE_CLIENT_ID || "190052814958-tsi43i10m25irafgqvn7hnqike3f3eql.apps.googleusercontent.com";
   const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || "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";
   const replatDomain = process.env.REPLIT_DEV_DOMAIN || "d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev";
+  const callbackURL = `https://${replatDomain}/auth/google/callback`;
   
-  console.log("Configuring Google OAuth with Client ID:", googleClientId);
-  console.log("Callback URL:", `https://${replatDomain}/auth/google/callback`);
+  console.log("=== Google OAuth Configuration ===");
+  console.log("Client ID:", googleClientId?.substring(0, 20) + "...");
+  console.log("Callback URL:", callbackURL);
+  console.log("Domain:", replatDomain);
   
   passport.use(
     new GoogleStrategy(
       {
         clientID: googleClientId,
         clientSecret: googleClientSecret,
-        callbackURL: `https://${replatDomain}/auth/google/callback`
+        callbackURL: callbackURL
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
@@ -174,16 +177,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Google OAuth routes
   app.get("/auth/google", (req, res, next) => {
     console.log("Starting Google OAuth authentication...");
-    passport.authenticate("google", {
-      scope: ["profile", "email"]
-    })(req, res, next);
+    console.log("Full request URL:", `${req.protocol}://${req.get('host')}${req.originalUrl}`);
+    
+    try {
+      passport.authenticate("google", {
+        scope: ["profile", "email"],
+        accessType: 'offline',
+        prompt: 'consent'
+      })(req, res, next);
+    } catch (error) {
+      console.error("Error initiating Google OAuth:", error);
+      res.redirect("/login?error=oauth_init_failed");
+    }
   });
 
   app.get("/auth/google/callback", 
     (req, res, next) => {
       console.log("Google OAuth callback received");
+      console.log("Callback query params:", req.query);
+      console.log("Callback URL:", req.url);
+      
+      // Check for error in callback
+      if (req.query.error) {
+        console.error("Google OAuth error:", req.query.error);
+        console.error("Error description:", req.query.error_description);
+        return res.redirect("/login?error=oauth_failed");
+      }
+      
       passport.authenticate("google", { 
-        failureRedirect: "/login",
+        failureRedirect: "/login?error=auth_failed",
         failureMessage: true 
       })(req, res, next);
     },
