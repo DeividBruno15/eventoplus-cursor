@@ -24,7 +24,9 @@ import Subscribe from "@/pages/subscribe";
 import SubscriptionManagement from "@/pages/subscription-management-simple";
 import Profile from "@/pages/profile";
 import Settings from "@/pages/settings";
-import Search from "@/pages/search";
+import SearchPage from "@/pages/search";
+import Cart from "@/pages/cart";
+import Contracts from "@/pages/contracts";
 import AuthGuard from "@/components/auth/auth-guard";
 import NotFound from "@/pages/not-found";
 
@@ -51,6 +53,30 @@ function Router() {
         <Layout>
           <AuthGuard>
             <Dashboard />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/search">
+        <Layout>
+          <AuthGuard>
+            <SearchPage />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/cart">
+        <Layout>
+          <AuthGuard>
+            <Cart />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/contracts">
+        <Layout>
+          <AuthGuard>
+            <Contracts />
           </AuthGuard>
         </Layout>
       </Route>
