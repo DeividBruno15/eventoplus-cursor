@@ -1,0 +1,144 @@
+import { pgTable, text, serial, integer, boolean, timestamp, decimal, varchar } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  userType: varchar("user_type", { length: 20 }).notNull(), // prestador, contratante, anunciante
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  planType: varchar("plan_type", { length: 20 }).default("free"), // free, professional, premium
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const events = pgTable("events", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  date: timestamp("date").notNull(),
+  location: text("location").notNull(),
+  budget: decimal("budget", { precision: 10, scale: 2 }).notNull(),
+  category: varchar("category", { length: 50 }).notNull(),
+  guestCount: integer("guest_count").notNull(),
+  organizerId: integer("organizer_id").references(() => users.id).notNull(),
+  status: varchar("status", { length: 20 }).default("active"), // active, closed, cancelled
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const eventApplications = pgTable("event_applications", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id").references(() => events.id).notNull(),
+  providerId: integer("provider_id").references(() => users.id).notNull(),
+  proposal: text("proposal").notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  status: varchar("status", { length: 20 }).default("pending"), // pending, approved, rejected
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const services = pgTable("services", {
+  id: serial("id").primaryKey(),
+  providerId: integer("provider_id").references(() => users.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  category: varchar("category", { length: 50 }).notNull(),
+  basePrice: decimal("base_price", { precision: 10, scale: 2 }),
+  active: boolean("active").default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const venues = pgTable("venues", {
+  id: serial("id").primaryKey(),
+  ownerId: integer("owner_id").references(() => users.id).notNull(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  location: text("location").notNull(),
+  capacity: integer("capacity").notNull(),
+  pricePerHour: decimal("price_per_hour", { precision: 10, scale: 2 }),
+  amenities: text("amenities").array(),
+  active: boolean("active").default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const chatMessages = pgTable("chat_messages", {
+  id: serial("id").primaryKey(),
+  senderId: integer("sender_id").references(() => users.id).notNull(),
+  receiverId: integer("receiver_id").references(() => users.id).notNull(),
+  message: text("message").notNull(),
+  eventId: integer("event_id").references(() => events.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const reviews = pgTable("reviews", {
+  id: serial("id").primaryKey(),
+  reviewerId: integer("reviewer_id").references(() => users.id).notNull(),
+  reviewedId: integer("reviewed_id").references(() => users.id).notNull(),
+  eventId: integer("event_id").references(() => events.id),
+  rating: integer("rating").notNull(),
+  comment: text("comment"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Insert schemas
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  stripeCustomerId: true,
+  stripeSubscriptionId: true,
+  planType: true,
+});
+
+export const insertEventSchema = createInsertSchema(events).omit({
+  id: true,
+  organizerId: true,
+  status: true,
+  createdAt: true,
+});
+
+export const insertEventApplicationSchema = createInsertSchema(eventApplications).omit({
+  id: true,
+  status: true,
+  createdAt: true,
+});
+
+export const insertServiceSchema = createInsertSchema(services).omit({
+  id: true,
+  providerId: true,
+  active: true,
+  createdAt: true,
+});
+
+export const insertVenueSchema = createInsertSchema(venues).omit({
+  id: true,
+  ownerId: true,
+  active: true,
+  createdAt: true,
+});
+
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertReviewSchema = createInsertSchema(reviews).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Types
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type User = typeof users.$inferSelect;
+export type InsertEvent = z.infer<typeof insertEventSchema>;
+export type Event = typeof events.$inferSelect;
+export type InsertEventApplication = z.infer<typeof insertEventApplicationSchema>;
+export type EventApplication = typeof eventApplications.$inferSelect;
+export type InsertService = z.infer<typeof insertServiceSchema>;
+export type Service = typeof services.$inferSelect;
+export type InsertVenue = z.infer<typeof insertVenueSchema>;
+export type Venue = typeof venues.$inferSelect;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertReview = z.infer<typeof insertReviewSchema>;
+export type Review = typeof reviews.$inferSelect;
