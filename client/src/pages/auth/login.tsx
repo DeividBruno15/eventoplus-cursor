@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -21,9 +21,21 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+
+  // Effect para redirecionar quando o usuário for autenticado
+  useEffect(() => {
+    if (user && loginSuccess) {
+      toast({
+        title: "Login realizado com sucesso!",
+        description: "Bem-vindo de volta ao Evento+",
+      });
+      setLocation("/dashboard");
+    }
+  }, [user, loginSuccess, toast, setLocation]);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -37,17 +49,14 @@ export default function Login() {
     setIsLoading(true);
     try {
       await login(data.email, data.password);
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo de volta ao Evento+",
-      });
-      setLocation("/dashboard");
+      setLoginSuccess(true);
     } catch (error: any) {
       toast({
         title: "Erro no login",
         description: error.message || "Credenciais inválidas",
         variant: "destructive",
       });
+      setLoginSuccess(false);
     } finally {
       setIsLoading(false);
     }

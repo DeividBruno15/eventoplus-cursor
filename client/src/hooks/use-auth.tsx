@@ -34,8 +34,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await apiRequest("POST", "/api/login", { email, password });
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      // Aguarda a query ser refetchada
+      await queryClient.refetchQueries({ queryKey: ["/api/user"] });
     },
   });
 
