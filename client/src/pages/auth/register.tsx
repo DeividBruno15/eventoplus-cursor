@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Link, useLocation } from "wouter";
 import { Calendar } from "lucide-react";
+import { FaGoogle } from "react-icons/fa";
 import { useAuth } from "@/hooks/use-auth";
 
 const registerSchema = z.object({
@@ -158,7 +159,7 @@ export default function Register() {
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-primary hover:bg-blue-700" 
+                  className="w-full bg-[#3C5BFA] hover:bg-blue-700" 
                   disabled={isLoading}
                 >
                   {isLoading ? "Criando conta..." : "Criar Conta"}
@@ -166,10 +167,31 @@ export default function Register() {
               </form>
             </Form>
 
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-muted-foreground">Ou continue com</span>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full mt-4"
+                onClick={() => window.location.href = '/auth/google'}
+              >
+                <FaGoogle className="w-4 h-4 mr-2" />
+                Cadastrar com Google
+              </Button>
+            </div>
+
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Já tem uma conta?{" "}
-                <Link href="/login" className="text-primary hover:underline">
+                <Link href="/login" className="text-[#3C5BFA] hover:underline">
                   Faça login
                 </Link>
               </p>

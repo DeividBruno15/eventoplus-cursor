@@ -58,7 +58,7 @@ export default function Login() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-10 h-10 gradient-hero rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#3C5BFA] rounded-lg flex items-center justify-center">
               <Calendar className="w-5 h-5 text-white" />
             </div>
             <span className="text-2xl font-bold text-black">Evento+</span>
@@ -113,7 +113,7 @@ export default function Login() {
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-primary hover:bg-blue-700" 
+                  className="w-full bg-[#3C5BFA] hover:bg-blue-700" 
                   disabled={isLoading}
                 >
                   {isLoading ? "Entrando..." : "Entrar"}
@@ -121,10 +121,31 @@ export default function Login() {
               </form>
             </Form>
 
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-muted-foreground">Ou continue com</span>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full mt-4"
+                onClick={() => window.location.href = '/auth/google'}
+              >
+                <FaGoogle className="w-4 h-4 mr-2" />
+                Entrar com Google
+              </Button>
+            </div>
+
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Não tem uma conta?{" "}
-                <Link href="/register" className="text-primary hover:underline">
+                <Link href="/register" className="text-[#3C5BFA] hover:underline">
                   Cadastre-se
                 </Link>
               </p>

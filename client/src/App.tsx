@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import Home from "@/pages/home";
 import Login from "@/pages/auth/login";
 import Register from "@/pages/auth/register";
+import SelectUserType from "@/pages/auth/select-user-type";
 import Dashboard from "@/pages/dashboard/dashboard";
 import Events from "@/pages/events/events";
 import CreateEvent from "@/pages/events/create-event";
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/select-user-type" component={SelectUserType} />
       <Route path="/pricing" component={Pricing} />
       
       {/* Protected Routes */}
