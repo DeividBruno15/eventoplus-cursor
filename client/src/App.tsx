@@ -11,6 +11,8 @@ import SelectUserType from "@/pages/auth/select-user-type";
 import Dashboard from "@/pages/dashboard/dashboard";
 import Events from "@/pages/events/events";
 import CreateEvent from "@/pages/events/create-event";
+import EventDetail from "@/pages/events/event-detail";
+import Services from "@/pages/services";
 import Pricing from "@/pages/pricing";
 import Subscribe from "@/pages/subscribe";
 import AuthGuard from "@/components/auth/auth-guard";
@@ -39,6 +41,16 @@ function Router() {
       <Route path="/events/create">
         <AuthGuard>
           <CreateEvent />
+        </AuthGuard>
+      </Route>
+      <Route path="/events/:id">
+        <AuthGuard>
+          <EventDetail />
+        </AuthGuard>
+      </Route>
+      <Route path="/services">
+        <AuthGuard>
+          <Services />
         </AuthGuard>
       </Route>
       <Route path="/subscribe">
