@@ -12,13 +12,9 @@ export default function Layout({ children }: LayoutProps) {
   const { user } = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  // Para usuários não autenticados, não renderiza nada (AuthGuard cuida do redirecionamento)
   if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <main>{children}</main>
-      </div>
-    );
+    return null;
   }
 
   return (

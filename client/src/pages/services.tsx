@@ -42,9 +42,8 @@ export default function Services() {
   const [locationFilter, setLocationFilter] = useState("");
   const [priceRange, setPriceRange] = useState("");
   
-  const { data: services = [], isLoading } = useQuery({
+  const { data: services = [], isLoading } = useQuery<Service[]>({
     queryKey: ["/api/services"],
-    queryFn: getQueryFn({ on401: "throw" }),
   });
 
   // Filtrar serviços

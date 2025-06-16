@@ -27,16 +27,14 @@ export default function EventDetail() {
   const eventId = params?.id ? parseInt(params.id) : null;
 
   // Buscar dados do evento
-  const { data: event, isLoading } = useQuery({
+  const { data: event, isLoading } = useQuery<any>({
     queryKey: ["/api/events", eventId],
-    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!eventId,
   });
 
   // Buscar candidaturas do evento
-  const { data: applications = [] } = useQuery({
+  const { data: applications = [] } = useQuery<any[]>({
     queryKey: ["/api/events", eventId, "applications"],
-    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!eventId,
   });
 
