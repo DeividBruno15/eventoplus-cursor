@@ -90,7 +90,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          console.log("Google OAuth callback received, processing profile:", profile.id);
+          console.log("=== Google OAuth Strategy Callback ===");
+          console.log("Access Token received:", !!accessToken);
+          console.log("Profile ID:", profile.id);
+          console.log("Profile emails:", profile.emails);
+          
           const email = profile.emails?.[0]?.value;
           if (!email) {
             console.error("No email found in Google profile");
@@ -98,11 +102,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
 
           console.log("Processing Google login for email:", email);
+          
           // Check if user already exists
           let user = await storage.getUserByEmail(email);
           
           if (user) {
-            // User exists, return them
             console.log("Existing user found:", user.email);
             return done(null, user);
           }
@@ -116,10 +120,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             userType: 'contratante' // Default user type, can be changed later
           });
 
-          console.log("New user created:", newUser.email);
+          console.log("New user created successfully:", newUser.email);
           return done(null, newUser);
         } catch (error) {
-          console.error("Error in Google OAuth callback:", error);
+          console.error("=== Google OAuth Strategy Error ===");
+          console.error("Error type:", error.constructor.name);
+          console.error("Error message:", error.message);
+          console.error("Full error:", error);
           return done(error);
         }
       }
@@ -176,19 +183,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Google OAuth routes
   app.get("/auth/google", (req, res, next) => {
-    console.log("Starting Google OAuth authentication...");
-    console.log("Full request URL:", `${req.protocol}://${req.get('host')}${req.originalUrl}`);
+    console.log("=== Starting Google OAuth ===");
+    console.log("Request URL:", `${req.protocol}://${req.get('host')}${req.originalUrl}`);
+    console.log("User Agent:", req.get('User-Agent'));
+    console.log("Referer:", req.get('Referer'));
     
-    try {
-      passport.authenticate("google", {
-        scope: ["profile", "email"],
-        accessType: 'offline',
-        prompt: 'consent'
-      })(req, res, next);
-    } catch (error) {
-      console.error("Error initiating Google OAuth:", error);
-      res.redirect("/login?error=oauth_init_failed");
-    }
+    // Test if Google strategy is properly configured
+    console.log("Google strategy configured, proceeding with authentication...");
+    
+    passport.authenticate("google", {
+      scope: ["profile", "email"]
+    })(req, res, next);
   });
 
   app.get("/auth/google/callback", 
