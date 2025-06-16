@@ -53,48 +53,50 @@ passport.deserializeUser(async (id: number, done) => {
   }
 });
 
-// Configure Google OAuth strategy
-if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-  passport.use(
-    new GoogleStrategy(
-      {
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "/auth/google/callback"
-      },
-      async (accessToken, refreshToken, profile, done) => {
-        try {
-          const email = profile.emails?.[0]?.value;
-          if (!email) {
-            return done(new Error("No email found in Google profile"));
-          }
 
-          // Check if user already exists
-          let user = await storage.getUserByEmail(email);
-          
-          if (user) {
-            // User exists, return them
-            return done(null, user);
-          }
-
-          // Create new user from Google profile
-          const newUser = await storage.createUser({
-            username: profile.displayName || email.split('@')[0],
-            email: email,
-            password: '', // Empty password for Google OAuth users
-            userType: 'contratante' // Default user type, can be changed later
-          });
-
-          return done(null, newUser);
-        } catch (error) {
-          return done(error);
-        }
-      }
-    )
-  );
-}
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Configure Google OAuth strategy here to ensure env vars are loaded
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    passport.use(
+      new GoogleStrategy(
+        {
+          clientID: process.env.GOOGLE_CLIENT_ID,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          callbackURL: "/auth/google/callback"
+        },
+        async (accessToken, refreshToken, profile, done) => {
+          try {
+            const email = profile.emails?.[0]?.value;
+            if (!email) {
+              return done(new Error("No email found in Google profile"));
+            }
+
+            // Check if user already exists
+            let user = await storage.getUserByEmail(email);
+            
+            if (user) {
+              // User exists, return them
+              return done(null, user);
+            }
+
+            // Create new user from Google profile
+            const newUser = await storage.createUser({
+              username: profile.displayName || email.split('@')[0],
+              email: email,
+              password: '', // Empty password for Google OAuth users
+              userType: 'contratante' // Default user type, can be changed later
+            });
+
+            return done(null, newUser);
+          } catch (error) {
+            return done(error);
+          }
+        }
+      )
+    );
+  }
+
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || 'dev-secret-key',
