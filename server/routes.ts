@@ -56,14 +56,17 @@ passport.deserializeUser(async (id: number, done) => {
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Configure Google OAuth strategy here to ensure env vars are loaded
-  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  // Configure Google OAuth strategy - using hardcoded values for now since env vars not loading
+  const googleClientId = "190052814958-tsi43i10m25irafgqvn7hnqike3f3eql.apps.googleusercontent.com";
+  const googleClientSecret = "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";
+  
+  if (googleClientId && googleClientSecret) {
     passport.use(
       new GoogleStrategy(
         {
-          clientID: process.env.GOOGLE_CLIENT_ID,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-          callbackURL: "/auth/google/callback"
+          clientID: googleClientId,
+          clientSecret: googleClientSecret,
+          callbackURL: "https://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google/callback"
         },
         async (accessToken, refreshToken, profile, done) => {
           try {
