@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -22,10 +22,14 @@ import {
   Plus
 } from "lucide-react";
 
-export default function Sidebar() {
+interface SidebarProps {
+  collapsed: boolean;
+  onToggle: (collapsed: boolean) => void;
+}
+
+export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { user, logout } = useAuth();
   const [location] = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
 
   if (!user) return null;
 
@@ -96,7 +100,7 @@ export default function Sidebar() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setCollapsed(!collapsed)}
+              onClick={() => onToggle(!collapsed)}
               className="ml-auto"
             >
               {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
