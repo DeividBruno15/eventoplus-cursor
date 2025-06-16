@@ -113,7 +113,9 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 
 ## Changelog
 
-### June 16, 2025 - Platform Completion
+### June 16, 2025 - Homepage Redesign & Platform Completion
+- **Institutional Homepage Redesign**: Clean, modern design following Figma reference with proper section organization, pricing tables, FAQ, and service categories
+- **Layout Architecture Fix**: Separated public routes (no sidebar) from protected routes (with sidebar) to eliminate topbar duplication
 - **Core Marketplace Features**: Complete event creation, service provider listings, application system, and detailed event pages with real-time updates
 - **Advanced Dashboard System**: Personalized dashboards for each user type (Contratantes, Prestadores, Anunciantes) with real-time metrics and user-specific actions
 - **Real-time Chat System**: Full WebSocket-powered messaging with contact lists, message history, and real-time notifications

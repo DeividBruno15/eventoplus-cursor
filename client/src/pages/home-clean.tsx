@@ -139,47 +139,320 @@ export default function HomeClean() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-20 px-4 sm:px-6 lg:px-8">
+      {/* Como funciona */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-black mb-6">
-              Tudo que você precisa
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-6">
+              Como funciona a Evento+
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Uma plataforma completa para simplificar todo o processo de planejamento e execução de eventos.
-            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#3C5BFA] rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Calendar className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Calendar className="w-8 h-8 text-[#3C5BFA]" />
               </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Gestão Completa</h3>
+              <h3 className="text-xl font-semibold text-black mb-4">Cadastre sua empresa</h3>
               <p className="text-gray-600">
-                Organize todos os aspectos do seu evento em uma única plataforma intuitiva.
+                Crie seu perfil completo e mostre seus serviços para milhares de organizadores.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#FFA94D] rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Users className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Users className="w-8 h-8 text-[#FFA94D]" />
               </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Rede Qualificada</h3>
+              <h3 className="text-xl font-semibold text-black mb-4">Receba solicitações</h3>
               <p className="text-gray-600">
-                Acesse uma rede de prestadores verificados e espaços de qualidade.
+                Organizadores interessados entrarão em contato diretamente com você.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Shield className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Zap className="w-8 h-8 text-green-600" />
               </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Pagamentos Seguros</h3>
+              <h3 className="text-xl font-semibold text-black mb-4">Feche contratos</h3>
               <p className="text-gray-600">
-                Transações protegidas com tecnologia de ponta e total transparência.
+                Negocie valores, prazos e condições de forma segura pela plataforma.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Todo para seu evento perfeito */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-6">
+              Todo para seu evento perfeito
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Row 1 */}
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h4 className="font-semibold text-black mb-2">Arquitetura e decoração</h4>
+              <p className="text-gray-600 text-sm">Design e ambientação</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h4 className="font-semibold text-black mb-2">Fotografia e filmagem</h4>
+              <p className="text-gray-600 text-sm">Registro profissional</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h4 className="font-semibold text-black mb-2">Alimentação e bebidas</h4>
+              <p className="text-gray-600 text-sm">Buffets e catering</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h4 className="font-semibold text-black mb-2">Animação e música</h4>
+              <p className="text-gray-600 text-sm">DJs e entretenimento</p>
+            </div>
+
+            {/* Row 2 */}
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h4 className="font-semibold text-black mb-2">Cerimonial e protocolo</h4>
+              <p className="text-gray-600 text-sm">Coordenação profissional</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h4 className="font-semibold text-black mb-2">Flores e paisagismo</h4>
+              <p className="text-gray-600 text-sm">Decoração floral</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h4 className="font-semibold text-black mb-2">Segurança e limpeza</h4>
+              <p className="text-gray-600 text-sm">Serviços de apoio</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h4 className="font-semibold text-black mb-2">Transporte e logística</h4>
+              <p className="text-gray-600 text-sm">Mobilidade e organização</p>
+            </div>
+
+            {/* Row 3 */}
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h4 className="font-semibold text-black mb-2">Espaços para eventos</h4>
+              <p className="text-gray-600 text-sm">Locais especiais</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h4 className="font-semibold text-black mb-2">Tecnologia e som</h4>
+              <p className="text-gray-600 text-sm">Equipamentos técnicos</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h4 className="font-semibold text-black mb-2">Marketing e design</h4>
+              <p className="text-gray-600 text-sm">Comunicação visual</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h4 className="font-semibold text-black mb-2">Vestuário e beleza</h4>
+              <p className="text-gray-600 text-sm">Estilo e cuidados</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Encontre seu perfil */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-6">
+              Encontre seu perfil na Evento+
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Users className="w-8 h-8 text-[#3C5BFA]" />
+              </div>
+              <h3 className="text-xl font-semibold text-black mb-4">Contratantes</h3>
+              <p className="text-gray-600">
+                Organize eventos incríveis encontrando os melhores prestadores e espaços.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Star className="w-8 h-8 text-[#FFA94D]" />
+              </div>
+              <h3 className="text-xl font-semibold text-black mb-4">Prestadores de Serviços</h3>
+              <p className="text-gray-600">
+                Conecte-se com organizadores e faça seu negócio crescer na área de eventos.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Calendar className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-black mb-4">Anunciantes de Espaços</h3>
+              <p className="text-gray-600">
+                Divulgue seu espaço e receba solicitações de aluguel para eventos.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Planos e benefícios */}
+      <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-6">
+              Planos e benefícios
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Plano Gratuito */}
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-black mb-2">Gratuito</h3>
+                <div className="text-4xl font-bold text-black mb-1">R$ 0</div>
+                <div className="text-gray-600">por mês</div>
+              </div>
+              
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center">
+                  <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white text-xs">✓</span>
+                  </div>
+                  <span className="text-gray-700">Até 3 eventos por mês</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white text-xs">✓</span>
+                  </div>
+                  <span className="text-gray-700">Suporte básico</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white text-xs">✓</span>
+                  </div>
+                  <span className="text-gray-700">Funcionalidades básicas</span>
+                </li>
+              </ul>
+              
+              <Button variant="outline" className="w-full border-gray-300">
+                Começar grátis
+              </Button>
+            </div>
+
+            {/* Plano Profissional - Destacado */}
+            <div className="bg-[#3C5BFA] rounded-2xl p-8 shadow-lg relative">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <div className="bg-[#FFA94D] text-white px-4 py-2 rounded-full text-sm font-semibold">
+                  Mais popular
+                </div>
+              </div>
+              
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-white mb-2">Profissional</h3>
+                <div className="text-4xl font-bold text-white mb-1">R$ 29,90</div>
+                <div className="text-blue-200">por mês</div>
+              </div>
+              
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center">
+                  <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
+                    <span className="text-[#3C5BFA] text-xs">✓</span>
+                  </div>
+                  <span className="text-white">Eventos ilimitados</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
+                    <span className="text-[#3C5BFA] text-xs">✓</span>
+                  </div>
+                  <span className="text-white">Suporte prioritário</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
+                    <span className="text-[#3C5BFA] text-xs">✓</span>
+                  </div>
+                  <span className="text-white">Analytics avançados</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-3">
+                    <span className="text-[#3C5BFA] text-xs">✓</span>
+                  </div>
+                  <span className="text-white">Chat ilimitado</span>
+                </li>
+              </ul>
+              
+              <Button className="w-full bg-white text-[#3C5BFA] hover:bg-gray-100">
+                Escolher plano
+              </Button>
+            </div>
+
+            {/* Plano Premium */}
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-black mb-2">Premium</h3>
+                <div className="text-4xl font-bold text-black mb-1">R$ 59,90</div>
+                <div className="text-gray-600">por mês</div>
+              </div>
+              
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center">
+                  <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white text-xs">✓</span>
+                  </div>
+                  <span className="text-gray-700">Tudo do Profissional</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white text-xs">✓</span>
+                  </div>
+                  <span className="text-gray-700">Destaque nos resultados</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white text-xs">✓</span>
+                  </div>
+                  <span className="text-gray-700">API personalizada</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white text-xs">✓</span>
+                  </div>
+                  <span className="text-gray-700">Gerente dedicado</span>
+                </li>
+              </ul>
+              
+              <Button variant="outline" className="w-full border-gray-300">
+                Escolher plano
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Perguntas frequentes */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-6">
+              Perguntas frequentes
+            </h2>
+          </div>
+
+          <div className="space-y-6">
+            <div className="border border-gray-200 rounded-lg p-6">
+              <h3 className="font-semibold text-black mb-2">Como funciona a cobrança?</h3>
+              <p className="text-gray-600">A cobrança é mensal e você pode cancelar a qualquer momento. Não há taxas de cancelamento.</p>
+            </div>
+            
+            <div className="border border-gray-200 rounded-lg p-6">
+              <h3 className="font-semibold text-black mb-2">Posso mudar de plano?</h3>
+              <p className="text-gray-600">Sim, você pode fazer upgrade ou downgrade do seu plano a qualquer momento através das configurações.</p>
+            </div>
+            
+            <div className="border border-gray-200 rounded-lg p-6">
+              <h3 className="font-semibold text-black mb-2">Existe período de teste?</h3>
+              <p className="text-gray-600">Sim, todos os planos pagos têm 7 dias de teste gratuito. Você pode cancelar sem custos.</p>
+            </div>
+            
+            <div className="border border-gray-200 rounded-lg p-6">
+              <h3 className="font-semibold text-black mb-2">Como funciona o suporte?</h3>
+              <p className="text-gray-600">Oferecemos suporte via chat e email. Planos pagos têm prioridade no atendimento.</p>
             </div>
           </div>
         </div>
