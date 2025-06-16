@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { eq, and, or } from "drizzle-orm";
+import { eq, and, or, desc } from "drizzle-orm";
 import { 
   users, 
   events, 
@@ -9,6 +9,9 @@ import {
   venues, 
   chatMessages, 
   reviews,
+  cartItems,
+  contracts,
+  notifications,
   type User, 
   type InsertUser,
   type Event,
@@ -22,7 +25,13 @@ import {
   type ChatMessage,
   type InsertChatMessage,
   type Review,
-  type InsertReview
+  type InsertReview,
+  type CartItem,
+  type InsertCartItem,
+  type Contract,
+  type InsertContract,
+  type Notification,
+  type InsertNotification
 } from "@shared/schema";
 
 const client = postgres(process.env.DATABASE_URL!);
@@ -268,6 +277,99 @@ export class DatabaseStorage implements IStorage {
   async createReview(reviewData: InsertReview): Promise<Review> {
     const result = await db.insert(reviews).values(reviewData).returning();
     return result[0];
+  }
+
+  // Cart Items
+  async getCartItems(userId: number): Promise<CartItem[]> {
+    return await db
+      .select()
+      .from(cartItems)
+      .where(eq(cartItems.userId, userId));
+  }
+
+  async createCartItem(itemData: InsertCartItem): Promise<CartItem> {
+    const result = await db.insert(cartItems).values(itemData).returning();
+    if (!result[0]) throw new Error("Failed to create cart item");
+    return result[0];
+  }
+
+  async updateCartItem(id: number, itemData: Partial<CartItem>): Promise<CartItem> {
+    const result = await db
+      .update(cartItems)
+      .set(itemData)
+      .where(eq(cartItems.id, id))
+      .returning();
+    if (!result[0]) throw new Error("Cart item not found");
+    return result[0];
+  }
+
+  async deleteCartItem(id: number): Promise<void> {
+    await db.delete(cartItems).where(eq(cartItems.id, id));
+  }
+
+  async clearCart(userId: number): Promise<void> {
+    await db.delete(cartItems).where(eq(cartItems.userId, userId));
+  }
+
+  // Contracts
+  async getContracts(userId: number): Promise<Contract[]> {
+    return await db
+      .select()
+      .from(contracts)
+      .where(or(eq(contracts.providerId, userId), eq(contracts.clientId, userId)));
+  }
+
+  async getContract(id: number): Promise<Contract | undefined> {
+    const result = await db
+      .select()
+      .from(contracts)
+      .where(eq(contracts.id, id));
+    return result[0];
+  }
+
+  async createContract(contractData: InsertContract): Promise<Contract> {
+    const result = await db.insert(contracts).values(contractData).returning();
+    if (!result[0]) throw new Error("Failed to create contract");
+    return result[0];
+  }
+
+  async updateContract(id: number, contractData: Partial<Contract>): Promise<Contract> {
+    const result = await db
+      .update(contracts)
+      .set(contractData)
+      .where(eq(contracts.id, id))
+      .returning();
+    if (!result[0]) throw new Error("Contract not found");
+    return result[0];
+  }
+
+  // Notifications
+  async getNotifications(userId: number): Promise<Notification[]> {
+    return await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(notifications.createdAt);
+  }
+
+  async createNotification(notificationData: InsertNotification): Promise<Notification> {
+    const result = await db.insert(notifications).values(notificationData).returning();
+    if (!result[0]) throw new Error("Failed to create notification");
+    return result[0];
+  }
+
+  async markNotificationRead(id: number): Promise<void> {
+    await db
+      .update(notifications)
+      .set({ read: true })
+      .where(eq(notifications.id, id));
+  }
+
+  async markAllNotificationsRead(userId: number): Promise<void> {
+    await db
+      .update(notifications)
+      .set({ read: true })
+      .where(eq(notifications.userId, userId));
   }
 }
 
