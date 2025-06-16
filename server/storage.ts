@@ -349,7 +349,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(notifications)
       .where(eq(notifications.userId, userId))
-      .orderBy(notifications.createdAt);
+      .orderBy(desc(notifications.createdAt));
   }
 
   async createNotification(notificationData: InsertNotification): Promise<Notification> {
