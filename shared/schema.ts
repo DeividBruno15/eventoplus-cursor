@@ -11,6 +11,12 @@ export const users = pgTable("users", {
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   planType: varchar("plan_type", { length: 20 }).default("free"), // free, professional, premium
+  twoFactorEnabled: boolean("two_factor_enabled").default(false),
+  twoFactorSecret: text("two_factor_secret"),
+  twoFactorBackupCodes: text("two_factor_backup_codes").array(),
+  twoFactorLastUsed: timestamp("two_factor_last_used"),
+  apiKey: text("api_key"),
+  apiKeyLastUsed: timestamp("api_key_last_used"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -81,6 +87,48 @@ export const reviews = pgTable("reviews", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Carrinho de compras
+export const cartItems = pgTable("cart_items", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  serviceId: integer("service_id").references(() => services.id).notNull(),
+  quantity: integer("quantity").default(1).notNull(),
+  customizations: text("customizations"),
+  eventDate: timestamp("event_date"),
+  eventLocation: text("event_location"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Contratos digitais
+export const contracts = pgTable("contracts", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  serviceType: text("service_type").notNull(),
+  providerId: integer("provider_id").references(() => users.id).notNull(),
+  clientId: integer("client_id").references(() => users.id).notNull(),
+  eventDate: timestamp("event_date").notNull(),
+  eventLocation: text("event_location"),
+  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+  status: varchar("status", { length: 20 }).default("draft").notNull(),
+  terms: text("terms"),
+  paymentTerms: text("payment_terms"),
+  cancellationPolicy: text("cancellation_policy"),
+  signedAt: timestamp("signed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Notificações
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  type: varchar("type", { length: 50 }).notNull(),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  read: boolean("read").default(false).notNull(),
+  metadata: text("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -88,6 +136,12 @@ export const insertUserSchema = createInsertSchema(users).omit({
   stripeCustomerId: true,
   stripeSubscriptionId: true,
   planType: true,
+  twoFactorEnabled: true,
+  twoFactorSecret: true,
+  twoFactorBackupCodes: true,
+  twoFactorLastUsed: true,
+  apiKey: true,
+  apiKeyLastUsed: true,
 });
 
 export const insertEventSchema = createInsertSchema(events).omit({
@@ -127,6 +181,24 @@ export const insertReviewSchema = createInsertSchema(reviews).omit({
   createdAt: true,
 });
 
+export const insertCartItemSchema = createInsertSchema(cartItems).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertContractSchema = createInsertSchema(contracts).omit({
+  id: true,
+  status: true,
+  signedAt: true,
+  createdAt: true,
+});
+
+export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  read: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -142,3 +214,9 @@ export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Review = typeof reviews.$inferSelect;
+export type InsertCartItem = z.infer<typeof insertCartItemSchema>;
+export type CartItem = typeof cartItems.$inferSelect;
+export type InsertContract = z.infer<typeof insertContractSchema>;
+export type Contract = typeof contracts.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type Notification = typeof notifications.$inferSelect;

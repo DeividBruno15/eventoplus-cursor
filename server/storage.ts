@@ -36,6 +36,7 @@ export interface IStorage {
   updateStripeCustomerId(userId: number, customerId: string): Promise<User>;
   updateUserStripeInfo(userId: number, customerId: string, subscriptionId: string): Promise<User>;
   updateUserType(userId: number, userType: string): Promise<User>;
+  updateUser2FA(userId: number, data: { enabled?: boolean; secret?: string; backupCodes?: string[]; lastUsed?: Date }): Promise<User>;
   
   // Events
   getEvents(): Promise<Event[]>;
@@ -63,6 +64,25 @@ export interface IStorage {
   // Reviews
   getReviews(reviewedId: number): Promise<Review[]>;
   createReview(review: InsertReview): Promise<Review>;
+  
+  // Cart Items
+  getCartItems(userId: number): Promise<CartItem[]>;
+  createCartItem(item: InsertCartItem): Promise<CartItem>;
+  updateCartItem(id: number, item: Partial<CartItem>): Promise<CartItem>;
+  deleteCartItem(id: number): Promise<void>;
+  clearCart(userId: number): Promise<void>;
+  
+  // Contracts
+  getContracts(userId: number): Promise<Contract[]>;
+  getContract(id: number): Promise<Contract | undefined>;
+  createContract(contract: InsertContract): Promise<Contract>;
+  updateContract(id: number, contract: Partial<Contract>): Promise<Contract>;
+  
+  // Notifications
+  getNotifications(userId: number): Promise<Notification[]>;
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  markNotificationRead(id: number): Promise<void>;
+  markAllNotificationsRead(userId: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -112,6 +132,23 @@ export class DatabaseStorage implements IStorage {
   async updateUserType(userId: number, userType: string): Promise<User> {
     const result = await db.update(users)
       .set({ userType })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!result[0]) throw new Error("User not found");
+    return result[0];
+  }
+
+  async updateUser2FA(userId: number, data: { enabled?: boolean; secret?: string; backupCodes?: string[]; lastUsed?: Date }): Promise<User> {
+    const updateData: any = {};
+    
+    if (data.enabled !== undefined) updateData.twoFactorEnabled = data.enabled;
+    if (data.secret !== undefined) updateData.twoFactorSecret = data.secret;
+    if (data.backupCodes !== undefined) updateData.twoFactorBackupCodes = data.backupCodes;
+    if (data.lastUsed !== undefined) updateData.twoFactorLastUsed = data.lastUsed;
+
+    const result = await db.update(users)
+      .set(updateData)
       .where(eq(users.id, userId))
       .returning();
     
