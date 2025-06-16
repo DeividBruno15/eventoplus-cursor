@@ -4,6 +4,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import Stripe from "stripe";
 import bcrypt from "bcryptjs";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
@@ -57,8 +58,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Trust proxy for Replit environment
   app.set('trust proxy', 1);
 
-  // Session configuration
+  // Configure PostgreSQL session store
+  const PgSession = connectPgSimple(session);
+
+  // Session configuration with PostgreSQL store
   app.use(session({
+    store: new PgSession({
+      conString: process.env.DATABASE_URL,
+      tableName: 'session'
+    }),
     secret: process.env.SESSION_SECRET || 'evento-plus-session-secret-key-2025',
     resave: false,
     saveUninitialized: false,
