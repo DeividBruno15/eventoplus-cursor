@@ -135,7 +135,9 @@ export default function Login() {
                 type="button"
                 variant="outline"
                 className="w-full mt-4"
-                onClick={() => window.location.href = '/auth/google'}
+                onClick={() => {
+                  window.location.href = '/auth/google';
+                }}
               >
                 <FaGoogle className="w-4 h-4 mr-2" />
                 Entrar com Google
