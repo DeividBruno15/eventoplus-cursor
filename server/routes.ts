@@ -326,7 +326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const application = await storage.createEventApplication({
         ...validatedData,
         eventId,
-        applicantId: userId
+        providerId: userId
       });
 
       res.status(201).json(application);
