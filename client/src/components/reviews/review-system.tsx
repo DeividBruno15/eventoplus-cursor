@@ -36,9 +36,8 @@ export default function ReviewSystem({ reviewedId, reviewedName, canReview = fal
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
-  const { data: reviews = [], isLoading } = useQuery({
+  const { data: reviews = [], isLoading } = useQuery<Review[]>({
     queryKey: ["/api/reviews", reviewedId],
-    queryFn: getQueryFn({ on401: "returnNull" }),
   });
 
   const createReviewMutation = useMutation({

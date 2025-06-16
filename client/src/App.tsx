@@ -24,6 +24,7 @@ import Subscribe from "@/pages/subscribe";
 import SubscriptionManagement from "@/pages/subscription-management-simple";
 import Profile from "@/pages/profile";
 import Settings from "@/pages/settings";
+import Search from "@/pages/search";
 import AuthGuard from "@/components/auth/auth-guard";
 import NotFound from "@/pages/not-found";
 
