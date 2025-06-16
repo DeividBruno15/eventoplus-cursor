@@ -184,6 +184,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user type endpoint for Google OAuth users
+  app.patch("/api/user-type", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const { userType } = req.body;
+      const userId = (req.user as any).id;
+      
+      // Update user type in database
+      const updatedUser = await storage.updateUserType(userId, userType);
+      
+      // Update session
+      req.user = updatedUser;
+      
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message || "Erro ao atualizar tipo de usuário" });
+    }
+  });
+
   // Events routes
   app.get("/api/events", async (req, res) => {
     try {

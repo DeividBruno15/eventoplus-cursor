@@ -35,6 +35,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateStripeCustomerId(userId: number, customerId: string): Promise<User>;
   updateUserStripeInfo(userId: number, customerId: string, subscriptionId: string): Promise<User>;
+  updateUserType(userId: number, userType: string): Promise<User>;
   
   // Events
   getEvents(): Promise<Event[]>;
@@ -101,6 +102,16 @@ export class DatabaseStorage implements IStorage {
         stripeSubscriptionId: subscriptionId,
         planType: "professional"
       })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!result[0]) throw new Error("User not found");
+    return result[0];
+  }
+
+  async updateUserType(userId: number, userType: string): Promise<User> {
+    const result = await db.update(users)
+      .set({ userType })
       .where(eq(users.id, userId))
       .returning();
     

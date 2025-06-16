@@ -64,7 +64,7 @@ export default function Register() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-10 h-10 gradient-hero rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#3C5BFA] rounded-lg flex items-center justify-center">
               <Calendar className="w-5 h-5 text-white" />
             </div>
             <span className="text-2xl font-bold text-black">Evento+</span>
