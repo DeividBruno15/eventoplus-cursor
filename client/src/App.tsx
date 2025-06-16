@@ -18,6 +18,7 @@ import Analytics from "@/pages/analytics";
 import Chat from "@/pages/chat";
 import Pricing from "@/pages/pricing";
 import Subscribe from "@/pages/subscribe";
+import SubscriptionManagement from "@/pages/subscription-management";
 import AuthGuard from "@/components/auth/auth-guard";
 import NotFound from "@/pages/not-found";
 
@@ -74,6 +75,11 @@ function Router() {
       <Route path="/subscribe">
         <AuthGuard>
           <Subscribe />
+        </AuthGuard>
+      </Route>
+      <Route path="/subscription">
+        <AuthGuard>
+          <SubscriptionManagement />
         </AuthGuard>
       </Route>
       
