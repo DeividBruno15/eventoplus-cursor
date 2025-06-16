@@ -57,9 +57,8 @@ export default function Venues() {
   });
 
   // Buscar venues do usuário (se anunciante) ou todos (se outro tipo)
-  const { data: venues = [], isLoading } = useQuery({
+  const { data: venues = [], isLoading } = useQuery<Venue[]>({
     queryKey: ["/api/venues", user?.userType === 'anunciante' ? user.id : 'all'],
-    queryFn: getQueryFn({ on401: "throw" }),
   });
 
   // Mutation para criar venue

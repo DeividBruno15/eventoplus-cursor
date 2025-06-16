@@ -82,15 +82,13 @@ export default function Chat() {
   }, [user, queryClient]);
 
   // Buscar contatos de chat
-  const { data: contacts = [] } = useQuery({
+  const { data: contacts = [] } = useQuery<ChatContact[]>({
     queryKey: ["/api/chat/contacts"],
-    queryFn: getQueryFn({ on401: "throw" }),
   });
 
   // Buscar mensagens do contato selecionado
-  const { data: messages = [] } = useQuery({
+  const { data: messages = [] } = useQuery<ChatMessage[]>({
     queryKey: ["/api/chat/messages", selectedContact?.id],
-    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!selectedContact,
   });
 

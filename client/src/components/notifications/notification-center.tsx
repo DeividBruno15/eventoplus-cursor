@@ -28,9 +28,8 @@ export default function NotificationCenter() {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
 
-  const { data: notifications = [] } = useQuery({
+  const { data: notifications = [] } = useQuery<Notification[]>({
     queryKey: ["/api/notifications"],
-    queryFn: getQueryFn({ on401: "returnNull" }),
     enabled: !!user,
     refetchInterval: 30000,
   });
