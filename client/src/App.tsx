@@ -56,6 +56,21 @@ function Router() {
           <Services />
         </AuthGuard>
       </Route>
+      <Route path="/venues">
+        <AuthGuard>
+          <Venues />
+        </AuthGuard>
+      </Route>
+      <Route path="/analytics">
+        <AuthGuard>
+          <Analytics />
+        </AuthGuard>
+      </Route>
+      <Route path="/chat">
+        <AuthGuard>
+          <Chat />
+        </AuthGuard>
+      </Route>
       <Route path="/subscribe">
         <AuthGuard>
           <Subscribe />
