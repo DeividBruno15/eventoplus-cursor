@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import session from "express-session";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { storage } from "./storage";
 import { insertEventSchema, insertEventApplicationSchema, insertUserSchema } from "@shared/schema";
 
@@ -14,7 +15,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-05-28.basil",
 });
 
 // Passport configuration
@@ -51,6 +52,47 @@ passport.deserializeUser(async (id: number, done) => {
     done(error, null);
   }
 });
+
+// Configure Google OAuth strategy
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: "/auth/google/callback"
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          const email = profile.emails?.[0]?.value;
+          if (!email) {
+            return done(new Error("No email found in Google profile"));
+          }
+
+          // Check if user already exists
+          let user = await storage.getUserByEmail(email);
+          
+          if (user) {
+            // User exists, return them
+            return done(null, user);
+          }
+
+          // Create new user from Google profile
+          const newUser = await storage.createUser({
+            username: profile.displayName || email.split('@')[0],
+            email: email,
+            password: '', // Empty password for Google OAuth users
+            userType: 'contratante' // Default user type, can be changed later
+          });
+
+          return done(null, newUser);
+        } catch (error) {
+          return done(error);
+        }
+      }
+    )
+  );
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Session middleware
@@ -104,6 +146,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { password, ...userWithoutPassword } = req.user as any;
     res.json(userWithoutPassword);
   });
+
+  // Google OAuth routes
+  app.get("/auth/google", passport.authenticate("google", {
+    scope: ["profile", "email"]
+  }));
+
+  app.get("/auth/google/callback", 
+    passport.authenticate("google", { failureRedirect: "/login" }),
+    (req, res) => {
+      // Successful authentication, redirect to dashboard or user selection
+      const user = req.user as any;
+      if (user.userType === 'contratante') {
+        res.redirect("/dashboard");
+      } else {
+        // Redirect to user type selection if using default
+        res.redirect("/select-user-type");
+      }
+    }
+  );
 
   app.post("/api/logout", (req, res) => {
     req.logout((err) => {

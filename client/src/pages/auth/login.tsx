@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { Link, useLocation } from "wouter";
 import { Calendar } from "lucide-react";
+import { FaGoogle } from "react-icons/fa";
 import { useAuth } from "@/hooks/use-auth";
 
 const loginSchema = z.object({
