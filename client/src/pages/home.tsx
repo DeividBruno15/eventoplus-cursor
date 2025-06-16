@@ -12,7 +12,7 @@ export default function Home() {
       
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="gradient-hero">
+        <div className="bg-hero-brand">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="text-white">
@@ -24,12 +24,12 @@ export default function Home() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link href="/register">
-                    <Button size="lg" className="bg-white text-primary hover:bg-gray-100 text-lg px-8 py-4">
+                    <Button size="lg" className="bg-white text-[#3C5BFA] hover:bg-gray-100 text-lg px-8 py-4">
                       Começar Gratuitamente
                     </Button>
                   </Link>
                   <Link href="/pricing">
-                    <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-4">
+                    <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white hover:text-[#3C5BFA] text-lg px-8 py-4">
                       Ver Planos
                     </Button>
                   </Link>
@@ -205,7 +205,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 gradient-hero">
+      <section className="py-20 bg-hero-brand">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl lg:text-5xl font-bold text-white mb-6">
             Pronto para revolucionar seus eventos?
@@ -215,12 +215,12 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/register">
-              <Button size="lg" className="bg-white text-primary hover:bg-gray-100 text-lg px-8 py-4">
+              <Button size="lg" className="bg-white text-[#3C5BFA] hover:bg-gray-100 text-lg px-8 py-4">
                 Começar Gratuitamente
               </Button>
             </Link>
             <Link href="/pricing">
-              <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-4">
+              <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white hover:text-[#3C5BFA] text-lg px-8 py-4">
                 Ver Planos
               </Button>
             </Link>

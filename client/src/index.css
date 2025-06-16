@@ -83,15 +83,15 @@
   }
 }
 
-/* Custom gradients for branding */
-.gradient-primary {
-  background: linear-gradient(135deg, hsl(234, 89%, 74%) 0%, hsl(237, 100%, 68%) 100%);
+/* Custom brand background */
+.bg-primary-brand {
+  background-color: #3C5BFA;
 }
 
-.gradient-secondary {
-  background: linear-gradient(135deg, hsl(28, 100%, 64%) 0%, hsl(31, 100%, 70%) 100%);
+.bg-secondary-brand {
+  background-color: #FFA94D;
 }
 
-.gradient-hero {
-  background: linear-gradient(135deg, hsl(234, 89%, 74%) 0%, hsl(220, 100%, 60%) 50%, hsl(28, 100%, 64%) 100%);
+.bg-hero-brand {
+  background: linear-gradient(135deg, #3C5BFA 0%, #5B7CFF 50%, #FFA94D 100%);
 }
