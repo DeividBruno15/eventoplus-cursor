@@ -26,17 +26,6 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
 
-  // Effect para redirecionar quando o usuário for autenticado
-  useEffect(() => {
-    if (user && loginSuccess) {
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo de volta ao Evento+",
-      });
-      setLocation("/dashboard");
-    }
-  }, [user, loginSuccess, toast, setLocation]);
-
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -49,14 +38,24 @@ export default function Login() {
     setIsLoading(true);
     try {
       await login(data.email, data.password);
-      setLoginSuccess(true);
+      
+      // Aguarda um momento para garantir que o estado foi atualizado
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      toast({
+        title: "Login realizado com sucesso!",
+        description: "Bem-vindo de volta ao Evento+",
+      });
+      
+      // Força o redirecionamento
+      window.location.href = "/dashboard";
+      
     } catch (error: any) {
       toast({
         title: "Erro no login",
         description: error.message || "Credenciais inválidas",
         variant: "destructive",
       });
-      setLoginSuccess(false);
     } finally {
       setIsLoading(false);
     }

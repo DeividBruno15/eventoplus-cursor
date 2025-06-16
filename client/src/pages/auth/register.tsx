@@ -31,17 +31,6 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState(false);
 
-  // Effect para redirecionar quando o usuário for autenticado
-  useEffect(() => {
-    if (user && registerSuccess) {
-      toast({
-        title: "Conta criada com sucesso!",
-        description: "Bem-vindo ao Evento+",
-      });
-      setLocation("/dashboard");
-    }
-  }, [user, registerSuccess, toast, setLocation]);
-
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -55,7 +44,17 @@ export default function Register() {
     setIsLoading(true);
     try {
       await registerUser(data.username, data.email, data.password, data.userType);
-      setRegisterSuccess(true);
+      
+      // Aguarda um momento para garantir que o estado foi atualizado
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      toast({
+        title: "Conta criada com sucesso!",
+        description: "Bem-vindo ao Evento+",
+      });
+      
+      // Força o redirecionamento
+      window.location.href = "/dashboard";
     } catch (error: any) {
       toast({
         title: "Erro no cadastro",
