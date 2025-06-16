@@ -20,6 +20,8 @@ import Chat from "@/pages/chat";
 import Pricing from "@/pages/pricing";
 import Subscribe from "@/pages/subscribe";
 import SubscriptionManagement from "@/pages/subscription-management";
+import Profile from "@/pages/profile";
+import Settings from "@/pages/settings";
 import AuthGuard from "@/components/auth/auth-guard";
 import NotFound from "@/pages/not-found";
 
@@ -82,6 +84,16 @@ function Router() {
         <Route path="/subscription">
           <AuthGuard>
             <SubscriptionManagement />
+          </AuthGuard>
+        </Route>
+        <Route path="/profile">
+          <AuthGuard>
+            <Profile />
+          </AuthGuard>
+        </Route>
+        <Route path="/settings">
+          <AuthGuard>
+            <Settings />
           </AuthGuard>
         </Route>
         

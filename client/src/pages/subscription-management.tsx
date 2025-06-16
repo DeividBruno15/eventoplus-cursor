@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, getQueryFn } from "@/lib/queryClient";
-import Header from "@/components/layout/header";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -194,29 +194,21 @@ export default function SubscriptionManagement() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Acesso Restrito</h1>
-            <p className="text-gray-600">Faça login para gerenciar sua assinatura.</p>
-          </div>
-        </div>
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Acesso Restrito</h1>
+        <p className="text-gray-600">Faça login para gerenciar sua assinatura.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-black mb-2">Gerenciar Assinatura</h1>
-          <p className="text-gray-600">
-            Controle sua assinatura, monitore o uso e visualize seu histórico de pagamentos
-          </p>
-        </div>
+    <div className="max-w-6xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-black mb-2">Gerenciar Assinatura</h1>
+        <p className="text-gray-600">
+          Controle sua assinatura, monitore o uso e visualize seu histórico de pagamentos
+        </p>
+      </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Informações da Assinatura */}
