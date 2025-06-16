@@ -53,6 +53,8 @@ passport.deserializeUser(async (id: number, done) => {
   }
 });
 
+
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Session configuration
   app.use(session({
@@ -122,6 +124,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     )
   );
+    passport.use(
+      new GoogleStrategy(
+        {
+          clientID: googleClientId,
+          clientSecret: googleClientSecret,
+          callbackURL: `https://${replatDomain}/auth/google/callback`
+        },
+        async (accessToken, refreshToken, profile, done) => {
+          try {
+            console.log("Google OAuth callback received, processing profile:", profile.id);
+            const email = profile.emails?.[0]?.value;
+            if (!email) {
+              console.error("No email found in Google profile");
+              return done(new Error("No email found in Google profile"));
+            }
+
+            console.log("Processing Google login for email:", email);
+            // Check if user already exists
+            let user = await storage.getUserByEmail(email);
+            
+            if (user) {
+              // User exists, return them
+              return done(null, user);
+            }
+
+            // Create new user from Google profile
+            const newUser = await storage.createUser({
+              username: profile.displayName || email.split('@')[0],
+              email: email,
+              password: '', // Empty password for Google OAuth users
+              userType: 'contratante' // Default user type, can be changed later
+            });
+
+            return done(null, newUser);
+          } catch (error) {
+            return done(error);
+          }
+        }
+      )
+    );
+  }
+
+
 
   // Auth routes
   app.post("/api/register", async (req, res) => {
@@ -137,38 +182,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Hash password
       const hashedPassword = await bcrypt.hash(validatedData.password, 10);
       
-      // Create user
       const user = await storage.createUser({
         ...validatedData,
-        password: hashedPassword
+        password: hashedPassword,
       });
 
-      // Auto-login after registration
+      // Remove password from response
+      const { password, ...userWithoutPassword } = user;
+      
       req.login(user, (err) => {
         if (err) {
-          return res.status(500).json({ message: "Erro ao fazer login automático" });
+          return res.status(500).json({ message: "Erro no login automático" });
         }
-        
-        const { password, ...userWithoutPassword } = user;
-        res.status(201).json(userWithoutPassword);
+        res.json(userWithoutPassword);
       });
     } catch (error: any) {
       res.status(400).json({ message: error.message || "Erro ao criar usuário" });
     }
   });
 
-  app.post("/api/login", passport.authenticate("local"), (req, res) => {
+  app.post("/api/login", passport.authenticate('local'), (req, res) => {
     const { password, ...userWithoutPassword } = req.user as any;
     res.json(userWithoutPassword);
-  });
-
-  app.get("/api/user", (req, res) => {
-    if (req.isAuthenticated()) {
-      const { password, ...userWithoutPassword } = req.user as any;
-      res.json(userWithoutPassword);
-    } else {
-      res.status(401).json({ message: "Não autenticado" });
-    }
   });
 
   // Google OAuth routes
@@ -208,6 +243,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json({ message: "Logout realizado com sucesso" });
     });
+  });
+
+  app.get("/api/user", (req, res) => {
+    if (req.isAuthenticated()) {
+      const { password, ...userWithoutPassword } = req.user as any;
+      res.json(userWithoutPassword);
+    } else {
+      res.status(401).json({ message: "Não autenticado" });
+    }
   });
 
   // Update user type endpoint for Google OAuth users
@@ -250,111 +294,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const validatedData = insertEventSchema.parse(req.body);
-      const userId = (req.user as any).id;
-      
       const event = await storage.createEvent({
         ...validatedData,
-        organizerId: userId
+        organizerId: (req.user as any).id,
       });
-
-      res.status(201).json(event);
+      res.json(event);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
   });
 
-  app.get("/api/events/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const event = await storage.getEvent(id);
-      
-      if (!event) {
-        return res.status(404).json({ message: "Evento não encontrado" });
-      }
-
-      res.json(event);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  app.get("/api/events/:id/applications", async (req, res) => {
-    try {
-      const eventId = parseInt(req.params.id);
-      const applications = await storage.getEventApplications(eventId);
-      res.json(applications);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  app.post("/api/events/:id/applications", async (req, res) => {
+  // Event applications routes
+  app.post("/api/events/:eventId/apply", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Não autenticado" });
     }
 
     try {
-      const eventId = parseInt(req.params.id);
-      const validatedData = insertEventApplicationSchema.parse(req.body);
-      const userId = (req.user as any).id;
-
-      const application = await storage.createEventApplication({
-        ...validatedData,
+      const eventId = parseInt(req.params.eventId);
+      const validatedData = insertEventApplicationSchema.parse({
+        ...req.body,
         eventId,
-        applicantId: userId
+        providerId: (req.user as any).id,
       });
-
-      res.status(201).json(application);
+      
+      const application = await storage.createEventApplication(validatedData);
+      res.json(application);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
   });
 
-  // Stripe payment route for one-time payments
-  app.post("/api/create-payment-intent", async (req, res) => {
+  // Stripe subscription endpoint
+  app.post('/api/get-or-create-subscription', async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.sendStatus(401);
+    }
+
+    let user = req.user as any;
+
+    if (user.stripeSubscriptionId) {
+      try {
+        const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+        res.send({
+          subscriptionId: subscription.id,
+          clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
+        });
+        return;
+      } catch (error) {
+        // Subscription might not exist, continue to create new one
+      }
+    }
+    
+    if (!user.email) {
+      throw new Error('No user email on file');
+    }
+
     try {
-      const { amount } = req.body;
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(amount * 100), // Convert to cents
-        currency: "usd",
+      const customer = await stripe.customers.create({
+        email: user.email,
+        name: user.username,
       });
-      res.json({ clientSecret: paymentIntent.client_secret });
+
+      user = await storage.updateStripeCustomerId(user.id, customer.id);
+
+      const subscription = await stripe.subscriptions.create({
+        customer: customer.id,
+        items: [{
+          price: process.env.STRIPE_PRICE_ID || 'price_1234567890',
+        }],
+        payment_behavior: 'default_incomplete',
+        expand: ['latest_invoice.payment_intent'],
+      });
+
+      await storage.updateUserStripeInfo(user.id, customer.id, subscription.id);
+  
+      res.send({
+        subscriptionId: subscription.id,
+        clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
+      });
     } catch (error: any) {
-      res
-        .status(500)
-        .json({ message: "Error creating payment intent: " + error.message });
+      return res.status(400).send({ error: { message: error.message } });
     }
   });
 
-  // WebSocket setup
   const httpServer = createServer(app);
+
+  // WebSocket for real-time chat
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
-
+  
   wss.on('connection', (ws: WebSocket) => {
-    console.log('New WebSocket connection');
-
-    ws.on('message', (data) => {
+    ws.on('message', (message: string) => {
       try {
-        const message = JSON.parse(data.toString());
-        console.log('Received message:', message);
-
-        // Broadcast to all connected clients
+        const data = JSON.parse(message);
+        
+        // Broadcast message to all connected clients
         wss.clients.forEach((client) => {
           if (client !== ws && client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify(message));
+            client.send(message);
           }
         });
       } catch (error) {
-        console.error('Error handling WebSocket message:', error);
+        console.error('Error parsing WebSocket message:', error);
       }
-    });
-
-    ws.on('close', () => {
-      console.log('WebSocket connection closed');
-    });
-
-    ws.on('error', (error) => {
-      console.error('WebSocket error:', error);
     });
   });
 
