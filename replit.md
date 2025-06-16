@@ -24,10 +24,10 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 - **Development Server**: TSX for TypeScript execution
 
 ### Data Storage Solutions
-- **Database**: PostgreSQL with Neon Database serverless
+- **Database**: PostgreSQL with Supabase serverless database
 - **ORM**: Drizzle ORM for type-safe database operations
 - **Schema**: Centralized schema definitions in `/shared/schema.ts`
-- **Migrations**: Drizzle Kit for database migrations
+- **Migrations**: Drizzle Kit for database migrations (npm run db:push)
 
 ## Key Components
 
@@ -67,6 +67,14 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 5. **Payment Processing**: Users upgrade to premium plans via Stripe
 6. **Real-time Updates**: WebSocket connections provide live notifications
 
+## Design System & Branding
+
+### Color Palette
+- **Primary Color**: `#3C5BFA` (Blue) - Main brand color
+- **Secondary Color**: `#FFA94D` (Orange) - Accent color  
+- **Text Colors**: Black (`#000000`) for primary, Gray (`#4B5563`) for secondary
+- **Theme Configuration**: Centralized in `/client/src/lib/theme.ts`
+
 ## External Dependencies
 
 ### Payment Processing
@@ -74,7 +82,7 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 - Environment variables: `STRIPE_SECRET_KEY`, `VITE_STRIPE_PUBLIC_KEY`
 
 ### Database
-- **Neon Database**: Serverless PostgreSQL hosting
+- **Supabase**: Serverless PostgreSQL hosting with real-time features
 - Environment variable: `DATABASE_URL`
 
 ### UI Components
@@ -105,7 +113,15 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 
 ## Changelog
 
-- June 16, 2025. Initial setup
+### June 16, 2025
+- Initial Evento+ platform setup with complete SaaS marketplace architecture
+- Implemented three-tier pricing system for all user types (Prestadores, Contratantes, Anunciantes)  
+- Configured Supabase database integration with proper schema
+- Added Stripe payment processing for subscription management
+- Applied custom brand colors (#3C5BFA primary, #FFA94D secondary)
+- Removed demo/sales elements per user requirements - direct plan selection approach
+- Set up real-time WebSocket chat infrastructure
+- Created centralized theme system in `/client/src/lib/theme.ts`
 
 ## User Preferences
 
