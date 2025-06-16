@@ -153,15 +153,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Google OAuth routes
-  app.get("/auth/google", passport.authenticate("google", {
-    scope: ["profile", "email"]
-  }));
+  app.get("/auth/google", (req, res, next) => {
+    console.log("Starting Google OAuth authentication...");
+    passport.authenticate("google", {
+      scope: ["profile", "email"]
+    })(req, res, next);
+  });
 
   app.get("/auth/google/callback", 
-    passport.authenticate("google", { failureRedirect: "/login" }),
+    (req, res, next) => {
+      console.log("Google OAuth callback received");
+      passport.authenticate("google", { 
+        failureRedirect: "/login",
+        failureMessage: true 
+      })(req, res, next);
+    },
     (req, res) => {
+      console.log("Google OAuth authentication successful");
       // Successful authentication, redirect to dashboard or user selection
       const user = req.user as any;
+      console.log("User authenticated:", user?.email, "Type:", user?.userType);
       if (user.userType === 'contratante') {
         res.redirect("/dashboard");
       } else {
