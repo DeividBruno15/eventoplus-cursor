@@ -19,7 +19,7 @@ import Analytics from "@/pages/analytics";
 import Chat from "@/pages/chat";
 import Pricing from "@/pages/pricing";
 import Subscribe from "@/pages/subscribe";
-import SubscriptionManagement from "@/pages/subscription-management";
+import SubscriptionManagement from "@/pages/subscription-management-simple";
 import Profile from "@/pages/profile";
 import Settings from "@/pages/settings";
 import AuthGuard from "@/components/auth/auth-guard";
