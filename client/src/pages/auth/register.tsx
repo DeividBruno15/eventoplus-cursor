@@ -26,9 +26,21 @@ type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function Register() {
   const [, setLocation] = useLocation();
-  const { register: registerUser } = useAuth();
+  const { register: registerUser, user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [registerSuccess, setRegisterSuccess] = useState(false);
+
+  // Effect para redirecionar quando o usuário for autenticado
+  useEffect(() => {
+    if (user && registerSuccess) {
+      toast({
+        title: "Conta criada com sucesso!",
+        description: "Bem-vindo ao Evento+",
+      });
+      setLocation("/dashboard");
+    }
+  }, [user, registerSuccess, toast, setLocation]);
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -43,11 +55,7 @@ export default function Register() {
     setIsLoading(true);
     try {
       await registerUser(data.username, data.email, data.password, data.userType);
-      toast({
-        title: "Conta criada com sucesso!",
-        description: "Bem-vindo ao Evento+",
-      });
-      setLocation("/dashboard");
+      setRegisterSuccess(true);
     } catch (error: any) {
       toast({
         title: "Erro no cadastro",
