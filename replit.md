@@ -1,8 +1,8 @@
-# Event Management Platform
+# Evento+ - SaaS Event Marketplace Platform
 
 ## Overview
 
-This is a full-stack event management platform built with React, Express.js, and PostgreSQL. The platform connects three types of users: event organizers (contratante), service providers (prestador), and venue advertisers (anunciante). It facilitates event planning by allowing organizers to create events, service providers to apply for opportunities, and venue owners to advertise their spaces.
+Evento+ is a comprehensive SaaS marketplace platform that connects event organizers with service providers and venue owners. The platform operates with a three-tier subscription model for each user type (Prestadores, Contratantes, Anunciantes) and includes integrated payment processing, real-time chat, and a complete event management ecosystem.
 
 ## System Architecture
 

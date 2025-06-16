@@ -28,9 +28,11 @@ export default function Home() {
                       Começar Gratuitamente
                     </Button>
                   </Link>
-                  <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-4">
-                    Ver Demo
-                  </Button>
+                  <Link href="/pricing">
+                    <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-4">
+                      Ver Planos
+                    </Button>
+                  </Link>
                 </div>
               </div>
               
@@ -217,9 +219,11 @@ export default function Home() {
                 Começar Gratuitamente
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-4">
-              Falar com Especialista
-            </Button>
+            <Link href="/pricing">
+              <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-4">
+                Ver Planos
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
