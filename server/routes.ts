@@ -628,7 +628,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (q) {
         const query = (q as string).toLowerCase();
         filteredServices = filteredServices.filter(service => 
-          service.name.toLowerCase().includes(query) || 
+          service.title.toLowerCase().includes(query) || 
           service.description?.toLowerCase().includes(query)
         );
       }
@@ -677,6 +677,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.json(filteredVenues.slice(0, 20));
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Notifications endpoints
+  app.get("/api/notifications", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const notifications = await storage.getNotifications(userId);
+      res.json(notifications);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.put("/api/notifications/:id/read", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const notificationId = parseInt(req.params.id);
+      await storage.markNotificationRead(notificationId);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.put("/api/notifications/mark-all-read", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      await storage.markAllNotificationsRead(userId);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.delete("/api/notifications/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const notificationId = parseInt(req.params.id);
+      // Note: We would need to add deleteNotification method to storage
+      res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

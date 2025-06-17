@@ -34,7 +34,8 @@ import {
   Search,
   ShoppingCart,
   FileText,
-  Shield
+  Shield,
+  Bell
 } from "lucide-react";
 
 interface SidebarProps {
@@ -57,6 +58,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: Users, label: "Prestadores", path: "/services" },
       { icon: MapPin, label: "Espaços", path: "/venues" },
       { icon: MessageSquare, label: "Chat", path: "/chat" },
+      { icon: Bell, label: "Notificações", path: "/notifications" },
       { icon: ShoppingCart, label: "Carrinho", path: "/cart" },
       { icon: FileText, label: "Contratos", path: "/contracts" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
@@ -67,6 +69,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: Calendar, label: "Eventos", path: "/events" },
       { icon: Star, label: "Gerenciar Serviços", path: "/services/manage" },
       { icon: MessageSquare, label: "Chat", path: "/chat" },
+      { icon: Bell, label: "Notificações", path: "/notifications" },
       { icon: FileText, label: "Contratos", path: "/contracts" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
     ],
@@ -76,6 +79,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: MapPin, label: "Gerenciar Espaços", path: "/venues/manage" },
       { icon: Calendar, label: "Eventos", path: "/events" },
       { icon: MessageSquare, label: "Chat", path: "/chat" },
+      { icon: Bell, label: "Notificações", path: "/notifications" },
       { icon: FileText, label: "Contratos", path: "/contracts" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
     ]

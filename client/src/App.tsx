@@ -41,6 +41,7 @@ import TwoFactor from "@/pages/two-factor";
 import Agenda from "@/pages/agenda";
 import HelpCenter from "@/pages/help-center";
 import Support from "@/pages/support";
+import NotificationsPage from "@/pages/notifications";
 import AuthGuard from "@/components/auth/auth-guard";
 import NotFound from "@/pages/not-found";
 
@@ -161,6 +162,14 @@ function Router() {
         <Layout>
           <AuthGuard>
             <ManageSubscription />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/notifications">
+        <Layout>
+          <AuthGuard>
+            <NotificationsPage />
           </AuthGuard>
         </Layout>
       </Route>
