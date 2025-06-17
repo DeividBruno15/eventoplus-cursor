@@ -62,32 +62,18 @@ export default function CreateEvent() {
       state: address.state
     });
     
-    // Update location field with full address
     const fullAddress = `${address.street}, ${address.neighborhood}, ${address.city}/${address.state}`;
     form.setValue('location', fullAddress);
   };
 
   const createEventMutation = useMutation({
     mutationFn: async (data: CreateEventForm) => {
-      const formData = new FormData();
-      
-      // Add event data
-      Object.keys(data).forEach(key => {
-        formData.append(key, data[key as keyof CreateEventForm]);
-      });
-      
-      // Add address data
-      formData.append('addressData', JSON.stringify(addressData));
-      
-      // Add event images
-      eventImages.forEach((image, index) => {
-        formData.append(`image_${index}`, image.file);
-      });
-      
       const eventData = {
         ...data,
         budget: parseFloat(data.budget),
         guestCount: parseInt(data.guestCount),
+        addressData: JSON.stringify(addressData),
+        imageCount: eventImages.length
       };
       return apiRequest("POST", "/api/events", eventData);
     },
@@ -114,37 +100,138 @@ export default function CreateEvent() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-black mb-2">
-            Criar Novo Evento
-          </h1>
-          <p className="text-gray-600">
-            Preencha os detalhes do seu evento para começar a receber propostas de prestadores qualificados.
-          </p>
-        </div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-black mb-2">
+          Criar Novo Evento
+        </h1>
+        <p className="text-gray-600">
+          Preencha os detalhes do seu evento para começar a receber propostas de prestadores qualificados.
+        </p>
+      </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações do Evento</CardTitle>
-            <CardDescription>
-              Forneça detalhes completos para atrair os melhores prestadores
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Informações do Evento</CardTitle>
+          <CardDescription>
+            Forneça detalhes completos para atrair os melhores prestadores
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Título do Evento</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: Casamento dos Sonhos - Marina & João" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Descreva detalhadamente seu evento, estilo, preferências e expectativas..."
+                        rows={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="title"
+                  name="date"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Título do Evento</FormLabel>
+                      <FormLabel>Data do Evento</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="guestCount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número de Convidados</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="150"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="space-y-4">
+                <FormLabel>Endereço do Evento</FormLabel>
+                <CEPInput onAddressFound={handleCEPFound} />
+                
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Localização Completa</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="Ex: Casamento João e Maria - Outubro 2024" 
+                          placeholder="Endereço completo será preenchido automaticamente com o CEP" 
                           {...field} 
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Categoria do Evento</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione a categoria" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="casamento">Casamento</SelectItem>
+                          <SelectItem value="festa-infantil">Festa Infantil</SelectItem>
+                          <SelectItem value="evento-corporativo">Evento Corporativo</SelectItem>
+                          <SelectItem value="formatura">Formatura</SelectItem>
+                          <SelectItem value="aniversario">Aniversário</SelectItem>
+                          <SelectItem value="outros">Outros</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -152,163 +239,56 @@ export default function CreateEvent() {
 
                 <FormField
                   control={form.control}
-                  name="description"
+                  name="budget"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Descrição</FormLabel>
+                      <FormLabel>Orçamento Total (R$)</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Descreva seu evento, estilo, preferências e expectativas..."
-                          rows={4}
-                          {...field} 
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="5000.00"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="date"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Data do Evento</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="date" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <div className="space-y-4">
+                <FormLabel>Imagens do Evento</FormLabel>
+                <p className="text-sm text-gray-600">
+                  Adicione até 5 imagens para ilustrar seu evento e atrair mais prestadores.
+                </p>
+                <MediaUpload
+                  onMediaChange={setEventImages}
+                  maxFiles={5}
+                  initialMedia={eventImages}
+                />
+              </div>
 
-                  <FormField
-                    control={form.control}
-                    name="guestCount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Número de Convidados</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="100" 
-                            type="number"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* CEP Integration */}
-                <div className="space-y-4">
-                  <FormLabel>Endereço do Evento</FormLabel>
-                  <CEPInput onAddressFound={handleCEPFound} />
-                  
-                  <FormField
-                    control={form.control}
-                    name="location"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Localização Completa</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Endereço completo será preenchido automaticamente com o CEP" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Categoria do Evento</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione a categoria" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="casamento">Casamento</SelectItem>
-                            <SelectItem value="festa-infantil">Festa Infantil</SelectItem>
-                            <SelectItem value="evento-corporativo">Evento Corporativo</SelectItem>
-                            <SelectItem value="formatura">Formatura</SelectItem>
-                            <SelectItem value="aniversario">Aniversário</SelectItem>
-                            <SelectItem value="outros">Outros</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="budget"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Orçamento Total (R$)</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="5000.00" 
-                            type="number"
-                            step="0.01"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Event Images Upload */}
-                <div className="space-y-4">
-                  <FormLabel>Imagens do Evento</FormLabel>
-                  <p className="text-sm text-gray-600">
-                    Adicione até 5 imagens para ilustrar seu evento e atrair mais prestadores.
-                  </p>
-                  <MediaUpload
-                    onMediaChange={setEventImages}
-                    maxFiles={5}
-                    initialMedia={eventImages}
-                  />
-                </div>
-
-                <div className="flex gap-4">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setLocation("/events")}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    className="bg-primary hover:bg-blue-700"
-                    disabled={createEventMutation.isPending}
-                  >
-                    {createEventMutation.isPending ? "Criando..." : "Publicar Evento"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      </div>
+              <div className="flex gap-4">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setLocation("/events")}
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit" 
+                  className="bg-primary hover:bg-blue-700"
+                  disabled={createEventMutation.isPending}
+                >
+                  {createEventMutation.isPending ? "Criando..." : "Publicar Evento"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
