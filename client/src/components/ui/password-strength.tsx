@@ -48,10 +48,9 @@ export function PasswordStrength({ password, onStrengthChange }: PasswordStrengt
           style={{ width: getStrengthWidth() }}
         />
       </div>
-      
       {/* Requirements list */}
       <div className="space-y-2">
-        <p className="text-sm text-gray-600 mb-2">Must contain at least:</p>
+        <p className="text-sm text-gray-600 mb-2">Deve conter, pelo menos:</p>
         
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
