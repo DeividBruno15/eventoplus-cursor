@@ -93,7 +93,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   const login = async (email: string, password: string) => {
-    await loginMutation.mutateAsync({ email, password });
+    try {
+      await loginMutation.mutateAsync({ email, password });
+      return { success: true };
+    } catch (error: any) {
+      return { 
+        success: false, 
+        error: error.message || "Erro ao fazer login" 
+      };
+    }
   };
 
   const register = async (username: string, email: string, password: string, userType: string) => {
