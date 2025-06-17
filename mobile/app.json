@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -16,31 +16,106 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.eventplus.app",
-      "buildNumber": "1"
+      "bundleIdentifier": "com.eventoplus.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Evento+ precisa acessar a câmera para tirar fotos de perfil, eventos e espaços.",
+        "NSPhotoLibraryUsageDescription": "Evento+ precisa acessar a galeria para selecionar fotos de perfil, eventos e espaços.",
+        "NSLocationWhenInUseUsageDescription": "Evento+ usa sua localização para encontrar eventos e espaços próximos.",
+        "NSFaceIDUsageDescription": "Evento+ usa Face ID para login seguro e rápido.",
+        "NSMicrophoneUsageDescription": "Evento+ precisa acessar o microfone para chamadas de vídeo durante negociações."
+      },
+      "associatedDomains": [
+        "applinks:evento-plus.app",
+        "applinks:www.evento-plus.app"
+      ],
+      "config": {
+        "googleMapsApiKey": "GOOGLE_MAPS_API_KEY_IOS"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#3C5BFA"
       },
-      "package": "com.eventplus.app",
-      "versionCode": 1
+      "package": "com.eventoplus.app",
+      "versionCode": 1,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.VIBRATE",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "GOOGLE_MAPS_API_KEY_ANDROID"
+        }
+      },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "evento-plus.app"
+            },
+            {
+              "scheme": "https",
+              "host": "www.evento-plus.app"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-camera",
       "expo-image-picker",
       "expo-location",
       "expo-notifications",
-      "expo-local-authentication"
+      "expo-local-authentication",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "13.0"
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {
-        "projectId": "evento-plus-mobile"
+        "projectId": "evento-plus-project-id"
       }
+    },
+    "owner": "evento-plus-team",
+    "privacy": "public",
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/evento-plus-project-id"
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
     }
   }
 }
