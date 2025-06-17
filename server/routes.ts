@@ -356,7 +356,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/events", async (req, res) => {
+  app.post("/api/events", createLimiter, async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Não autenticado" });
     }
@@ -701,7 +701,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/services", async (req, res) => {
+  app.post("/api/services", createLimiter, async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Não autenticado" });
     }
@@ -722,7 +722,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create venue endpoint
-  app.post("/api/venues", async (req, res) => {
+  app.post("/api/venues", createLimiter, async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Não autenticado" });
     }
@@ -1426,7 +1426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/public/webhook", async (req, res) => {
+  app.post("/api/public/webhook", webhookLimiter, async (req, res) => {
     // Basic API key authentication for webhooks
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

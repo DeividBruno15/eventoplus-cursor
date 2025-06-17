@@ -5,12 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Calendar, Users, MapPin, TrendingUp, Plus } from "lucide-react";
+import type { DashboardStats } from "@shared/types";
 
 export default function Dashboard() {
   const { user } = useAuth();
 
   // Buscar estatísticas do dashboard
-  const { data: stats } = useQuery({
+  const { data: stats = {} } = useQuery<DashboardStats>({
     queryKey: ["/api/dashboard/stats"],
     enabled: !!user,
   });
@@ -26,9 +27,9 @@ export default function Dashboard() {
           title: "Dashboard do Prestador",
           description: "Gerencie seus serviços e candidaturas",
           stats: [
-            { label: "Candidaturas Ativas", value: stats?.applicationsCount?.toString() || "0", icon: Calendar },
-            { label: "Serviços Cadastrados", value: stats?.servicesCount?.toString() || "0", icon: Users },
-            { label: "Avaliação Média", value: stats?.averageRating || "5.0", icon: TrendingUp },
+            { label: "Candidaturas Ativas", value: (stats as any)?.applicationsCount?.toString() || "0", icon: Calendar },
+            { label: "Serviços Cadastrados", value: (stats as any)?.servicesCount?.toString() || "0", icon: Users },
+            { label: "Avaliação Média", value: (stats as any)?.averageRating?.toString() || "5.0", icon: TrendingUp },
           ],
           actions: [
             { label: "Cadastrar Serviço", href: "/services/create", icon: Plus },
