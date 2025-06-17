@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evento+ Mobile Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .mobile-frame {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #3C5BFA;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .app-content {
+            height: calc(100% - 44px - 83px);
+            overflow-y: auto;
+            background: #fff;
+        }
+
+        .header {
+            background: #3C5BFA;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            color: #3C5BFA;
+            background: white;
+            border-bottom: 3px solid #3C5BFA;
+        }
+
+        .tab-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: #3C5BFA;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        .feature-text h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .feature-text p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .bottom-nav {
+            height: 83px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 10px 0 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #999;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #3C5BFA;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            background: currentColor;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+
+        .instructions {
+            background: #FFF9E6;
+            border: 1px solid #FFE066;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px;
+            color: #B8860B;
+        }
+
+        .instructions h3 {
+            margin-bottom: 15px;
+            color: #B8860B;
+        }
+
+        .instructions ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .code {
+            background: #f8f9fa;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+        }
+
+        @media (max-width: 420px) {
+            .mobile-frame {
+                width: 100%;
+                height: 100vh;
+                margin: 0;
+                border-radius: 0;
+                padding: 0;
+            }
+            
+            .screen {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-frame">
+        <div class="screen">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>Evento+</span>
+                <span>100%</span>
+            </div>
+            
+            <div class="app-content">
+                <div class="header">
+                    <div class="logo">E+</div>
+                    <h1>Evento+</h1>
+                    <p>Conectando eventos perfeitos</p>
+                </div>
+
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="showTab('features')">Funcionalidades</button>
+                    <button class="nav-tab" onclick="showTab('screens')">Telas</button>
+                    <button class="nav-tab" onclick="showTab('setup')">Como Testar</button>
+                </div>
+
+                <div id="features" class="tab-content active">
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <div class="feature-icon">👤</div>
+                            <div class="feature-text">
+                                <h3>Autenticação Completa</h3>
+                                <p>Login, registro e perfil com biometria</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">📊</div>
+                            <div class="feature-text">
+                                <h3>Dashboard Personalizado</h3>
+                                <p>Diferentes para cada tipo de usuário</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">🎉</div>
+                            <div class="feature-text">
+                                <h3>Gestão de Eventos</h3>
+                                <p>Criar, visualizar e se candidatar</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">💬</div>
+                            <div class="feature-text">
+                                <h3>Chat em Tempo Real</h3>
+                                <p>Mensagens entre usuários</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">📸</div>
+                            <div class="feature-text">
+                                <h3>Câmera Integrada</h3>
+                                <p>Upload de fotos de perfil e eventos</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">🔔</div>
+                            <div class="feature-text">
+                                <h3>Notificações Push</h3>
+                                <p>Alertas em tempo real</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">🔒</div>
+                            <div class="feature-text">
+                                <h3>Face ID / Touch ID</h3>
+                                <p>Login seguro com biometria</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">📱</div>
+                            <div class="feature-text">
+                                <h3>Modo Offline</h3>
+                                <p>Funciona sem internet e sincroniza</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="screens" class="tab-content">
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <div class="feature-icon">🏠</div>
+                            <div class="feature-text">
+                                <h3>Tela Inicial</h3>
+                                <p>Dashboard com métricas personalizadas</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">📅</div>
+                            <div class="feature-text">
+                                <h3>Lista de Eventos</h3>
+                                <p>Navegação e filtros avançados</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">🛠️</div>
+                            <div class="feature-text">
+                                <h3>Catálogo de Serviços</h3>
+                                <p>Prestadores organizados por categoria</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">🏢</div>
+                            <div class="feature-text">
+                                <h3>Espaços para Eventos</h3>
+                                <p>Locais disponíveis para aluguel</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">💬</div>
+                            <div class="feature-text">
+                                <h3>Chat</h3>
+                                <p>Conversas organizadas por contato</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">👤</div>
+                            <div class="feature-text">
+                                <h3>Perfil</h3>
+                                <p>Dados pessoais e configurações</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="setup" class="tab-content">
+                    <div class="instructions">
+                        <h3>Para testar no seu celular:</h3>
+                        <ol>
+                            <li>Baixe o app <span class="code">Expo Go</span> na App Store ou Google Play</li>
+                            <li>Crie uma conta gratuita no Expo</li>
+                            <li>No terminal do projeto: <span class="code">cd mobile && npx expo start</span></li>
+                            <li>Escaneie o QR code que aparece com o Expo Go</li>
+                        </ol>
+                    </div>
+
+                    <div class="instructions">
+                        <h3>Para testar no computador:</h3>
+                        <ol>
+                            <li><strong>iOS:</strong> Abra Xcode Simulator (apenas Mac)</li>
+                            <li><strong>Android:</strong> Abra Android Studio Emulator</li>
+                            <li>Execute: <span class="code">npx expo start</span></li>
+                            <li>Pressione 'i' para iOS ou 'a' para Android</li>
+                        </ol>
+                    </div>
+
+                    <div class="instructions">
+                        <h3>Versão Web (limitada):</h3>
+                        <ol>
+                            <li>Execute: <span class="code">cd mobile && npx expo start --web</span></li>
+                            <li>Abre automaticamente no navegador</li>
+                            <li>Use DevTools para simular dispositivo móvel</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <a href="#" class="nav-item active">
+                    <div class="nav-icon"></div>
+                    <span>Início</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon"></div>
+                    <span>Eventos</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon"></div>
+                    <span>Serviços</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon"></div>
+                    <span>Chat</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon"></div>
+                    <span>Perfil</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked nav tab
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
