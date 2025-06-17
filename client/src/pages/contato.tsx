@@ -80,12 +80,12 @@ export default function Contato() {
               <Link href="/contato">
                 <span className="text-[#3C5BFA] font-medium cursor-pointer">Contato</span>
               </Link>
-              <Link href="/login">
+              <Link href="/auth/login">
                 <Button variant="outline" className="border-gray-300">
                   Entrar
                 </Button>
               </Link>
-              <Link href="/register">
+              <Link href="/auth/register">
                 <Button className="bg-[#3C5BFA] hover:bg-[#2C46E8]">
                   Cadastrar
                 </Button>
