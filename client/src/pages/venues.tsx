@@ -324,15 +324,6 @@ export default function Venues() {
               <div className="space-y-4">
                 <Label>Endereço *</Label>
                 <CEPInput onAddressFound={handleCEPFound} />
-                <div>
-                  <Label htmlFor="location">Endereço Completo</Label>
-                  <Input
-                    id="location"
-                    value={formData.location}
-                    onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                    placeholder="Será preenchido automaticamente com o CEP"
-                  />
-                </div>
               </div>
 
               {/* Capacity and Pricing */}
@@ -374,41 +365,77 @@ export default function Venues() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {formData.pricingModel === "hourly" && (
                   <div>
-                    <Label htmlFor="pricePerHour">Preço por Hora (R$) *</Label>
-                    <Input
-                      id="pricePerHour"
-                      type="number"
-                      step="0.01"
-                      value={formData.pricePerHour}
-                      onChange={(e) => setFormData(prev => ({ ...prev, pricePerHour: e.target.value }))}
-                      placeholder="200.00"
-                    />
+                    <Label htmlFor="pricePerHour">Preço por Hora *</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                      <Input
+                        id="pricePerHour"
+                        type="text"
+                        value={formData.pricePerHour}
+                        onChange={(e) => {
+                          let value = e.target.value.replace(/[^\d]/g, '');
+                          if (value === '') {
+                            setFormData(prev => ({ ...prev, pricePerHour: '' }));
+                            return;
+                          }
+                          value = (parseFloat(value) / 100).toFixed(2);
+                          const formatted = value.replace('.', ',');
+                          setFormData(prev => ({ ...prev, pricePerHour: formatted }));
+                        }}
+                        placeholder="0,00"
+                        className="pl-10"
+                      />
+                    </div>
                   </div>
                 )}
                 {formData.pricingModel === "daily" && (
                   <div>
-                    <Label htmlFor="pricePerDay">Preço por Dia (R$) *</Label>
-                    <Input
-                      id="pricePerDay"
-                      type="number"
-                      step="0.01"
-                      value={formData.pricePerDay}
-                      onChange={(e) => setFormData(prev => ({ ...prev, pricePerDay: e.target.value }))}
-                      placeholder="1500.00"
-                    />
+                    <Label htmlFor="pricePerDay">Preço por Dia *</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                      <Input
+                        id="pricePerDay"
+                        type="text"
+                        value={formData.pricePerDay}
+                        onChange={(e) => {
+                          let value = e.target.value.replace(/[^\d]/g, '');
+                          if (value === '') {
+                            setFormData(prev => ({ ...prev, pricePerDay: '' }));
+                            return;
+                          }
+                          value = (parseFloat(value) / 100).toFixed(2);
+                          const formatted = value.replace('.', ',');
+                          setFormData(prev => ({ ...prev, pricePerDay: formatted }));
+                        }}
+                        placeholder="0,00"
+                        className="pl-10"
+                      />
+                    </div>
                   </div>
                 )}
                 {formData.pricingModel === "weekend" && (
                   <div>
-                    <Label htmlFor="pricePerWeekend">Preço por Fim de Semana (R$) *</Label>
-                    <Input
-                      id="pricePerWeekend"
-                      type="number"
-                      step="0.01"
-                      value={formData.pricePerWeekend}
-                      onChange={(e) => setFormData(prev => ({ ...prev, pricePerWeekend: e.target.value }))}
-                      placeholder="3000.00"
-                    />
+                    <Label htmlFor="pricePerWeekend">Preço por Fim de Semana *</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                      <Input
+                        id="pricePerWeekend"
+                        type="text"
+                        value={formData.pricePerWeekend}
+                        onChange={(e) => {
+                          let value = e.target.value.replace(/[^\d]/g, '');
+                          if (value === '') {
+                            setFormData(prev => ({ ...prev, pricePerWeekend: '' }));
+                            return;
+                          }
+                          value = (parseFloat(value) / 100).toFixed(2);
+                          const formatted = value.replace('.', ',');
+                          setFormData(prev => ({ ...prev, pricePerWeekend: formatted }));
+                        }}
+                        placeholder="0,00"
+                        className="pl-10"
+                      />
+                    </div>
                   </div>
                 )}
               </div>
