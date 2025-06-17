@@ -62,7 +62,7 @@ export function PasswordStrength({ password, onStrengthChange }: PasswordStrengt
             <span className={`text-sm ${
               checks.length ? "text-green-600" : "text-gray-500"
             }`}>
-              At least 8 character
+              Pelo menos 8 caracteres
             </span>
           </div>
           
@@ -75,7 +75,7 @@ export function PasswordStrength({ password, onStrengthChange }: PasswordStrengt
             <span className={`text-sm ${
               checks.uppercase ? "text-green-600" : "text-gray-500"
             }`}>
-              At least 1 uppercase
+              Pelo menos 1 letra maiúscula
             </span>
           </div>
           
@@ -88,7 +88,7 @@ export function PasswordStrength({ password, onStrengthChange }: PasswordStrengt
             <span className={`text-sm ${
               checks.number ? "text-green-600" : "text-gray-500"
             }`}>
-              At least 1 number
+              Pelo menos 1 número
             </span>
           </div>
         </div>

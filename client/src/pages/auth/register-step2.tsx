@@ -26,6 +26,11 @@ const registerStep2Schema = z.object({
   confirmPassword: z.string(),
   phone: z.string().min(10, "Telefone deve ter pelo menos 10 dígitos"),
   zipCode: z.string().min(8, "CEP deve ter 8 dígitos"),
+  street: z.string().min(1, "Rua é obrigatória"),
+  number: z.string().min(1, "Número é obrigatório"),
+  neighborhood: z.string().min(1, "Bairro é obrigatório"),
+  city: z.string().min(1, "Cidade é obrigatória"),
+  state: z.string().min(1, "Estado é obrigatório"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Senhas não conferem",
   path: ["confirmPassword"],
@@ -67,6 +72,11 @@ export default function RegisterStep2() {
       confirmPassword: "",
       phone: "",
       zipCode: "",
+      street: "",
+      number: "",
+      neighborhood: "",
+      city: "",
+      state: "",
     },
   });
 
@@ -87,6 +97,13 @@ export default function RegisterStep2() {
       city: address.city,
       state: address.state
     });
+    
+    // Auto-populate form fields
+    form.setValue("zipCode", address.cep.replace(/\D/g, ''));
+    form.setValue("street", address.street);
+    form.setValue("neighborhood", address.neighborhood);
+    form.setValue("city", address.city);
+    form.setValue("state", address.state);
   };
 
   const handleContinue = (data: RegisterStep2Form) => {
@@ -351,21 +368,86 @@ export default function RegisterStep2() {
 
                 {/* Address */}
                 <div className="space-y-4">
-                  <FormLabel>Endereço</FormLabel>
-                  <CEPInput onAddressFound={handleCEPFound} />
+                  <FormLabel className="text-base font-semibold">Endereço</FormLabel>
+                  
+                  <div>
+                    <FormLabel className="text-sm">CEP</FormLabel>
+                    <CEPInput onAddressFound={handleCEPFound} initialValue={form.watch("zipCode")} />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="street"
+                      render={({ field }) => (
+                        <FormItem className="md:col-span-2">
+                          <FormLabel>Rua</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Nome da rua" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="number"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Número</FormLabel>
+                          <FormControl>
+                            <Input placeholder="123" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
                   <FormField
                     control={form.control}
-                    name="zipCode"
+                    name="neighborhood"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>CEP</FormLabel>
+                        <FormLabel>Bairro</FormLabel>
                         <FormControl>
-                          <Input placeholder="00000-000" {...field} />
+                          <Input placeholder="Nome do bairro" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Cidade</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Nome da cidade" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="state"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Estado</FormLabel>
+                          <FormControl>
+                            <Input placeholder="UF" {...field} maxLength={2} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
 
                 <div className="flex justify-between pt-6">
