@@ -31,7 +31,7 @@ export default function HomeClean() {
                 <img 
                   src={eventoLogo} 
                   alt="Evento+"
-                  className="h-8 object-contain"
+                  className="h-6 object-contain"
                 />
               </div>
             </div>
