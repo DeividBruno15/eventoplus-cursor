@@ -199,6 +199,46 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  async getEventWithApplications(id: number): Promise<any> {
+    const event = await db.select().from(events).where(eq(events.id, id)).limit(1);
+    if (!event[0]) return null;
+
+    const applications = await db
+      .select({
+        id: eventApplications.id,
+        providerId: eventApplications.providerId,
+        proposal: eventApplications.proposal,
+        price: eventApplications.price,
+        estimatedHours: eventApplications.estimatedHours,
+        availableDate: eventApplications.availableDate,
+        status: eventApplications.status,
+        rejectionReason: eventApplications.rejectionReason,
+        createdAt: eventApplications.createdAt,
+        provider: {
+          id: users.id,
+          username: users.username,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImage: users.profileImage
+        }
+      })
+      .from(eventApplications)
+      .leftJoin(users, eq(eventApplications.providerId, users.id))
+      .where(eq(eventApplications.eventId, id));
+
+    const organizer = await db.select({
+      username: users.username,
+      firstName: users.firstName,
+      lastName: users.lastName
+    }).from(users).where(eq(users.id, event[0].organizerId)).limit(1);
+
+    return {
+      ...event[0],
+      applications,
+      organizer: organizer[0]
+    };
+  }
+
   async createEvent(eventData: InsertEvent & { organizerId: number }): Promise<Event> {
     const result = await db.insert(events).values({
       ...eventData,
