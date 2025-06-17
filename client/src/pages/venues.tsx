@@ -25,9 +25,9 @@ interface Venue {
   location: string;
   category: string;
   capacity: number;
-  pricePerHour?: number;
-  pricePerDay?: number;
-  pricePerWeekend?: number;
+  pricePerHour?: string | number;
+  pricePerDay?: string | number;
+  pricePerWeekend?: string | number;
   pricingModel: string;
   amenities: string[];
   images: string[];
@@ -72,8 +72,8 @@ export default function Venues() {
     queryKey: ["/api/venues"],
     queryFn: async () => {
       const response = await apiRequest("GET", "/api/venues");
-      console.log('Venues API response:', response);
-      return response;
+      const data = await response.json();
+      return data;
     },
   });
 
@@ -227,19 +227,21 @@ export default function Venues() {
 
   const formatPrice = (venue: Venue) => {
     if (venue.pricingModel === "hourly" && venue.pricePerHour) {
-      return `R$ ${venue.pricePerHour}/hora`;
+      const price = typeof venue.pricePerHour === 'string' ? parseFloat(venue.pricePerHour) : venue.pricePerHour;
+      return `R$ ${price.toFixed(2).replace('.', ',')}/hora`;
     }
     if (venue.pricingModel === "daily" && venue.pricePerDay) {
-      return `R$ ${venue.pricePerDay}/dia`;
+      const price = typeof venue.pricePerDay === 'string' ? parseFloat(venue.pricePerDay) : venue.pricePerDay;
+      return `R$ ${price.toFixed(2).replace('.', ',')}/dia`;
     }
     if (venue.pricingModel === "weekend" && venue.pricePerWeekend) {
-      return `R$ ${venue.pricePerWeekend}/fim de semana`;
+      const price = typeof venue.pricePerWeekend === 'string' ? parseFloat(venue.pricePerWeekend) : venue.pricePerWeekend;
+      return `R$ ${price.toFixed(2).replace('.', ',')}/fim de semana`;
     }
     return "Consultar preço";
   };
 
   // Filter venues
-  console.log('Venues data:', venues, 'Type:', typeof venues, 'Is Array:', Array.isArray(venues));
   const filteredVenues = Array.isArray(venues) ? venues.filter((venue: Venue) => {
     const matchesSearch = venue.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          venue.description.toLowerCase().includes(searchTerm.toLowerCase());
