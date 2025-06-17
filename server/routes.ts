@@ -170,8 +170,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     )
   );
 
-  // Auth routes
-  app.post("/api/register", async (req, res) => {
+  // Apply rate limiting to all API routes
+  app.use('/api', apiLimiter);
+  
+  // Auth routes with specific rate limiting
+  app.post("/api/register", authLimiter, async (req, res) => {
     try {
       const {
         userType,
@@ -564,7 +567,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Mobile Authentication Routes
-  app.post("/api/mobile/login", async (req, res) => {
+  app.post("/api/mobile/login", authLimiter, async (req, res) => {
     try {
       const { email, password } = req.body;
       const user = await storage.getUserByEmail(email);
