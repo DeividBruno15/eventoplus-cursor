@@ -13,6 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MapPin, Users, DollarSign, Plus, Edit2, Eye, Star, Calendar, Building } from "lucide-react";
+import { CEPInput } from "@/components/ui/cep-input";
+import { MediaUpload } from "@/components/ui/media-upload";
 
 interface Venue {
   id: number;
@@ -48,13 +50,17 @@ export default function Venues() {
     name: "",
     description: "",
     address: "",
+    neighborhood: "",
     city: "",
     state: "",
+    cep: "",
     capacity: "",
     pricePerHour: "",
     category: "",
     amenities: [] as string[]
   });
+
+  const [mediaFiles, setMediaFiles] = useState<any[]>([]);
 
   // Buscar venues do usuário (se anunciante) ou todos (se outro tipo)
   const { data: venues = [], isLoading } = useQuery<Venue[]>({
@@ -135,13 +141,27 @@ export default function Venues() {
       name: "",
       description: "",
       address: "",
+      neighborhood: "",
       city: "",
       state: "",
+      cep: "",
       capacity: "",
       pricePerHour: "",
       category: "",
       amenities: []
     });
+    setMediaFiles([]);
+  };
+
+  const handleCEPFound = (address: any) => {
+    setFormData(prev => ({
+      ...prev,
+      cep: address.cep,
+      address: address.street,
+      neighborhood: address.neighborhood,
+      city: address.city,
+      state: address.state
+    }));
   };
 
   const handleSubmit = () => {

@@ -332,7 +332,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 ? "bg-[#3C5BFA] text-white" 
                 : "text-gray-600 hover:bg-gray-100"
             } ${collapsed ? 'justify-center' : ''}`}>
-              <Headphones className="h-5 w-5" />
+              <MessageSquare className="h-5 w-5" />
               {!collapsed && <span>Suporte</span>}
             </a>
           </Link>

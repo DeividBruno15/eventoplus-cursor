@@ -30,6 +30,8 @@ import Contracts from "@/pages/contracts";
 import APIDocs from "@/pages/api-docs";
 import TwoFactor from "@/pages/two-factor";
 import Agenda from "@/pages/agenda";
+import HelpCenter from "@/pages/help-center";
+import Support from "@/pages/support";
 import AuthGuard from "@/components/auth/auth-guard";
 import NotFound from "@/pages/not-found";
 
@@ -192,6 +194,22 @@ function Router() {
         <Layout>
           <AuthGuard>
             <Agenda />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/help-center">
+        <Layout>
+          <AuthGuard>
+            <HelpCenter />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/support">
+        <Layout>
+          <AuthGuard>
+            <Support />
           </AuthGuard>
         </Layout>
       </Route>
