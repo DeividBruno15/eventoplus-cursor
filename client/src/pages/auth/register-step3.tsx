@@ -8,49 +8,18 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Check, ArrowLeft } from "lucide-react";
 
-// Service Category Icons
-const EntertainmentIcon = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 2L13.09 5.26L16 4L14.74 7.09L18 8L14.74 8.91L16 12L13.09 10.74L12 14L10.91 10.74L8 12L9.26 8.91L6 8L9.26 7.09L8 4L10.91 5.26L12 2Z" fill="#3C5BFA"/>
-    <path d="M5 16L6.5 19.5L10 18L8.5 21.5L12 22L8.5 22.5L10 26L6.5 24.5L5 28L3.5 24.5L0 26L1.5 22.5L-2 22L1.5 21.5L0 18L3.5 19.5L5 16Z" fill="#3C5BFA"/>
-  </svg>
-);
-
-const FoodIcon = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M11 9H9V2H7V9H5V2H3V9C3 10.66 4.34 12 6 12H9V22H11V12H12C13.66 12 15 10.66 15 9V2H13V9H11Z" fill="#3C5BFA"/>
-    <path d="M16 6V14H18V22H20V2C18.9 2 17.99 2.9 17.99 4L18 6H16Z" fill="#3C5BFA"/>
-  </svg>
-);
-
-const OrganizationIcon = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z" fill="#3C5BFA"/>
-    <path d="M8 12H16V14H8V12Z" fill="#3C5BFA"/>
-    <path d="M8 16H13V18H8V16Z" fill="#3C5BFA"/>
-  </svg>
-);
-
-const ProductionIcon = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M17 10.5V7C17 6.45 16.55 6 16 6H4C3.45 6 3 6.45 3 7V10.5C3 10.78 3.22 11 3.5 11H4.75L5.72 15.5C5.86 16.29 6.54 16.9 7.34 16.9H12.66C13.46 16.9 14.14 16.29 14.28 15.5L15.25 11H16.5C16.78 11 17 10.78 17 10.5Z" fill="#3C5BFA"/>
-    <path d="M18 9V7C18 5.9 17.1 5 16 5H14V3C14 2.45 13.55 2 13 2H7C6.45 2 6 2.45 6 3V5H4C2.9 5 2 5.9 2 7V9C0.9 9 0 9.9 0 11V18C0 19.1 0.9 20 2 20H18C19.1 20 20 19.1 20 18V11C20 9.9 19.1 9 18 9Z" fill="#3C5BFA"/>
-  </svg>
-);
-
-const CleaningIcon = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M18 6L16.5 4.5L15 6V10.5C15 11.33 14.33 12 13.5 12S12 11.33 12 10.5V6L10.5 4.5L9 6V10.5C9 12.43 10.57 14 12.5 14S16 12.43 16 10.5V6H18Z" fill="#3C5BFA"/>
-    <path d="M8 20V12H6V20C6 21.1 6.9 22 8 22S10 21.1 10 20V12H8V20Z" fill="#3C5BFA"/>
-    <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6S10 5.1 10 4S10.9 2 12 2Z" fill="#3C5BFA"/>
-  </svg>
-);
+// Import service category icons
+import microphoneIcon from "@assets/Microphone, Mic, Rec_1750126816998.png";
+import foodIcon from "@assets/Group-1_1750126826239.png";
+import organizationIcon from "@assets/Group_1750126830235.png";
+import productionIcon from "@assets/video-camera-movie-film_1750126838703.png";
+import cleaningIcon from "@assets/wash-bucket_1750126846234.png";
 
 const serviceCategories = [
   {
     id: "entretenimento",
     name: "Entretenimento e animação",
-    icon: <EntertainmentIcon />,
+    icon: microphoneIcon,
     services: [
       "DJ",
       "Cantores",
@@ -65,7 +34,7 @@ const serviceCategories = [
   {
     id: "alimentacao",
     name: "Alimentação e bebidas",
-    icon: <FoodIcon />,
+    icon: foodIcon,
     services: [
       "Cozinheiro / Chef de cozinha",
       "Churrasqueiro",
@@ -79,7 +48,7 @@ const serviceCategories = [
   {
     id: "organizacao",
     name: "Organização e suporte",
-    icon: <OrganizationIcon />,
+    icon: organizationIcon,
     services: [
       "Cerimonialista / Assessoria de eventos",
       "Hostess / Recepcionista",
@@ -91,7 +60,7 @@ const serviceCategories = [
   {
     id: "producao",
     name: "Produção e visual",
-    icon: <ProductionIcon />,
+    icon: productionIcon,
     services: [
       "Fotógrafo / Videomaker",
       "Decorador / Designer de eventos",
@@ -104,7 +73,7 @@ const serviceCategories = [
   {
     id: "limpeza",
     name: "Limpeza e manutenção",
-    icon: <CleaningIcon />,
+    icon: cleaningIcon,
     services: [
       "Limpeza pré-evento (antes da montagem)",
       "Limpeza durante o evento (equipe de suporte para manter o ambiente organizado)",
@@ -257,7 +226,13 @@ export default function RegisterStep3() {
                         onClick={() => handleCategorySelect(category.id)}
                       >
                         <div className="text-center">
-                          <div className="mb-4 flex justify-center">{category.icon}</div>
+                          <div className="mb-4 flex justify-center">
+                            <img 
+                              src={category.icon} 
+                              alt={category.name}
+                              className="w-12 h-12 object-contain"
+                            />
+                          </div>
                           <h3 className="font-semibold text-blue-600 text-lg leading-tight">
                             {category.name}
                           </h3>
