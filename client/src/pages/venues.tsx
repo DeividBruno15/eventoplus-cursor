@@ -49,6 +49,7 @@ export default function Venues() {
     description: "",
     location: "",
     capacity: "",
+    number: "",
     pricePerHour: "",
     pricePerDay: "",
     pricePerWeekend: "",
@@ -132,6 +133,7 @@ export default function Venues() {
       description: "",
       location: "",
       capacity: "",
+      number: "",
       pricePerHour: "",
       pricePerDay: "",
       pricePerWeekend: "",
@@ -166,10 +168,12 @@ export default function Venues() {
   };
 
   const handleSubmit = () => {
-    if (!formData.name || !formData.description || !formData.location || !formData.capacity || !formData.category) {
+    if (!formData.name || !formData.description || !formData.capacity || !formData.category || 
+        !formData.number || !addressData.street || !addressData.neighborhood || 
+        !addressData.city || !addressData.state || !addressData.cep) {
       toast({
         title: "Campos obrigatórios",
-        description: "Preencha todos os campos obrigatórios",
+        description: "Preencha todos os campos obrigatórios: nome, descrição, categoria, capacidade, CEP e endereço completo",
         variant: "destructive",
       });
       return;
@@ -322,8 +326,61 @@ export default function Venues() {
 
               {/* Location */}
               <div className="space-y-4">
-                <Label>Endereço *</Label>
+                <Label>CEP *</Label>
                 <CEPInput onAddressFound={handleCEPFound} />
+                
+                {/* Address fields */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="street">Rua *</Label>
+                    <Input
+                      id="street"
+                      value={addressData.street}
+                      onChange={(e) => setAddressData(prev => ({ ...prev, street: e.target.value }))}
+                      placeholder="Nome da rua"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="number">Número *</Label>
+                    <Input
+                      id="number"
+                      value={formData.number || ''}
+                      onChange={(e) => setFormData(prev => ({ ...prev, number: e.target.value }))}
+                      placeholder="123"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="neighborhood">Bairro *</Label>
+                    <Input
+                      id="neighborhood"
+                      value={addressData.neighborhood}
+                      onChange={(e) => setAddressData(prev => ({ ...prev, neighborhood: e.target.value }))}
+                      placeholder="Nome do bairro"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="city">Cidade *</Label>
+                    <Input
+                      id="city"
+                      value={addressData.city}
+                      onChange={(e) => setAddressData(prev => ({ ...prev, city: e.target.value }))}
+                      placeholder="Nome da cidade"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="state">Estado *</Label>
+                    <Input
+                      id="state"
+                      value={addressData.state}
+                      onChange={(e) => setAddressData(prev => ({ ...prev, state: e.target.value }))}
+                      placeholder="UF"
+                      maxLength={2}
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Capacity and Pricing */}

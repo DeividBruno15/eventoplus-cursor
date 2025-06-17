@@ -1,0 +1,51 @@
+> rest-express@1.0.0 dev
+=== Google OAuth Configuration ===index.ts
+Client ID: 190052814958-tsi43i1...
+Callback URL: https://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google/callback
+Domain: d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev
+5:31:15 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 8 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+5:31:21 PM [express] GET /api/user 401 in 5ms :: {"message":"Não autenticado"}
+5:31:34 PM [express] GET /api/user 304 in 299ms :: {"id":3,"username":"Anunciante","firstName":null,…
+5:31:47 PM [express] POST /api/login 200 in 1540ms :: {"id":3,"username":"Anunciante","firstName":nu…
+5:31:48 PM [express] GET /api/user 304 in 291ms :: {"id":3,"username":"Anunciante","firstName":null,…
+5:31:48 PM [express] GET /api/user 304 in 289ms :: {"id":3,"username":"Anunciante","firstName":null,…
+5:32:00 PM [express] GET /api/user 304 in 306ms :: {"id":3,"username":"Anunciante","firstName":null,…
+Getting venues for user: 3
+Venues retrieved: 0
+5:32:06 PM [express] GET /api/venues 304 in 595ms :: []
+5:32:49 PM [express] POST /api/venues 400 in 893ms :: {"message":"[\n  {\n    \"code\": \"invalid_ty…
+Google OAuth callback received
+Callback query params: {}
+Callback URL: /auth/google/callback
+PayloadTooLargeError: request entity too large
+    at readStream (/home/runner/workspace/node_modules/raw-body/index.js:163:17)
+    at getRawBody (/home/runner/workspace/node_modules/raw-body/index.js:116:12)
+    at read (/home/runner/workspace/node_modules/body-parser/lib/read.js:79:3)
+    at jsonParser (/home/runner/workspace/node_modules/body-parser/lib/types/json.js:138:5)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at expressInit (/home/runner/workspace/node_modules/express/lib/middleware/init.js:40:5)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at query (/home/runner/workspace/node_modules/express/lib/middleware/query.js:45:5)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at Function.handle (/home/runner/workspace/node_modules/express/lib/router/index.js:175:3)
+    at Function.handle (/home/runner/workspace/node_modules/express/lib/application.js:181:10)
+    at Server.app (/home/runner/workspace/node_modules/express/lib/express.js:39:9)
+    at Server.emit (node:events:518:28)
+    at parserOnIncoming (node:_http_server:1141:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:118:17)
+^C

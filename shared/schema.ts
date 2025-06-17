@@ -102,6 +102,7 @@ export const venues = pgTable("venues", {
   name: text("name").notNull(),
   description: text("description").notNull(),
   location: text("location").notNull(),
+  number: text("number"),
   category: text("category").notNull(),
   capacity: integer("capacity").notNull(),
   pricePerHour: decimal("price_per_hour", { precision: 10, scale: 2 }),
