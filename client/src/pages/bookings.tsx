@@ -30,7 +30,8 @@ export default function Bookings() {
     queryKey: ["/api/venue-reservations"],
   });
 
-  const filteredBookings = bookings.filter((booking: any) => {
+  const bookingsArray = Array.isArray(bookings) ? bookings : [];
+  const filteredBookings = bookingsArray.filter((booking: any) => {
     if (activeTab === "all") return true;
     return booking.status === activeTab;
   });

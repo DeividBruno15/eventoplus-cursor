@@ -23,7 +23,6 @@ import CreateEvent from "@/pages/events/create-event";
 import EventDetail from "@/pages/events/event-detail";
 import EventDetails from "@/pages/events/event-details";
 import ManageServices from "@/pages/services/manage-services";
-import CreateService from "@/pages/services/create-service";
 import ManageVenues from "@/pages/venues/manage-venues";
 import CreateVenue from "@/pages/venues/create-venue";
 import ManageSubscription from "@/pages/subscription/manage-subscription";
@@ -47,6 +46,8 @@ import NotificationsPage from "@/pages/notifications";
 import AdvertiserAnalytics from "@/pages/analytics-advertiser";
 import AuthGuard from "@/components/auth/auth-guard";
 import NotFound from "@/pages/not-found";
+import Providers from "@/pages/providers";
+import Bookings from "@/pages/bookings";
 import { useAuth } from "@/hooks/use-auth";
 
 // Analytics Wrapper Component
@@ -297,6 +298,22 @@ function Router() {
         <Layout>
           <AuthGuard>
             <Support />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/providers">
+        <Layout>
+          <AuthGuard>
+            <Providers />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/bookings">
+        <Layout>
+          <AuthGuard>
+            <Bookings />
           </AuthGuard>
         </Layout>
       </Route>
