@@ -1,0 +1,99 @@
+Olá, pessoal! Tudo bem?
+
+O colaborador [NOME DA PESSOA], da área [ÁREA DA PESSOA], foi desligado da empresa [DATA DA DEMISSÃO], sendo o seu último dia de trabalho [DATA DO ÚLTIMO DIA DE TRABALHO]. 
+
+Segue informações para os próximos passos da rescisão:
+
+Nome completo: ____________
+Departamento: _____________
+Motivo: ___________________
+Tem comissão/remuneração variável para o acerto? _______________
+Se for contrato de estágio, qual o saldo de dias de férias para o acerto? ____________.
+
+
+Estou à disposição para esclarecimentos adicionais.
+
+Atenciosamente,
+
+
+Alinhamento sobre notificações para viagens e relatório voltar aberto
+
+
+Verificar com o pessoal se for ter mensagens no histórico, validar com o pessoal do asgard se vai ter que fazer alguma coisa ou o pessoal implementar algo.
+
+excluir uma despesa avulsa de um relatório enviado
+Você tem despesas que podem ser excluídas!
+
+A reserva de viagem vinculada foi cancelada, e essa despesa está liberada para exclusão. Ela está destacada com uma cor diferente para facilitar a identificação.
+
+
+Entrar com a Vick no roadmap para entender como esta, ver a visibilidade, entender como esta essa sobrecarga, se o outro time é mais técnico ela precisa participar. Como podemos fazer para ser mais eficiente. Acho que ela pode sugerir ali sobre o tempo da daily no squad. Pedir para ela mostrar a agenda e ver o que esta dobrado, fazer melhor gestão de tempo. Sentar junto com ela e tentar organizar isso.
+
+Falar com o tom para investigar como o squad trabalha ali que é mais lento e tem muita dependência.
+
+
+O link que direciona o email, deixa o link do jeito que ta
+o link que direciona ser direcionado para loja, a gente tem isso ja implementado no VExpenses, se a gente vê que ele ta utilizando o mobile, direcionamos ele para o app. Tem de ser implementado, ao abrir esse link ele verifica o user-agent e ja abre o app. Não é difícil fazer, não é gambiarra. Resolve aprovações e depois vemos os outros. Quebra problema 
+
+Designer são o guardião das jornadas. Uma vez por mês deixa eu fazer uma jornada aqui. 
+
+Furos, tem culpa do Deivid nisso ter acontecido. Quais mecanismos que o Deivid tem que construir para que isso não aconteça, sem microgerenciar. Como construímos esses mecanismos? 
+O que eu vou criar para garantir que os designers estão olhando dados. Tem que pensar em uma coisa, pensar em sistemas em mecanismos. Tenho que gastar um tempinho para ver tudo isso. 
+
+Tenho que garantir execução, quais sistemas eu crio para garantir a estratégia tática. Como eu vou garantir que as pessoas façam sem microgerenciar? O que a gente constrói para que isso fique melhor para as pessoas fazerem?
+
+Se tirar uma hora por semana e olhar os dados eu teria identificado isso. 
+
+Como eu crio isso para DS, onde eu coloco isso na Weekly? 
+Será, que vale. Como faço para as pessoas fazerem conforme eu atuava, entregas e como eu gostaria que elas fizessem. 
+
+Coisas que percebi que quero revisitar.
+Como essas pessoas estão gastando o tempo dela.
+Como eu crio mecanismos para elas fazerem um bom trabalho.
+Não necessariamente pensando na solução mas no processo.
+
+Estágio em UX/UI Designer (Remoto)
+
+_____________________________________________________________
+
+Pix Fase 3
+Daily Balance (Não estou pensando nas SDM aqui)
+Demora para aparecer despesa cartões
+Despesa de viagem
+Integração CAF (segurança)
+Discovery- Trazer mais informações para os usuários como senha inválida, tentativa de tokenizacao e etc.
+Discovery- Cartão virtual
+Victoria Facundes
+10:25
+Proxy de comunicação com a SWAP
+Solução para necessidade de rodar comandos
+Diminuição do número de suporte
+Melhorias no painel de depósitos no gesti
+__________________________________________________________________
+
+kZ9Hz8G00gSYsIvy
+
+postgres://postgres:[kZ9Hz8G00gSYsIvy]@db.ukmwjjtxquepywmbkaeg.supabase.co:6543/postgres
+
+postgresql://postgres.ukmwjjtxquepywmbkaeg:kZ9Hz8G00gSYsIvy@aws-0-sa-east-1.pooler.supabase.com:5432/postgres
+
+
+acessar esse link: https://vexpenses.gupy.io/jobs/9348309
+
+
+- Criar anuncio espaço dando erro
+- No formulário de criar anuncio do espaço o campo "Endereço" deve ser "CEP" com validação de API. Inserir novos campos: Rua, Número, Bairro, Cidade e Estado, esses campos serão preenchidos automaticamente ao inserir o CEP.
+ - O campo de valor no anuncio deve ser no formato R$ 0,00 ou R$ 0.000,00 
+- Atualizar imagem dando erro
+- Em atualizar perfil deve ter o mesmo comportamento de endereço, "CEP" com validação de API. Inserir novos campos: Rua, Número, Bairro, Cidade e Estado, esses campos serão preenchidos automaticamente ao inserir o CEP.
+- Menu Análises para o Anunciante não funciona, fazer uma tela para esse usuário em especifico sobre análises.
+ - Ao clicar nesse menu aparece o header que não deveria.
+- Menu de buscar espaços para o perfil "Contratante" deve aparecer
+- No formulário de criação de evento no tipo de usuário "Contratante" no campo serviços deve vir as opções que temos cadastradas como serviços, as mesma que estão na etapa 3 do cadastro.
+ - O campo "Orçamento" deve ter o formato de moeda R$ 0,00
+ - Não precisa ter o campo "Orçamento total" ou ele deveria ser preenchido automático conforme informa os serviços e valores para o evento.
+- Erro ao criar evento
+- Mudar o ícone do menu "Meus Eventos" na sidebar pois esta o mesmo de "Agenda".
+- Ao acessar o menu "Meus eventos" no tipo de usuário contratante, esta trazendo um header que não deveria.
+- Diminuir um pouco a logo em todos os lugares que ela aparece, ta um pouco grande.
+

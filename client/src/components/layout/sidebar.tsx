@@ -35,7 +35,8 @@ import {
   ShoppingCart,
   FileText,
   Shield,
-  Bell
+  Bell,
+  CalendarDays
 } from "lucide-react";
 
 interface SidebarProps {
@@ -53,7 +54,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     contratante: [
       { icon: Home, label: "Dashboard", path: "/dashboard" },
       { icon: Search, label: "Buscar", path: "/search" },
-      { icon: Calendar, label: "Meus Eventos", path: "/events" },
+      { icon: CalendarDays, label: "Meus Eventos", path: "/events" },
       { icon: Plus, label: "Criar Evento", path: "/events/create" },
       { icon: Users, label: "Prestadores", path: "/services" },
       { icon: MapPin, label: "Espaços", path: "/venues" },
@@ -66,7 +67,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     prestador: [
       { icon: Home, label: "Dashboard", path: "/dashboard" },
       { icon: Search, label: "Buscar", path: "/search" },
-      { icon: Calendar, label: "Eventos", path: "/events" },
+      { icon: CalendarDays, label: "Eventos", path: "/events" },
       { icon: Star, label: "Gerenciar Serviços", path: "/services/manage" },
       { icon: MessageSquare, label: "Chat", path: "/chat" },
       { icon: Bell, label: "Notificações", path: "/notifications" },
@@ -77,7 +78,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: Home, label: "Dashboard", path: "/dashboard" },
       { icon: Search, label: "Buscar", path: "/search" },
       { icon: MapPin, label: "Gerenciar Espaços", path: "/venues/manage" },
-      { icon: Calendar, label: "Eventos", path: "/events" },
+      { icon: CalendarDays, label: "Eventos", path: "/events" },
       { icon: MessageSquare, label: "Chat", path: "/chat" },
       { icon: Bell, label: "Notificações", path: "/notifications" },
       { icon: FileText, label: "Contratos", path: "/contracts" },
