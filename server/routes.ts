@@ -476,19 +476,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint específico para candidatar-se a evento (usado pelo frontend)
+  app.post("/api/events/:id/apply", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const eventId = parseInt(req.params.id);
+      const { proposal, proposedPrice } = req.body;
+      const userId = (req.user as any).id;
+
+      // Verificar se já existe aplicação deste usuário para este evento
+      const existingApplications = await storage.getEventApplications(eventId);
+      const userAlreadyApplied = existingApplications.some(app => app.providerId === userId);
+      
+      if (userAlreadyApplied) {
+        return res.status(400).json({ message: "Você já se candidatou a este evento" });
+      }
+
+      const application = await storage.createEventApplication({
+        eventId,
+        providerId: userId,
+        proposal,
+        price: proposedPrice.toString()
+      });
+
+      res.status(201).json(application);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   // Stripe payment route for one-time payments
   app.post("/api/create-payment-intent", async (req, res) => {
     try {
       const { amount } = req.body;
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(amount * 100), // Convert to cents
-        currency: "usd",
+        amount: Math.round(amount * 100), // Convert to centavos
+        currency: "brl", // Moeda brasileira
       });
       res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error: any) {
       res
         .status(500)
-        .json({ message: "Error creating payment intent: " + error.message });
+        .json({ message: "Erro ao criar intenção de pagamento: " + error.message });
     }
   });
 

@@ -163,7 +163,7 @@ export default function EventDetail() {
                 </div>
                 <div className="flex items-center gap-1">
                   <Users className="h-4 w-4" />
-                  <span>{event.expectedAttendees} pessoas</span>
+                  <span>{event.guestCount} pessoas</span>
                 </div>
               </div>
             </div>

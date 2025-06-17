@@ -229,8 +229,8 @@ export const insertEventSchema = createInsertSchema(events).omit({
 
 export const insertEventApplicationSchema = createInsertSchema(eventApplications).omit({
   id: true,
-  status: true,
   createdAt: true,
+  updatedAt: true,
 });
 
 export const insertServiceSchema = createInsertSchema(services).omit({
