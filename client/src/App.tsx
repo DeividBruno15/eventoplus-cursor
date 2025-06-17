@@ -29,6 +29,7 @@ import Cart from "@/pages/cart";
 import Contracts from "@/pages/contracts";
 import APIDocs from "@/pages/api-docs";
 import TwoFactor from "@/pages/two-factor";
+import Agenda from "@/pages/agenda";
 import AuthGuard from "@/components/auth/auth-guard";
 import NotFound from "@/pages/not-found";
 
@@ -183,6 +184,14 @@ function Router() {
         <Layout>
           <AuthGuard>
             <TwoFactor />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/agenda">
+        <Layout>
+          <AuthGuard>
+            <Agenda />
           </AuthGuard>
         </Layout>
       </Route>

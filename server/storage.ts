@@ -92,6 +92,14 @@ export interface IStorage {
   createNotification(notification: InsertNotification): Promise<Notification>;
   markNotificationRead(id: number): Promise<void>;
   markAllNotificationsRead(userId: number): Promise<void>;
+  
+  // Profile updates
+  updateUser(userId: number, data: Partial<User>): Promise<User>;
+  
+  // Agenda methods
+  getProviderAgenda(providerId: number): Promise<any[]>;
+  getContractorAgenda(contractorId: number): Promise<any[]>;
+  getAdvertiserAgenda(advertiserId: number): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -370,6 +378,74 @@ export class DatabaseStorage implements IStorage {
       .update(notifications)
       .set({ read: true })
       .where(eq(notifications.userId, userId));
+  }
+
+  // Profile updates
+  async updateUser(userId: number, data: Partial<User>): Promise<User> {
+    const result = await db
+      .update(users)
+      .set(data)
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!result[0]) throw new Error("User not found");
+    return result[0];
+  }
+
+  // Agenda methods
+  async getProviderAgenda(providerId: number): Promise<any[]> {
+    // Get events where provider was accepted
+    const acceptedApplications = await db
+      .select({
+        eventId: eventApplications.eventId,
+        eventTitle: events.title,
+        eventDate: events.date,
+        eventLocation: events.location,
+        status: eventApplications.status,
+        budget: events.budget
+      })
+      .from(eventApplications)
+      .innerJoin(events, eq(eventApplications.eventId, events.id))
+      .where(and(
+        eq(eventApplications.providerId, providerId),
+        eq(eventApplications.status, 'approved')
+      ));
+
+    return acceptedApplications.map(app => ({
+      id: app.eventId,
+      title: app.eventTitle,
+      eventDate: app.eventDate,
+      eventLocation: app.eventLocation,
+      status: 'confirmed',
+      type: 'event',
+      value: app.budget
+    }));
+  }
+
+  async getContractorAgenda(contractorId: number): Promise<any[]> {
+    // Get events created by contractor
+    const userEvents = await db
+      .select()
+      .from(events)
+      .where(eq(events.organizerId, contractorId));
+
+    return userEvents.map(event => ({
+      id: event.id,
+      title: event.title,
+      eventDate: event.date,
+      eventLocation: event.location,
+      status: event.status === 'active' ? 'scheduled' : event.status,
+      type: 'event',
+      description: event.description,
+      value: event.budget
+    }));
+  }
+
+  async getAdvertiserAgenda(advertiserId: number): Promise<any[]> {
+    // Get venue reservations for advertiser's venues
+    // This would need venue reservation system implementation
+    // For now, return empty array as placeholder
+    return [];
   }
 }
 
