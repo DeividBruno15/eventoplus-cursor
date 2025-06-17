@@ -1,445 +1,551 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Code, Copy, Globe, Key, ChevronDown, ChevronRight, Play } from "lucide-react";
+import { Copy, Play, Key, Globe, Code, Database } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface APIEndpoint {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
-  path: string;
+  endpoint: string;
   description: string;
-  auth: boolean;
+  auth: 'required' | 'optional' | 'none';
   parameters?: { name: string; type: string; required: boolean; description: string }[];
-  response: any;
-  example: string;
+  response?: string;
+  example?: string;
 }
 
-const API_ENDPOINTS: APIEndpoint[] = [
+const apiEndpoints: APIEndpoint[] = [
   {
     method: 'GET',
-    path: '/api/public/events',
-    description: 'Listar eventos públicos ativos',
-    auth: false,
+    endpoint: '/api/public/events',
+    description: 'Lista eventos públicos com filtros opcionais',
+    auth: 'none',
     parameters: [
-      { name: 'page', type: 'number', required: false, description: 'Página para paginação (padrão: 1)' },
-      { name: 'limit', type: 'number', required: false, description: 'Limite de itens por página (padrão: 20)' },
-      { name: 'category', type: 'string', required: false, description: 'Filtrar por categoria' },
-      { name: 'location', type: 'string', required: false, description: 'Filtrar por localização' }
+      { name: 'category', type: 'string', required: false, description: 'Categoria do evento' },
+      { name: 'location', type: 'string', required: false, description: 'Localização' },
+      { name: 'page', type: 'number', required: false, description: 'Página (padrão: 1)' },
+      { name: 'limit', type: 'number', required: false, description: 'Itens por página (padrão: 10)' }
     ],
-    response: {
-      data: [
-        {
-          id: 1,
-          title: "Casamento João e Maria",
-          category: "Casamento",
-          location: "São Paulo, SP",
-          date: "2025-07-15",
-          budget: 50000,
-          expectedAttendees: 150,
-          status: "active"
-        }
-      ],
-      pagination: {
-        page: 1,
-        limit: 20,
-        total: 45,
-        totalPages: 3
-      }
-    },
-    example: `curl -X GET "https://evento-plus.replit.app/api/public/events?page=1&limit=10" \\
-  -H "Content-Type: application/json"`
+    response: `{
+  "events": [
+    {
+      "id": 1,
+      "title": "Festival de Música",
+      "category": "Entretenimento",
+      "location": "São Paulo, SP",
+      "budget": "15000.00",
+      "status": "active",
+      "createdAt": "2024-01-15"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 50,
+    "totalPages": 5
+  }
+}`,
+    example: 'curl -X GET "https://evento-plus.app/api/public/events?category=Entretenimento&limit=5"'
   },
   {
     method: 'GET',
-    path: '/api/public/services',
-    description: 'Listar serviços disponíveis',
-    auth: false,
+    endpoint: '/api/public/services',
+    description: 'Lista prestadores de serviços públicos',
+    auth: 'none',
     parameters: [
-      { name: 'category', type: 'string', required: false, description: 'Filtrar por categoria' },
-      { name: 'location', type: 'string', required: false, description: 'Filtrar por localização' },
-      { name: 'min_price', type: 'number', required: false, description: 'Preço mínimo' },
-      { name: 'max_price', type: 'number', required: false, description: 'Preço máximo' }
+      { name: 'category', type: 'string', required: false, description: 'Categoria do serviço' },
+      { name: 'location', type: 'string', required: false, description: 'Localização' },
+      { name: 'rating', type: 'number', required: false, description: 'Avaliação mínima' }
     ],
-    response: {
-      data: [
-        {
-          id: 1,
-          title: "DJ para Festas",
-          description: "Serviço de DJ profissional",
-          category: "DJ",
-          basePrice: 800,
-          provider: {
-            name: "João DJ",
-            rating: 4.8
-          },
-          location: "São Paulo, SP"
-        }
-      ]
-    },
-    example: `curl -X GET "https://evento-plus.replit.app/api/public/services?category=DJ" \\
-  -H "Content-Type: application/json"`
+    response: `{
+  "services": [
+    {
+      "id": 1,
+      "name": "DJ Paulo Silva",
+      "category": "Entretenimento",
+      "rating": 4.8,
+      "location": "Rio de Janeiro, RJ",
+      "priceRange": "500-2000"
+    }
+  ]
+}`,
+    example: 'curl -X GET "https://evento-plus.app/api/public/services?category=Alimentação"'
   },
   {
     method: 'GET',
-    path: '/api/public/venues',
-    description: 'Listar espaços para eventos',
-    auth: false,
+    endpoint: '/api/public/venues',
+    description: 'Lista espaços para eventos públicos',
+    auth: 'none',
     parameters: [
-      { name: 'city', type: 'string', required: false, description: 'Filtrar por cidade' },
       { name: 'capacity', type: 'number', required: false, description: 'Capacidade mínima' },
-      { name: 'category', type: 'string', required: false, description: 'Tipo de espaço' }
+      { name: 'location', type: 'string', required: false, description: 'Localização' },
+      { name: 'amenities', type: 'string', required: false, description: 'Comodidades (separadas por vírgula)' }
     ],
-    response: {
-      data: [
-        {
-          id: 1,
-          name: "Salão Crystal",
-          description: "Elegante salão para eventos",
-          capacity: 200,
-          pricePerHour: 150,
-          city: "São Paulo",
-          state: "SP",
-          amenities: ["Ar condicionado", "Sistema de som", "Decoração"]
-        }
-      ]
-    },
-    example: `curl -X GET "https://evento-plus.replit.app/api/public/venues?city=São Paulo" \\
-  -H "Content-Type: application/json"`
+    response: `{
+  "venues": [
+    {
+      "id": 1,
+      "name": "Salão Premium",
+      "capacity": 200,
+      "location": "Belo Horizonte, MG",
+      "amenities": ["ar-condicionado", "som", "estacionamento"],
+      "pricePerHour": "350.00"
+    }
+  ]
+}`,
+    example: 'curl -X GET "https://evento-plus.app/api/public/venues?capacity=100"'
   },
   {
     method: 'POST',
-    path: '/api/webhooks/event-application',
-    description: 'Webhook para notificações de candidaturas',
-    auth: true,
+    endpoint: '/api/public/webhook',
+    description: 'Endpoint para receber webhooks de terceiros',
+    auth: 'required',
     parameters: [
-      { name: 'webhook_url', type: 'string', required: true, description: 'URL para receber notifications' },
-      { name: 'events', type: 'array', required: true, description: 'Tipos de eventos: ["application_created", "application_approved"]' }
+      { name: 'event_type', type: 'string', required: true, description: 'Tipo do evento' },
+      { name: 'data', type: 'object', required: true, description: 'Dados do evento' },
+      { name: 'timestamp', type: 'string', required: true, description: 'Timestamp do evento' }
     ],
-    response: {
-      id: 1,
-      webhook_url: "https://sua-aplicacao.com/webhook",
-      events: ["application_created", "application_approved"],
-      active: true,
-      created_at: "2025-01-01T00:00:00Z"
-    },
-    example: `curl -X POST "https://evento-plus.replit.app/api/webhooks/event-application" \\
+    response: `{
+  "success": true,
+  "message": "Webhook processado com sucesso",
+  "id": "webhook_12345"
+}`,
+    example: `curl -X POST "https://evento-plus.app/api/public/webhook" \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
-  -d '{
-    "webhook_url": "https://sua-aplicacao.com/webhook",
-    "events": ["application_created", "application_approved"]
-  }'`
+  -d '{"event_type": "booking_created", "data": {...}}'`
   }
 ];
 
-export default function APIDocs() {
+export default function APIDocumentation() {
   const { toast } = useToast();
-  const [selectedEndpoint, setSelectedEndpoint] = useState<APIEndpoint | null>(null);
-  const [testUrl, setTestUrl] = useState("");
-  const [testResponse, setTestResponse] = useState("");
+  const [selectedEndpoint, setSelectedEndpoint] = useState(apiEndpoints[0]);
+  const [testUrl, setTestUrl] = useState('');
+  const [testBody, setTestBody] = useState('');
+  const [testResponse, setTestResponse] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copiado!",
-      description: "Código copiado para a área de transferência",
-    });
-  };
-
-  const testEndpoint = async (endpoint: APIEndpoint) => {
+  const copyToClipboard = async (text: string) => {
     try {
-      const url = `${window.location.origin}${endpoint.path}`;
-      setTestUrl(url);
-      
-      const response = await fetch(url, {
-        method: endpoint.method,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(endpoint.auth ? { 'Authorization': 'Bearer YOUR_API_KEY' } : {})
-        }
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: "Copiado",
+        description: "Código copiado para a área de transferência",
       });
-      
-      const data = await response.json();
-      setTestResponse(JSON.stringify(data, null, 2));
-    } catch (error) {
-      setTestResponse(`Erro: ${error}`);
+    } catch (err) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível copiar o código",
+        variant: "destructive",
+      });
     }
   };
 
-  const getMethodBadge = (method: string) => {
-    const colors = {
-      GET: 'bg-blue-100 text-blue-800',
-      POST: 'bg-green-100 text-green-800',
-      PUT: 'bg-yellow-100 text-yellow-800',
-      DELETE: 'bg-red-100 text-red-800'
-    };
-    return (
-      <Badge className={`${colors[method as keyof typeof colors]} font-mono`}>
-        {method}
-      </Badge>
-    );
+  const testEndpoint = async () => {
+    setIsLoading(true);
+    try {
+      const url = testUrl || `https://evento-plus.app${selectedEndpoint.endpoint}`;
+      const options: RequestInit = {
+        method: selectedEndpoint.method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+
+      if (selectedEndpoint.method !== 'GET' && testBody) {
+        options.body = testBody;
+      }
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+      
+      setTestResponse(JSON.stringify(data, null, 2));
+      
+      toast({
+        title: "Teste Executado",
+        description: `Status: ${response.status}`,
+      });
+    } catch (error) {
+      setTestResponse(JSON.stringify({ error: 'Erro na requisição' }, null, 2));
+      toast({
+        title: "Erro no Teste",
+        description: "Não foi possível executar a requisição",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getMethodColor = (method: string) => {
+    switch (method) {
+      case 'GET': return 'bg-green-100 text-green-800';
+      case 'POST': return 'bg-blue-100 text-blue-800';
+      case 'PUT': return 'bg-yellow-100 text-yellow-800';
+      case 'DELETE': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getAuthBadge = (auth: string) => {
+    switch (auth) {
+      case 'required': return <Badge variant="destructive">API Key Obrigatória</Badge>;
+      case 'optional': return <Badge variant="secondary">API Key Opcional</Badge>;
+      case 'none': return <Badge variant="outline">Público</Badge>;
+      default: return null;
+    }
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="flex items-center gap-3 mb-8">
-        <Globe className="h-8 w-8 text-[#3C5BFA]" />
-        <div>
-          <h1 className="text-3xl font-bold text-black">API Pública</h1>
-          <p className="text-gray-600">Documentação da API REST para integração com sistemas externos</p>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <div className="flex items-center space-x-3 mb-4">
+            <Globe className="w-8 h-8 text-[#3C5BFA]" />
+            <h1 className="text-3xl font-bold text-gray-900">API Pública Evento+</h1>
+          </div>
+          <p className="text-lg text-gray-600">
+            Documentação completa da API pública para integração com sistemas externos
+          </p>
         </div>
-      </div>
 
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-          <TabsTrigger value="authentication">Autenticação</TabsTrigger>
-          <TabsTrigger value="endpoints">Endpoints</TabsTrigger>
-          <TabsTrigger value="testing">Teste da API</TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="endpoints" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="endpoints">Endpoints</TabsTrigger>
+            <TabsTrigger value="authentication">Autenticação</TabsTrigger>
+            <TabsTrigger value="testing">Teste da API</TabsTrigger>
+            <TabsTrigger value="examples">Exemplos</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="overview" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sobre a API</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p>
-                A API pública do Evento+ permite que desenvolvedores integrem nossos dados de eventos, 
-                serviços e espaços em suas próprias aplicações. Nossa API RESTful utiliza JSON para 
-                todas as respostas e segue padrões da indústria.
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-blue-900 mb-2">URL Base</h3>
-                  <code className="text-sm bg-white p-2 rounded border block">
-                    https://evento-plus.replit.app/api/public
-                  </code>
-                </div>
-                
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-green-900 mb-2">Formato de Resposta</h3>
-                  <code className="text-sm bg-white p-2 rounded border block">
-                    Content-Type: application/json
-                  </code>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="font-semibold">Recursos Disponíveis:</h3>
-                <ul className="space-y-1 text-sm">
-                  <li>• <strong>Eventos:</strong> Consultar eventos públicos ativos</li>
-                  <li>• <strong>Serviços:</strong> Listar prestadores de serviços disponíveis</li>
-                  <li>• <strong>Espaços:</strong> Explorar locais para eventos</li>
-                  <li>• <strong>Webhooks:</strong> Receber notificações em tempo real</li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Limites de Taxa</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-[#3C5BFA]">1000</div>
-                  <div className="text-sm text-gray-600">Requisições/hora</div>
-                  <div className="text-xs text-gray-500 mt-1">Sem autenticação</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-[#3C5BFA]">5000</div>
-                  <div className="text-sm text-gray-600">Requisições/hora</div>
-                  <div className="text-xs text-gray-500 mt-1">Com API Key</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-[#3C5BFA]">∞</div>
-                  <div className="text-sm text-gray-600">Requisições/hora</div>
-                  <div className="text-xs text-gray-500 mt-1">Plano Enterprise</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="authentication" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Key className="h-5 w-5" />
-                Autenticação via API Key
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p>
-                Para endpoints que requerem autenticação, utilize uma API Key no header Authorization.
-              </p>
-              
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold mb-2">Como obter sua API Key:</h3>
-                <ol className="space-y-1 text-sm">
-                  <li>1. Faça login na sua conta Evento+</li>
-                  <li>2. Acesse Configurações → Integrações</li>
-                  <li>3. Clique em "Gerar Nova API Key"</li>
-                  <li>4. Copie e armazene a chave com segurança</li>
-                </ol>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="font-semibold">Exemplo de uso:</h3>
-                <pre className="bg-black text-green-400 p-4 rounded-lg text-sm overflow-x-auto">
-{`curl -X GET "https://evento-plus.replit.app/api/protected/my-events" \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
-  -H "Content-Type: application/json"`}
-                </pre>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => copyToClipboard(`curl -X GET "https://evento-plus.replit.app/api/protected/my-events" \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
-  -H "Content-Type: application/json"`)}
-                >
-                  <Copy className="h-4 w-4 mr-1" />
-                  Copiar
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="endpoints" className="space-y-6">
-          {API_ENDPOINTS.map((endpoint, index) => (
-            <Card key={index}>
-              <Collapsible>
-                <CollapsibleTrigger className="w-full">
-                  <CardHeader className="hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-3">
-                        {getMethodBadge(endpoint.method)}
-                        <code className="font-mono text-sm">{endpoint.path}</code>
-                        {endpoint.auth && (
-                          <Badge variant="outline" className="text-xs">
-                            <Key className="h-3 w-3 mr-1" />
-                            Auth
-                          </Badge>
-                        )}
-                      </div>
-                      <ChevronDown className="h-4 w-4" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm text-gray-600">{endpoint.description}</p>
-                    </div>
+          <TabsContent value="endpoints" className="space-y-6">
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* Lista de endpoints */}
+              <div className="lg:col-span-1">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Code className="w-5 h-5" />
+                      <span>Endpoints Disponíveis</span>
+                    </CardTitle>
                   </CardHeader>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <CardContent className="pt-0 space-y-4">
-                    {endpoint.parameters && (
+                  <CardContent className="space-y-2">
+                    {apiEndpoints.map((endpoint, index) => (
+                      <div
+                        key={index}
+                        className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                          selectedEndpoint === endpoint 
+                            ? 'bg-[#3C5BFA] text-white' 
+                            : 'hover:bg-gray-100'
+                        }`}
+                        onClick={() => setSelectedEndpoint(endpoint)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            selectedEndpoint === endpoint 
+                              ? 'bg-white text-[#3C5BFA]' 
+                              : getMethodColor(endpoint.method)
+                          }`}>
+                            {endpoint.method}
+                          </span>
+                          {getAuthBadge(endpoint.auth)}
+                        </div>
+                        <p className="text-sm mt-1 font-mono">
+                          {endpoint.endpoint}
+                        </p>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Detalhes do endpoint selecionado */}
+              <div className="lg:col-span-2">
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <Badge className={getMethodColor(selectedEndpoint.method)}>
+                          {selectedEndpoint.method}
+                        </Badge>
+                        <code className="text-lg font-mono">{selectedEndpoint.endpoint}</code>
+                      </div>
+                      {getAuthBadge(selectedEndpoint.auth)}
+                    </div>
+                    <p className="text-gray-600">{selectedEndpoint.description}</p>
+                  </CardHeader>
+                  
+                  <CardContent className="space-y-6">
+                    {/* Parâmetros */}
+                    {selectedEndpoint.parameters && (
                       <div>
-                        <h4 className="font-semibold mb-2">Parâmetros:</h4>
-                        <div className="space-y-2">
-                          {endpoint.parameters.map((param, i) => (
-                            <div key={i} className="flex items-center gap-2 text-sm">
-                              <code className="bg-gray-100 px-2 py-1 rounded text-xs">
-                                {param.name}
-                              </code>
-                              <Badge variant={param.required ? "destructive" : "secondary"} className="text-xs">
-                                {param.type}
-                              </Badge>
-                              {param.required && (
-                                <Badge variant="destructive" className="text-xs">obrigatório</Badge>
-                              )}
-                              <span className="text-gray-600">{param.description}</span>
-                            </div>
-                          ))}
+                        <h3 className="font-semibold mb-3">Parâmetros</h3>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b">
+                                <th className="text-left p-2">Nome</th>
+                                <th className="text-left p-2">Tipo</th>
+                                <th className="text-left p-2">Obrigatório</th>
+                                <th className="text-left p-2">Descrição</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {selectedEndpoint.parameters.map((param, index) => (
+                                <tr key={index} className="border-b">
+                                  <td className="p-2 font-mono">{param.name}</td>
+                                  <td className="p-2">
+                                    <Badge variant="outline">{param.type}</Badge>
+                                  </td>
+                                  <td className="p-2">
+                                    {param.required ? (
+                                      <Badge variant="destructive">Sim</Badge>
+                                    ) : (
+                                      <Badge variant="secondary">Não</Badge>
+                                    )}
+                                  </td>
+                                  <td className="p-2">{param.description}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
                       </div>
                     )}
 
-                    <div>
-                      <h4 className="font-semibold mb-2">Resposta de Exemplo:</h4>
-                      <pre className="bg-gray-50 p-3 rounded-lg text-xs overflow-x-auto">
-                        {JSON.stringify(endpoint.response, null, 2)}
-                      </pre>
-                    </div>
+                    {/* Resposta */}
+                    {selectedEndpoint.response && (
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-semibold">Resposta de Exemplo</h3>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => copyToClipboard(selectedEndpoint.response!)}
+                          >
+                            <Copy className="w-4 h-4 mr-1" />
+                            Copiar
+                          </Button>
+                        </div>
+                        <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+                          {selectedEndpoint.response}
+                        </pre>
+                      </div>
+                    )}
 
-                    <div>
-                      <h4 className="font-semibold mb-2">Exemplo cURL:</h4>
-                      <pre className="bg-black text-green-400 p-3 rounded-lg text-xs overflow-x-auto">
-                        {endpoint.example}
-                      </pre>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="mt-2"
-                        onClick={() => copyToClipboard(endpoint.example)}
-                      >
-                        <Copy className="h-4 w-4 mr-1" />
-                        Copiar
-                      </Button>
-                    </div>
+                    {/* Exemplo de uso */}
+                    {selectedEndpoint.example && (
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-semibold">Exemplo de Uso (cURL)</h3>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => copyToClipboard(selectedEndpoint.example!)}
+                          >
+                            <Copy className="w-4 h-4 mr-1" />
+                            Copiar
+                          </Button>
+                        </div>
+                        <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+                          {selectedEndpoint.example}
+                        </pre>
+                      </div>
+                    )}
                   </CardContent>
-                </CollapsibleContent>
-              </Collapsible>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="testing" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Teste da API</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p>Teste os endpoints diretamente aqui na documentação:</p>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <h3 className="font-semibold">Endpoints Disponíveis:</h3>
-                  {API_ENDPOINTS.map((endpoint, index) => (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={() => {
-                        setSelectedEndpoint(endpoint);
-                        testEndpoint(endpoint);
-                      }}
-                    >
-                      <Play className="h-4 w-4 mr-2" />
-                      {getMethodBadge(endpoint.method)}
-                      <code className="ml-2">{endpoint.path}</code>
-                    </Button>
-                  ))}
-                </div>
-
-                <div className="space-y-4">
-                  {testUrl && (
-                    <div>
-                      <h3 className="font-semibold mb-2">URL Testada:</h3>
-                      <code className="block bg-gray-100 p-2 rounded text-sm">{testUrl}</code>
-                    </div>
-                  )}
-
-                  {testResponse && (
-                    <div>
-                      <h3 className="font-semibold mb-2">Resposta:</h3>
-                      <pre className="bg-gray-50 p-3 rounded text-xs max-h-60 overflow-y-auto">
-                        {testResponse}
-                      </pre>
-                    </div>
-                  )}
-                </div>
+                </Card>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="authentication">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Key className="w-5 h-5" />
+                  <span>Autenticação da API</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h3 className="font-semibold mb-3">API Key</h3>
+                  <p className="text-gray-600 mb-4">
+                    Para endpoints que requerem autenticação, use sua API key no header Authorization:
+                  </p>
+                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+{`Authorization: Bearer YOUR_API_KEY`}
+                  </pre>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h3 className="font-semibold mb-3">Como Obter sua API Key</h3>
+                  <ol className="list-decimal list-inside space-y-2 text-gray-600">
+                    <li>Faça login na sua conta Evento+</li>
+                    <li>Acesse as configurações do perfil</li>
+                    <li>Navegue até a seção "API"</li>
+                    <li>Gere uma nova API key</li>
+                    <li>Copie e guarde a chave em local seguro</li>
+                  </ol>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h3 className="font-semibold mb-3">Limites de Taxa</h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-blue-50 rounded-lg">
+                      <h4 className="font-medium text-blue-900">Endpoints Públicos</h4>
+                      <p className="text-blue-700">1000 requisições por hora</p>
+                    </div>
+                    <div className="p-4 bg-green-50 rounded-lg">
+                      <h4 className="font-medium text-green-900">Endpoints Autenticados</h4>
+                      <p className="text-green-700">5000 requisições por hora</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="testing">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Play className="w-5 h-5" />
+                  <span>Teste da API</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        Endpoint Selecionado
+                      </label>
+                      <div className="flex items-center space-x-2">
+                        <Badge className={getMethodColor(selectedEndpoint.method)}>
+                          {selectedEndpoint.method}
+                        </Badge>
+                        <code className="text-sm bg-gray-100 px-2 py-1 rounded">
+                          {selectedEndpoint.endpoint}
+                        </code>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        URL Completa
+                      </label>
+                      <Input
+                        value={testUrl}
+                        onChange={(e) => setTestUrl(e.target.value)}
+                        placeholder={`https://evento-plus.app${selectedEndpoint.endpoint}`}
+                      />
+                    </div>
+
+                    {selectedEndpoint.method !== 'GET' && (
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Body (JSON)
+                        </label>
+                        <Textarea
+                          value={testBody}
+                          onChange={(e) => setTestBody(e.target.value)}
+                          placeholder='{"key": "value"}'
+                          rows={6}
+                        />
+                      </div>
+                    )}
+
+                    <Button 
+                      onClick={testEndpoint}
+                      disabled={isLoading}
+                      className="w-full"
+                    >
+                      {isLoading ? "Executando..." : "Testar Endpoint"}
+                    </Button>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Resposta
+                    </label>
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm h-80">
+                      {testResponse || 'Execute um teste para ver a resposta...'}
+                    </pre>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="examples">
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>JavaScript/Node.js</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+{`// Listar eventos públicos
+const response = await fetch('/api/public/events');
+const data = await response.json();
+
+// Com autenticação
+const response = await fetch('/api/public/webhook', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    event_type: 'booking_created',
+    data: { eventId: 123 }
+  })
+});`}
+                  </pre>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Python</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+{`import requests
+
+# Listar eventos públicos
+response = requests.get('https://evento-plus.app/api/public/events')
+events = response.json()
+
+# Com autenticação
+headers = {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+}
+data = {
+    'event_type': 'booking_created',
+    'data': {'eventId': 123}
+}
+response = requests.post(
+    'https://evento-plus.app/api/public/webhook',
+    headers=headers,
+    json=data
+)`}
+                  </pre>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }

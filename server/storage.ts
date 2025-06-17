@@ -52,6 +52,8 @@ export interface IStorage {
   updateUserStripeInfo(userId: number, customerId: string, subscriptionId: string): Promise<User>;
   updateUserType(userId: number, userType: string): Promise<User>;
   updateUser2FA(userId: number, data: { enabled?: boolean; secret?: string; backupCodes?: string[]; lastUsed?: Date }): Promise<User>;
+  generateApiKey(userId: number): Promise<string>;
+  validateApiKey(apiKey: string): Promise<User | null>;
   
   // Events
   getEvents(): Promise<Event[]>;
@@ -685,6 +687,33 @@ export class DatabaseStorage implements IStorage {
       blockedReason: reason,
       createdAt: new Date()
     };
+  }
+
+  async generateApiKey(userId: number): Promise<string> {
+    const apiKey = `evt_${crypto.randomBytes(32).toString('hex')}`;
+    
+    await db.update(users)
+      .set({ apiKey, apiKeyLastUsed: new Date() })
+      .where(eq(users.id, userId));
+    
+    return apiKey;
+  }
+
+  async validateApiKey(apiKey: string): Promise<User | null> {
+    const result = await db
+      .select()
+      .from(users)
+      .where(eq(users.apiKey, apiKey))
+      .limit(1);
+    
+    if (result.length === 0) return null;
+    
+    // Update last used timestamp
+    await db.update(users)
+      .set({ apiKeyLastUsed: new Date() })
+      .where(eq(users.id, result[0].id));
+    
+    return result[0];
   }
 }
 

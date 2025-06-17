@@ -1138,7 +1138,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Disable 2FA
       await storage.updateUser2FA(user.id, {
         enabled: false,
-        secret: null,
+        secret: undefined,
         backupCodes: []
       });
 
@@ -1170,6 +1170,172 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       res.json({ backupCodes });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Public API Endpoints
+  app.get("/api/public/events", async (req, res) => {
+    try {
+      const { category, location, page = 1, limit = 10 } = req.query;
+      const offset = (Number(page) - 1) * Number(limit);
+
+      const events = await storage.getEvents();
+      
+      // Filter by category and location if provided
+      let filteredEvents = events.filter(event => event.status === 'active');
+      
+      if (category) {
+        filteredEvents = filteredEvents.filter(event => 
+          event.category && event.category.toLowerCase().includes(String(category).toLowerCase())
+        );
+      }
+      
+      if (location) {
+        filteredEvents = filteredEvents.filter(event => 
+          event.location && event.location.toLowerCase().includes(String(location).toLowerCase())
+        );
+      }
+
+      // Pagination
+      const total = filteredEvents.length;
+      const paginatedEvents = filteredEvents
+        .slice(offset, offset + Number(limit))
+        .map(event => ({
+          id: event.id,
+          title: event.title,
+          category: event.category,
+          location: event.location,
+          budget: event.budget,
+          status: event.status,
+          createdAt: event.createdAt?.toISOString().split('T')[0]
+        }));
+
+      res.json({
+        events: paginatedEvents,
+        pagination: {
+          page: Number(page),
+          limit: Number(limit),
+          total,
+          totalPages: Math.ceil(total / Number(limit))
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/public/services", async (req, res) => {
+    try {
+      const { category, location, rating } = req.query;
+
+      const services = await storage.getServices();
+      
+      // Filter services
+      let filteredServices = services;
+      
+      if (category) {
+        filteredServices = filteredServices.filter(service => 
+          service.category && service.category.toLowerCase().includes(String(category).toLowerCase())
+        );
+      }
+      
+      if (location) {
+        filteredServices = filteredServices.filter(service => 
+          service.location && service.location.toLowerCase().includes(String(location).toLowerCase())
+        );
+      }
+
+      // Map to public format
+      const publicServices = filteredServices.map(service => ({
+        id: service.id,
+        name: service.name,
+        category: service.category,
+        rating: 4.5, // Would calculate from reviews in real implementation
+        location: service.location,
+        priceRange: `${service.priceMin || 0}-${service.priceMax || 999999}`
+      }));
+
+      res.json({ services: publicServices });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/public/venues", async (req, res) => {
+    try {
+      const { capacity, location, amenities } = req.query;
+
+      const venues = await storage.getVenues();
+      
+      // Filter venues
+      let filteredVenues = venues;
+      
+      if (capacity) {
+        filteredVenues = filteredVenues.filter(venue => 
+          venue.capacity && venue.capacity >= Number(capacity)
+        );
+      }
+      
+      if (location) {
+        filteredVenues = filteredVenues.filter(venue => 
+          venue.location && venue.location.toLowerCase().includes(String(location).toLowerCase())
+        );
+      }
+
+      if (amenities) {
+        const requestedAmenities = String(amenities).split(',').map(a => a.trim().toLowerCase());
+        filteredVenues = filteredVenues.filter(venue => 
+          venue.amenities && requestedAmenities.some(amenity =>
+            venue.amenities!.some(venueAmenity => 
+              venueAmenity.toLowerCase().includes(amenity)
+            )
+          )
+        );
+      }
+
+      // Map to public format
+      const publicVenues = filteredVenues.map(venue => ({
+        id: venue.id,
+        name: venue.name,
+        capacity: venue.capacity,
+        location: venue.location,
+        amenities: venue.amenities || [],
+        pricePerHour: venue.pricePerHour
+      }));
+
+      res.json({ venues: publicVenues });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/public/webhook", async (req, res) => {
+    // Basic API key authentication for webhooks
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: "API key obrigatória" });
+    }
+
+    try {
+      const { event_type, data, timestamp } = req.body;
+
+      if (!event_type || !data) {
+        return res.status(400).json({ message: "event_type e data são obrigatórios" });
+      }
+
+      // Process webhook (in real implementation, would handle different event types)
+      const webhookId = `webhook_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      // Log webhook for debugging
+      console.log(`Webhook received: ${event_type}`, { data, timestamp, webhookId });
+
+      res.json({
+        success: true,
+        message: "Webhook processado com sucesso",
+        id: webhookId
+      });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
