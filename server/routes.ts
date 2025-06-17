@@ -174,6 +174,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password,
         phone,
         zipCode,
+        street: streetField,
+        number: numberField,
+        neighborhood: neighborhoodField,
+        city: cityField,
+        state: stateField,
         addressData,
         selectedServices
       } = req.body;
@@ -211,10 +216,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (addressData) {
         const parsedAddress = JSON.parse(addressData);
-        userData.address = `${parsedAddress.street}, ${parsedAddress.neighborhood}`;
+        userData.street = parsedAddress.street;
+        userData.neighborhood = parsedAddress.neighborhood;
         userData.city = parsedAddress.city;
         userData.state = parsedAddress.state;
+        userData.address = `${parsedAddress.street}, ${parsedAddress.neighborhood}`;
       }
+
+      // Handle individual address fields
+      if (streetField) userData.street = streetField;
+      if (numberField) userData.number = numberField;
+      if (neighborhoodField) userData.neighborhood = neighborhoodField;
+      if (cityField) userData.city = cityField;
+      if (stateField) userData.state = stateField;
 
       // Create user
       const user = await storage.createUser(userData);
