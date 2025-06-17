@@ -205,9 +205,9 @@ export default function Venues() {
     createVenueMutation.mutate({
       ...formData,
       capacity: parseInt(formData.capacity),
-      pricePerHour: formData.pricePerHour ? parseFloat(formData.pricePerHour) : null,
-      pricePerDay: formData.pricePerDay ? parseFloat(formData.pricePerDay) : null,
-      pricePerWeekend: formData.pricePerWeekend ? parseFloat(formData.pricePerWeekend) : null,
+      pricePerHour: formData.pricePerHour ? parseFloat(formData.pricePerHour.replace(',', '.')) : null,
+      pricePerDay: formData.pricePerDay ? parseFloat(formData.pricePerDay.replace(',', '.')) : null,
+      pricePerWeekend: formData.pricePerWeekend ? parseFloat(formData.pricePerWeekend.replace(',', '.')) : null,
     });
   };
 

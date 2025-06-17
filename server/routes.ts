@@ -481,6 +481,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { imageData } = req.body;
       const userId = (req.user as any).id;
       
+      console.log('Profile image upload request for user:', userId);
+      console.log('Image data received:', !!imageData);
+      
       if (!imageData) {
         return res.status(400).json({ message: "Dados da imagem não fornecidos" });
       }
@@ -493,6 +496,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Clear user cache to refresh data
       userCache.delete(userId);
       
+      console.log('Profile image updated successfully for user:', userId);
       res.json({ message: "Imagem de perfil atualizada com sucesso", user: updatedUser });
     } catch (error: any) {
       console.error("Profile image upload error:", error);
