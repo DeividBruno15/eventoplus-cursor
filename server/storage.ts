@@ -100,6 +100,15 @@ export interface IStorage {
   getProviderAgenda(providerId: number): Promise<any[]>;
   getContractorAgenda(contractorId: number): Promise<any[]>;
   getAdvertiserAgenda(advertiserId: number): Promise<any[]>;
+  
+  // Venue reservations
+  getVenueReservations(venueId: number): Promise<VenueReservation[]>;
+  createVenueReservation(reservation: InsertVenueReservation): Promise<VenueReservation>;
+  updateVenueReservation(id: number, data: Partial<VenueReservation>): Promise<VenueReservation>;
+  
+  // Venue availability
+  getVenueAvailability(venueId: number): Promise<VenueAvailability[]>;
+  setVenueAvailability(venueId: number, date: string, available: boolean, reason?: string): Promise<VenueAvailability>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -443,9 +452,87 @@ export class DatabaseStorage implements IStorage {
 
   async getAdvertiserAgenda(advertiserId: number): Promise<any[]> {
     // Get venue reservations for advertiser's venues
-    // This would need venue reservation system implementation
-    // For now, return empty array as placeholder
-    return [];
+    const reservations = await db
+      .select({
+        reservationId: venueReservations.id,
+        venueName: venues.name,
+        startDate: venueReservations.startDate,
+        endDate: venueReservations.endDate,
+        clientName: users.username,
+        totalPrice: venueReservations.totalPrice,
+        status: venueReservations.status
+      })
+      .from(venueReservations)
+      .innerJoin(venues, eq(venueReservations.venueId, venues.id))
+      .innerJoin(users, eq(venueReservations.userId, users.id))
+      .where(eq(venues.ownerId, advertiserId));
+
+    return reservations.map(res => ({
+      id: res.reservationId,
+      title: `Reserva - ${res.venueName}`,
+      eventDate: res.startDate,
+      eventLocation: res.venueName,
+      status: res.status === 'confirmed' ? 'confirmed' : 'scheduled',
+      type: 'venue_reservation',
+      clientName: res.clientName,
+      value: res.totalPrice
+    }));
+  }
+
+  // Venue reservations
+  async getVenueReservations(venueId: number): Promise<VenueReservation[]> {
+    return await db
+      .select()
+      .from(venueReservations)
+      .where(eq(venueReservations.venueId, venueId))
+      .orderBy(venueReservations.startDate);
+  }
+
+  async createVenueReservation(reservationData: InsertVenueReservation): Promise<VenueReservation> {
+    const result = await db.insert(venueReservations).values(reservationData).returning();
+    if (!result[0]) throw new Error("Failed to create venue reservation");
+    return result[0];
+  }
+
+  async updateVenueReservation(id: number, data: Partial<VenueReservation>): Promise<VenueReservation> {
+    const result = await db
+      .update(venueReservations)
+      .set(data)
+      .where(eq(venueReservations.id, id))
+      .returning();
+    if (!result[0]) throw new Error("Venue reservation not found");
+    return result[0];
+  }
+
+  // Venue availability
+  async getVenueAvailability(venueId: number): Promise<VenueAvailability[]> {
+    return await db
+      .select()
+      .from(venueAvailability)
+      .where(eq(venueAvailability.venueId, venueId))
+      .orderBy(venueAvailability.date);
+  }
+
+  async setVenueAvailability(venueId: number, date: string, available: boolean, reason?: string): Promise<VenueAvailability> {
+    const result = await db
+      .insert(venueAvailability)
+      .values({
+        venueId,
+        date: new Date(date),
+        available,
+        blockedReason: reason
+      })
+      .onConflictDoUpdate({
+        target: [venueAvailability.venueId, venueAvailability.date],
+        set: { 
+          available, 
+          blockedReason: reason 
+        }
+      })
+      .returning();
+    
+    if (!result[0]) throw new Error("Failed to set venue availability");
+    return result[0];
   }
 }
 

@@ -135,6 +135,34 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Reservas de venues
+export const venueReservations = pgTable("venue_reservations", {
+  id: serial("id").primaryKey(),
+  venueId: integer("venue_id").references(() => venues.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  priceType: varchar("price_type", { length: 20 }).default("day").notNull(),
+  hoursPerDay: integer("hours_per_day").default(1),
+  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
+  status: varchar("status", { length: 20 }).default("pending").notNull(),
+  specialRequests: text("special_requests"),
+  contactPhone: text("contact_phone").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  confirmedAt: timestamp("confirmed_at"),
+  cancelledAt: timestamp("cancelled_at"),
+});
+
+// Disponibilidade de venues
+export const venueAvailability = pgTable("venue_availability", {
+  id: serial("id").primaryKey(),
+  venueId: integer("venue_id").references(() => venues.id).notNull(),
+  date: timestamp("date").notNull(),
+  available: boolean("available").default(true).notNull(),
+  blockedReason: text("blocked_reason"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -205,6 +233,19 @@ export const insertNotificationSchema = createInsertSchema(notifications).omit({
   createdAt: true,
 });
 
+export const insertVenueReservationSchema = createInsertSchema(venueReservations).omit({
+  id: true,
+  status: true,
+  createdAt: true,
+  confirmedAt: true,
+  cancelledAt: true,
+});
+
+export const insertVenueAvailabilitySchema = createInsertSchema(venueAvailability).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -226,3 +267,7 @@ export type InsertContract = z.infer<typeof insertContractSchema>;
 export type Contract = typeof contracts.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type Notification = typeof notifications.$inferSelect;
+export type InsertVenueReservation = z.infer<typeof insertVenueReservationSchema>;
+export type VenueReservation = typeof venueReservations.$inferSelect;
+export type InsertVenueAvailability = z.infer<typeof insertVenueAvailabilitySchema>;
+export type VenueAvailability = typeof venueAvailability.$inferSelect;

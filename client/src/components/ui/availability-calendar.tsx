@@ -92,11 +92,11 @@ export default function AvailabilityCalendar({
     );
   };
 
-  const isDateBooked = (date: Date) => {
+  const isDateBooked = (date: Date): boolean => {
     const slot = availability.find(slot => 
       isSameDay(parseISO(slot.date), date)
     );
-    return slot ? !slot.available && slot.bookedBy : false;
+    return slot ? !slot.available && !!slot.bookedBy : false;
   };
 
   const handleDateSelect = (date: Date) => {
@@ -203,11 +203,11 @@ export default function AvailabilityCalendar({
                 mode="multiple"
                 selected={selectedDates}
                 onSelect={(dates) => !isOwner && setSelectedDates(dates || [])}
-                disabled={(date) => isOwner ? false : isDateBooked(date)}
+                disabled={(date) => isOwner ? false : !!isDateBooked(date)}
                 className="rounded-md border"
                 locale={ptBR}
                 modifiers={{
-                  booked: (date) => isDateBooked(date),
+                  booked: (date) => !!isDateBooked(date),
                   available: (date) => isDateAvailable(date),
                   selected: (date) => isDateSelected(date)
                 }}
