@@ -63,21 +63,80 @@ export default function HomeClean() {
 
       {/* Hero Section */}
       <section className="pt-20 pb-16 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-6">
-            Conecte. Organize.
-            <br />
-            <span className="text-[#3C5BFA]">Celebre.</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            A plataforma completa que conecta organizadores de eventos com os melhores prestadores de serviços e espaços únicos.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <img 
-              src={appStoreImage} 
-              alt="Baixe na App Store e Google Play"
-              className="h-16 object-contain cursor-pointer hover:opacity-80 transition-opacity"
-            />
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="text-left">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-6">
+                Conecte. Organize.
+                <br />
+                <span className="text-[#3C5BFA]">Celebre.</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl">
+                A plataforma completa que conecta organizadores de eventos com os melhores prestadores de serviços e espaços únicos.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-start items-start">
+                <img 
+                  src={appStoreImage} 
+                  alt="Baixe na App Store e Google Play"
+                  className="h-12 object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                />
+              </div>
+            </div>
+
+            {/* Right Motion Animation */}
+            <div className="relative h-96 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#3C5BFA]/5 to-[#FFA94D]/5 rounded-3xl"></div>
+              
+              {/* Animated Cards */}
+              <div className="relative h-full flex flex-col justify-center space-y-4 p-6">
+                {/* Contratante Publishing Event */}
+                <div className="bg-white rounded-xl shadow-lg p-4 transform transition-all duration-1000 hover:scale-105 animate-pulse">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Users className="w-5 h-5 text-[#3C5BFA]" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm text-black">Maria Silva</p>
+                      <p className="text-xs text-gray-600">Publicou: "Casamento em SP"</p>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs text-gray-500">Orçamento: R$ 15.000</div>
+                </div>
+
+                {/* Anunciante Publishing Space */}
+                <div className="bg-white rounded-xl shadow-lg p-4 transform transition-all duration-1000 hover:scale-105 animate-pulse" style={{animationDelay: '0.5s'}}>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <Calendar className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm text-black">Espaço Premium</p>
+                      <p className="text-xs text-gray-600">Novo espaço disponível</p>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs text-gray-500">Capacidade: 200 pessoas</div>
+                </div>
+
+                {/* Prestador Applying */}
+                <div className="bg-white rounded-xl shadow-lg p-4 transform transition-all duration-1000 hover:scale-105 animate-pulse" style={{animationDelay: '1s'}}>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                      <Star className="w-5 h-5 text-[#FFA94D]" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm text-black">DJ Carlos</p>
+                      <p className="text-xs text-gray-600">Se candidatou ao evento</p>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs text-gray-500">Proposta: R$ 2.500</div>
+                </div>
+              </div>
+
+              {/* Floating Elements */}
+              <div className="absolute top-4 right-4 w-8 h-8 bg-[#3C5BFA]/20 rounded-full animate-bounce"></div>
+              <div className="absolute bottom-4 left-4 w-6 h-6 bg-[#FFA94D]/20 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
+            </div>
           </div>
         </div>
       </section>
@@ -124,11 +183,7 @@ export default function HomeClean() {
               <p className="text-gray-600 mb-6">
                 Ofereça seus serviços para eventos e amplie seu negócio com nossa plataforma.
               </p>
-              <Link href="/register?userType=prestador">
-                <Button className="bg-[#3C5BFA] hover:bg-[#2C46E8] text-white">
-                  Cadastrar como Prestador
-                </Button>
-              </Link>
+              
             </div>
 
             <div className="text-center p-8 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl">
@@ -139,11 +194,7 @@ export default function HomeClean() {
               <p className="text-gray-600 mb-6">
                 Encontre os melhores prestadores e espaços para realizar seu evento dos sonhos.
               </p>
-              <Link href="/register?userType=contratante">
-                <Button className="bg-[#FFA94D] hover:bg-orange-600 text-white">
-                  Cadastrar como Contratante
-                </Button>
-              </Link>
+              
             </div>
 
             <div className="text-center p-8 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl">
@@ -154,11 +205,6 @@ export default function HomeClean() {
               <p className="text-gray-600 mb-6">
                 Anuncie seus espaços e aumente a visibilidade dos seus locais para eventos.
               </p>
-              <Link href="/register?userType=anunciante">
-                <Button className="bg-green-600 hover:bg-green-700 text-white">
-                  Cadastrar como Anunciante
-                </Button>
-              </Link>
             </div>
           </div>
         </div>
@@ -223,48 +269,7 @@ export default function HomeClean() {
         </div>
       </section>
 
-      {/* Encontre seu perfil */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-black mb-6">
-              Encontre seu perfil na Evento+
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Users className="w-8 h-8 text-[#3C5BFA]" />
-              </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Contratantes</h3>
-              <p className="text-gray-600">
-                Organize eventos incríveis encontrando os melhores prestadores e espaços.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Star className="w-8 h-8 text-[#FFA94D]" />
-              </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Prestadores de Serviços</h3>
-              <p className="text-gray-600">
-                Conecte-se com organizadores e faça seu negócio crescer na área de eventos.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Calendar className="w-8 h-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Anunciantes de Espaços</h3>
-              <p className="text-gray-600">
-                Divulgue seu espaço e receba solicitações de aluguel para eventos.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Planos e benefícios */}
       <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
