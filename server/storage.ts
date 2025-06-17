@@ -120,6 +120,82 @@ export interface IStorage {
   // Venue availability
   getVenueAvailability(venueId: number): Promise<VenueAvailability[]>;
   setVenueAvailability(venueId: number, date: string, available: boolean, reason?: string): Promise<VenueAvailability>;
+  
+  // Subscription management
+  getSubscriptionPlans(userType?: string): Promise<SubscriptionPlan[]>;
+  createSubscriptionPlan(plan: InsertSubscriptionPlan): Promise<SubscriptionPlan>;
+  updateSubscriptionPlan(id: number, plan: Partial<SubscriptionPlan>): Promise<SubscriptionPlan>;
+  
+  // User subscriptions
+  getUserSubscription(userId: number): Promise<UserSubscription | undefined>;
+  createUserSubscription(subscription: InsertUserSubscription): Promise<UserSubscription>;
+  updateUserSubscription(id: number, subscription: Partial<UserSubscription>): Promise<UserSubscription>;
+  cancelUserSubscription(id: number): Promise<UserSubscription>;
+  
+  // Payment methods
+  getPaymentMethods(userId: number): Promise<PaymentMethod[]>;
+  createPaymentMethod(method: InsertPaymentMethod): Promise<PaymentMethod>;
+  updatePaymentMethod(id: number, method: Partial<PaymentMethod>): Promise<PaymentMethod>;
+  deletePaymentMethod(id: number): Promise<void>;
+  setDefaultPaymentMethod(userId: number, methodId: number): Promise<void>;
+  
+  // Transactions
+  getTransactions(userId: number): Promise<Transaction[]>;
+  createTransaction(transaction: InsertTransaction): Promise<Transaction>;
+  updateTransaction(id: number, transaction: Partial<Transaction>): Promise<Transaction>;
+  
+  // Enhanced reviews
+  getReviewsEnhanced(reviewedId: number): Promise<ReviewEnhanced[]>;
+  createReviewEnhanced(review: InsertReviewEnhanced): Promise<ReviewEnhanced>;
+  updateReviewEnhanced(id: number, review: Partial<ReviewEnhanced>): Promise<ReviewEnhanced>;
+  moderateReview(id: number, status: string, notes?: string): Promise<ReviewEnhanced>;
+  voteReviewHelpful(id: number): Promise<void>;
+  reportReview(id: number): Promise<void>;
+  
+  // User reputation
+  getUserReputation(userId: number): Promise<UserReputation | undefined>;
+  updateUserReputation(userId: number, data: Partial<UserReputation>): Promise<UserReputation>;
+  recalculateUserReputation(userId: number): Promise<UserReputation>;
+  
+  // Digital contracts
+  getDigitalContracts(userId: number, role?: string): Promise<DigitalContract[]>;
+  getDigitalContract(id: number): Promise<DigitalContract | undefined>;
+  createDigitalContract(contract: InsertDigitalContract): Promise<DigitalContract>;
+  updateDigitalContract(id: number, contract: Partial<DigitalContract>): Promise<DigitalContract>;
+  signDigitalContract(id: number, userId: number, signature: string): Promise<DigitalContract>;
+  
+  // Financial records
+  getFinancialRecords(userId: number, type?: string): Promise<FinancialRecord[]>;
+  createFinancialRecord(record: InsertFinancialRecord): Promise<FinancialRecord>;
+  updateFinancialRecord(id: number, record: Partial<FinancialRecord>): Promise<FinancialRecord>;
+  getFinancialSummary(userId: number, period?: string): Promise<any>;
+  
+  // Two-factor authentication
+  getTwoFactorAuth(userId: number): Promise<TwoFactorAuth | undefined>;
+  createTwoFactorAuth(auth: InsertTwoFactorAuth): Promise<TwoFactorAuth>;
+  updateTwoFactorAuth(userId: number, auth: Partial<TwoFactorAuth>): Promise<TwoFactorAuth>;
+  verifyTwoFactorAuth(userId: number, token: string): Promise<boolean>;
+  
+  // Security audit logs
+  createSecurityAuditLog(log: InsertSecurityAuditLog): Promise<SecurityAuditLog>;
+  getSecurityAuditLogs(userId?: number): Promise<SecurityAuditLog[]>;
+  
+  // LGPD compliance
+  getLgpdRequests(userId: number): Promise<LgpdRequest[]>;
+  createLgpdRequest(request: InsertLgpdRequest): Promise<LgpdRequest>;
+  updateLgpdRequest(id: number, request: Partial<LgpdRequest>): Promise<LgpdRequest>;
+  processLgpdRequest(id: number, processedBy: number, responseData: string): Promise<LgpdRequest>;
+  
+  // AI matching
+  getAiMatchingPreferences(userId: number): Promise<AiMatchingPreferences | undefined>;
+  updateAiMatchingPreferences(userId: number, preferences: Partial<AiMatchingPreferences>): Promise<AiMatchingPreferences>;
+  getAiRecommendations(userId: number, type: string): Promise<any[]>;
+  
+  // Chatbot
+  getChatbotConversation(sessionId: string): Promise<ChatbotConversation | undefined>;
+  createChatbotConversation(conversation: InsertChatbotConversation): Promise<ChatbotConversation>;
+  updateChatbotConversation(id: number, conversation: Partial<ChatbotConversation>): Promise<ChatbotConversation>;
+  getChatbotConversations(userId: number): Promise<ChatbotConversation[]>;
 }
 
 export class DatabaseStorage implements IStorage {

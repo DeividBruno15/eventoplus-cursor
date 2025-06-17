@@ -205,6 +205,223 @@ export const venueAvailability = pgTable("venue_availability", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Subscription plans table
+export const subscriptionPlans = pgTable("subscription_plans", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  userType: text("user_type").notNull(), // prestador, contratante, anunciante
+  level: text("level").notNull(), // essencial, profissional, premium
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("BRL"),
+  features: text("features").array().notNull(),
+  maxEvents: integer("max_events"),
+  maxServices: integer("max_services"),
+  maxVenues: integer("max_venues"),
+  commissionRate: decimal("commission_rate", { precision: 5, scale: 2 }),
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// User subscriptions table
+export const userSubscriptions = pgTable("user_subscriptions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  planId: integer("plan_id").references(() => subscriptionPlans.id).notNull(),
+  stripeSubscriptionId: text("stripe_subscription_id").unique(),
+  status: text("status").notNull().default("active"), // active, cancelled, past_due, unpaid
+  currentPeriodStart: timestamp("current_period_start").notNull(),
+  currentPeriodEnd: timestamp("current_period_end").notNull(),
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Payment methods table
+export const paymentMethods = pgTable("payment_methods", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  stripePaymentMethodId: text("stripe_payment_method_id").notNull(),
+  type: text("type").notNull(), // card, pix, boleto
+  brand: text("brand"), // visa, mastercard, etc
+  last4: text("last4"),
+  expiryMonth: integer("expiry_month"),
+  expiryYear: integer("expiry_year"),
+  isDefault: boolean("is_default").notNull().default(false),
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Transactions table
+export const transactions = pgTable("transactions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  subscriptionId: integer("subscription_id").references(() => userSubscriptions.id),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("BRL"),
+  status: text("status").notNull(), // pending, succeeded, failed, refunded
+  type: text("type").notNull(), // subscription, service_fee, commission
+  description: text("description"),
+  metadata: text("metadata"), // JSON string
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Enhanced reviews table
+export const reviewsEnhanced = pgTable("reviews_enhanced", {
+  id: serial("id").primaryKey(),
+  reviewerId: integer("reviewer_id").references(() => users.id).notNull(),
+  reviewedId: integer("reviewed_id").references(() => users.id).notNull(),
+  eventId: integer("event_id").references(() => events.id),
+  serviceId: integer("service_id").references(() => services.id),
+  venueId: integer("venue_id").references(() => venues.id),
+  contractId: integer("contract_id").references(() => contracts.id),
+  rating: integer("rating").notNull(), // 1-5
+  title: text("title").notNull(),
+  comment: text("comment").notNull(),
+  pros: text("pros").array(),
+  cons: text("cons").array(),
+  wouldRecommend: boolean("would_recommend").notNull().default(true),
+  isAnonymous: boolean("is_anonymous").notNull().default(false),
+  status: text("status").notNull().default("pending"), // pending, approved, rejected, flagged
+  moderationNotes: text("moderation_notes"),
+  helpfulVotes: integer("helpful_votes").notNull().default(0),
+  reportCount: integer("report_count").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// User reputation scores
+export const userReputation = pgTable("user_reputation", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull().unique(),
+  overallRating: decimal("overall_rating", { precision: 3, scale: 2 }).notNull().default("0.00"),
+  totalReviews: integer("total_reviews").notNull().default(0),
+  fiveStarCount: integer("five_star_count").notNull().default(0),
+  fourStarCount: integer("four_star_count").notNull().default(0),
+  threeStarCount: integer("three_star_count").notNull().default(0),
+  twoStarCount: integer("two_star_count").notNull().default(0),
+  oneStarCount: integer("one_star_count").notNull().default(0),
+  responseRate: decimal("response_rate", { precision: 5, scale: 2 }).notNull().default("0.00"),
+  averageResponseTime: integer("average_response_time"), // in minutes
+  completionRate: decimal("completion_rate", { precision: 5, scale: 2 }).notNull().default("0.00"),
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
+});
+
+// Digital contracts table
+export const digitalContracts = pgTable("digital_contracts", {
+  id: serial("id").primaryKey(),
+  contractorId: integer("contractor_id").references(() => users.id).notNull(),
+  providerId: integer("provider_id").references(() => users.id).notNull(),
+  eventId: integer("event_id").references(() => events.id),
+  serviceId: integer("service_id").references(() => services.id),
+  venueId: integer("venue_id").references(() => venues.id),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  terms: text("terms").notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("BRL"),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  status: text("status").notNull().default("draft"), // draft, sent, signed, completed, cancelled
+  contractorSignature: text("contractor_signature"),
+  providerSignature: text("provider_signature"),
+  contractorSignedAt: timestamp("contractor_signed_at"),
+  providerSignedAt: timestamp("provider_signed_at"),
+  documentUrl: text("document_url"),
+  templateUsed: text("template_used"),
+  metadata: text("metadata"), // JSON string
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Financial dashboard data
+export const financialRecords = pgTable("financial_records", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  type: text("type").notNull(), // income, expense, commission, fee
+  category: text("category").notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("BRL"),
+  description: text("description").notNull(),
+  eventId: integer("event_id").references(() => events.id),
+  contractId: integer("contract_id").references(() => digitalContracts.id),
+  transactionId: integer("transaction_id").references(() => transactions.id),
+  date: timestamp("date").notNull(),
+  status: text("status").notNull().default("pending"), // pending, confirmed, cancelled
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }),
+  netAmount: decimal("net_amount", { precision: 10, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Two-factor authentication
+export const twoFactorAuth = pgTable("two_factor_auth", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull().unique(),
+  secret: text("secret").notNull(),
+  backupCodes: text("backup_codes").array().notNull(),
+  enabled: boolean("enabled").notNull().default(false),
+  lastUsed: timestamp("last_used"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Security audit logs
+export const securityAuditLogs = pgTable("security_audit_logs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  action: text("action").notNull(),
+  resource: text("resource"),
+  resourceId: integer("resource_id"),
+  ipAddress: text("ip_address").notNull(),
+  userAgent: text("user_agent"),
+  success: boolean("success").notNull(),
+  reason: text("reason"),
+  metadata: text("metadata"), // JSON string
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// LGPD compliance data
+export const lgpdRequests = pgTable("lgpd_requests", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  type: text("type").notNull(), // access, rectification, deletion, portability, objection
+  status: text("status").notNull().default("pending"), // pending, processing, completed, rejected
+  requestData: text("request_data"), // JSON string
+  responseData: text("response_data"), // JSON string
+  processedBy: integer("processed_by").references(() => users.id),
+  processedAt: timestamp("processed_at"),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// AI matching preferences
+export const aiMatchingPreferences = pgTable("ai_matching_preferences", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull().unique(),
+  preferences: text("preferences").notNull(), // JSON string
+  lastTrainingDate: timestamp("last_training_date"),
+  accuracy: decimal("accuracy", { precision: 5, scale: 2 }),
+  enabled: boolean("enabled").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Chatbot conversations
+export const chatbotConversations = pgTable("chatbot_conversations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  sessionId: text("session_id").notNull(),
+  messages: text("messages").notNull(), // JSON array
+  status: text("status").notNull().default("active"), // active, resolved, escalated
+  satisfactionRating: integer("satisfaction_rating"), // 1-5
+  tags: text("tags").array(),
+  escalatedToHuman: boolean("escalated_to_human").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -316,3 +533,123 @@ export type InsertVenueReservation = z.infer<typeof insertVenueReservationSchema
 export type VenueReservation = typeof venueReservations.$inferSelect;
 export type InsertVenueAvailability = z.infer<typeof insertVenueAvailabilitySchema>;
 export type VenueAvailability = typeof venueAvailability.$inferSelect;
+
+// New schemas for advanced features
+export const insertSubscriptionPlanSchema = createInsertSchema(subscriptionPlans).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertUserSubscriptionSchema = createInsertSchema(userSubscriptions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPaymentMethodSchema = createInsertSchema(paymentMethods).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertTransactionSchema = createInsertSchema(transactions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertReviewEnhancedSchema = createInsertSchema(reviewsEnhanced).omit({
+  id: true,
+  status: true,
+  helpfulVotes: true,
+  reportCount: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertUserReputationSchema = createInsertSchema(userReputation).omit({
+  id: true,
+  lastUpdated: true,
+});
+
+export const insertDigitalContractSchema = createInsertSchema(digitalContracts).omit({
+  id: true,
+  status: true,
+  contractorSignature: true,
+  providerSignature: true,
+  contractorSignedAt: true,
+  providerSignedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertFinancialRecordSchema = createInsertSchema(financialRecords).omit({
+  id: true,
+  status: true,
+  createdAt: true,
+});
+
+export const insertTwoFactorAuthSchema = createInsertSchema(twoFactorAuth).omit({
+  id: true,
+  lastUsed: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSecurityAuditLogSchema = createInsertSchema(securityAuditLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertLgpdRequestSchema = createInsertSchema(lgpdRequests).omit({
+  id: true,
+  status: true,
+  processedBy: true,
+  processedAt: true,
+  createdAt: true,
+});
+
+export const insertAiMatchingPreferencesSchema = createInsertSchema(aiMatchingPreferences).omit({
+  id: true,
+  lastTrainingDate: true,
+  accuracy: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertChatbotConversationSchema = createInsertSchema(chatbotConversations).omit({
+  id: true,
+  status: true,
+  satisfactionRating: true,
+  escalatedToHuman: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// New types for advanced features
+export type InsertSubscriptionPlan = z.infer<typeof insertSubscriptionPlanSchema>;
+export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
+export type InsertUserSubscription = z.infer<typeof insertUserSubscriptionSchema>;
+export type UserSubscription = typeof userSubscriptions.$inferSelect;
+export type InsertPaymentMethod = z.infer<typeof insertPaymentMethodSchema>;
+export type PaymentMethod = typeof paymentMethods.$inferSelect;
+export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
+export type Transaction = typeof transactions.$inferSelect;
+export type InsertReviewEnhanced = z.infer<typeof insertReviewEnhancedSchema>;
+export type ReviewEnhanced = typeof reviewsEnhanced.$inferSelect;
+export type InsertUserReputation = z.infer<typeof insertUserReputationSchema>;
+export type UserReputation = typeof userReputation.$inferSelect;
+export type InsertDigitalContract = z.infer<typeof insertDigitalContractSchema>;
+export type DigitalContract = typeof digitalContracts.$inferSelect;
+export type InsertFinancialRecord = z.infer<typeof insertFinancialRecordSchema>;
+export type FinancialRecord = typeof financialRecords.$inferSelect;
+export type InsertTwoFactorAuth = z.infer<typeof insertTwoFactorAuthSchema>;
+export type TwoFactorAuth = typeof twoFactorAuth.$inferSelect;
+export type InsertSecurityAuditLog = z.infer<typeof insertSecurityAuditLogSchema>;
+export type SecurityAuditLog = typeof securityAuditLogs.$inferSelect;
+export type InsertLgpdRequest = z.infer<typeof insertLgpdRequestSchema>;
+export type LgpdRequest = typeof lgpdRequests.$inferSelect;
+export type InsertAiMatchingPreferences = z.infer<typeof insertAiMatchingPreferencesSchema>;
+export type AiMatchingPreferences = typeof aiMatchingPreferences.$inferSelect;
+export type InsertChatbotConversation = z.infer<typeof insertChatbotConversationSchema>;
+export type ChatbotConversation = typeof chatbotConversations.$inferSelect;
