@@ -408,9 +408,11 @@ export default function HomeClean() {
                   </li>
                 </ul>
                 
-                <Button className="w-full bg-white text-[#3C5BFA] hover:bg-gray-100">
-                  Escolher plano
-                </Button>
+                <Link href="/auth/login">
+                  <Button className="w-full bg-white text-[#3C5BFA] hover:bg-gray-100">
+                    Escolher plano
+                  </Button>
+                </Link>
               </div>
 
               {/* Premium */}
@@ -454,9 +456,11 @@ export default function HomeClean() {
                   </li>
                 </ul>
                 
-                <Button variant="outline" className="w-full border-gray-300">
-                  Escolher plano
-                </Button>
+                <Link href="/auth/login">
+                  <Button variant="outline" className="w-full border-gray-300">
+                    Escolher plano
+                  </Button>
+                </Link>
               </div>
             </div>
           )}
@@ -824,17 +828,17 @@ export default function HomeClean() {
             Escolha seu perfil e comece a transformar seus eventos hoje mesmo.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register?userType=prestador">
+            <Link href="/auth/register?userType=prestador">
               <Button size="lg" className="bg-white text-[#3C5BFA] hover:bg-gray-100 px-6 py-3 text-base">
                 Cadastrar como Prestador
               </Button>
             </Link>
-            <Link href="/register?userType=contratante">
+            <Link href="/auth/register?userType=contratante">
               <Button size="lg" className="bg-[#FFA94D] text-white hover:bg-orange-600 px-6 py-3 text-base">
                 Cadastrar como Contratante
               </Button>
             </Link>
-            <Link href="/register?userType=anunciante">
+            <Link href="/auth/register?userType=anunciante">
               <Button size="lg" className="bg-green-600 text-white hover:bg-green-700 px-6 py-3 text-base">
                 Cadastrar como Anunciante
               </Button>

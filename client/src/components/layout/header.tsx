@@ -18,8 +18,7 @@ export default function Header() {
   return (
     <header className="bg-white shadow-sm border-b border-gray-100">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4">
             <Link href="/" className="flex items-center">
               <img 
                 src={eventoLogo} 
@@ -155,7 +154,6 @@ export default function Header() {
           <Button variant="ghost" size="sm" className="md:hidden">
             <Menu className="w-5 h-5 text-gray-600" />
           </Button>
-        </div>
       </nav>
     </header>
   );
