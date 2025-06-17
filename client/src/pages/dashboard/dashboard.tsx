@@ -41,9 +41,9 @@ export default function Dashboard() {
           title: "Dashboard do Organizador",
           description: "Organize e gerencie seus eventos",
           stats: [
-            { label: "Eventos Ativos", value: stats?.eventsCount?.toString() || "0", icon: Calendar },
-            { label: "Prestadores Contratados", value: stats?.providersCount?.toString() || "0", icon: Users },
-            { label: "Orçamento Total", value: `R$ ${stats?.totalBudget?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00'}`, icon: TrendingUp },
+            { label: "Eventos Ativos", value: (stats as any)?.eventsCount?.toString() || "0", icon: Calendar },
+            { label: "Prestadores Contratados", value: (stats as any)?.providersCount?.toString() || "0", icon: Users },
+            { label: "Orçamento Total", value: `R$ ${(stats as any)?.totalBudget?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00'}`, icon: TrendingUp },
           ],
           actions: [
             { label: "Criar Evento", href: "/events/create", icon: Plus },
@@ -55,9 +55,9 @@ export default function Dashboard() {
           title: "Dashboard do Anunciante",
           description: "Gerencie seus espaços e reservas",
           stats: [
-            { label: "Espaços Cadastrados", value: stats?.venuesCount?.toString() || "0", icon: MapPin },
-            { label: "Reservas Ativas", value: stats?.reservationsCount?.toString() || "0", icon: Calendar },
-            { label: "Taxa de Ocupação", value: `${stats?.occupancyRate || 0}%`, icon: TrendingUp },
+            { label: "Espaços Cadastrados", value: (stats as any)?.venuesCount?.toString() || "0", icon: MapPin },
+            { label: "Reservas Ativas", value: (stats as any)?.reservationsCount?.toString() || "0", icon: Calendar },
+            { label: "Taxa de Ocupação", value: `${(stats as any)?.occupancyRate || 0}%`, icon: TrendingUp },
           ],
           actions: [
             { label: "Cadastrar Espaço", href: "/venues/create", icon: Plus },
