@@ -55,35 +55,38 @@ export default function Venues() {
     cep: "",
     capacity: "",
     pricePerHour: "",
+    pricePerDay: "",
+    pricePerWeekend: "",
+    pricingModel: "hourly",
     category: "",
     amenities: [] as string[]
   });
 
   const [mediaFiles, setMediaFiles] = useState<any[]>([]);
-
-  // Fetch venues
-  const { data: venues = [], isLoading } = useQuery<Venue[]>({
-    queryKey: ["/api/venues", user?.userType === 'anunciante' ? user.id : 'all'],
+  const [addressData, setAddressData] = useState({
+    cep: "",
+    street: "",
+    neighborhood: "",
+    city: "",
+    state: ""
   });
 
-  // Create venue mutation
+  // Fetch user venues
+  const { data: userVenues = [], isLoading: venuesLoading } = useQuery({
+    queryKey: ["/api/venues"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/venues");
+      return response;
+    },
+  });
+
   const createVenueMutation = useMutation({
     mutationFn: async (venueData: any) => {
-      const formDataToSend = new FormData();
-      
-      // Add venue data
-      Object.keys(venueData).forEach(key => {
-        if (key !== 'mediaFiles') {
-          formDataToSend.append(key, venueData[key]);
-        }
+      return apiRequest("POST", "/api/venues", {
+        ...venueData,
+        images: mediaFiles.map(m => m.url),
+        addressData: JSON.stringify(addressData)
       });
-      
-      // Add media files
-      mediaFiles.forEach((media, index) => {
-        formDataToSend.append(`media_${index}`, media.file);
-      });
-      
-      return apiRequest("POST", "/api/venues", formDataToSend);
     },
     onSuccess: () => {
       toast({
