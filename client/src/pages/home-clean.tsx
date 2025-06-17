@@ -10,6 +10,12 @@ import { Link } from "wouter";
 import { ArrowRight, Calendar, Users, Zap, Shield, Star, Play } from "lucide-react";
 import { useState } from "react";
 import eventoLogo from "@assets/logo evennto_1750165135991.png";
+import microphoneIcon from "@assets/Microphone, Mic, Rec_1750126816998.png";
+import foodIcon from "@assets/Group-1_1750126826239.png";
+import organizationIcon from "@assets/Group_1750126830235.png";
+import productionIcon from "@assets/video-camera-movie-film_1750126838703.png";
+import cleaningIcon from "@assets/wash-bucket_1750126846234.png";
+import appStoreImage from "@assets/image_1750168721135.png";
 
 export default function HomeClean() {
   const [activeUserType, setActiveUserType] = useState<'prestadores' | 'contratantes' | 'anunciantes'>('prestadores');
@@ -31,8 +37,15 @@ export default function HomeClean() {
             </div>
             <div className="flex items-center space-x-8">
               <a href="#pricing" className="text-gray-600 hover:text-black">Preços</a>
-              <a href="#" className="text-gray-600 hover:text-black">Recursos</a>
-              <a href="#" className="text-gray-600 hover:text-black">Contato</a>
+              <Link href="/como-funciona">
+                <span className="text-gray-600 hover:text-black cursor-pointer">Como funciona</span>
+              </Link>
+              <Link href="/quem-somos">
+                <span className="text-gray-600 hover:text-black cursor-pointer">Quem somos</span>
+              </Link>
+              <Link href="/contato">
+                <span className="text-gray-600 hover:text-black cursor-pointer">Contato</span>
+              </Link>
               <Link href="/login">
                 <Button variant="outline" className="border-gray-300">
                   Entrar
@@ -40,7 +53,7 @@ export default function HomeClean() {
               </Link>
               <Link href="/register">
                 <Button className="bg-[#3C5BFA] hover:bg-[#2C46E8]">
-                  Começar grátis
+                  Cadastrar
                 </Button>
               </Link>
             </div>
@@ -60,16 +73,11 @@ export default function HomeClean() {
             A plataforma completa que conecta organizadores de eventos com os melhores prestadores de serviços e espaços únicos.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/register">
-              <Button size="lg" className="bg-[#3C5BFA] hover:bg-[#2C46E8] px-8 py-4 text-lg">
-                Começar gratuitamente
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Button variant="outline" size="lg" className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-4 text-lg">
-              <Play className="mr-2 h-5 w-5" />
-              Ver demonstração
-            </Button>
+            <img 
+              src={appStoreImage} 
+              alt="Baixe na App Store e Google Play"
+              className="h-16 object-contain cursor-pointer hover:opacity-80 transition-opacity"
+            />
           </div>
         </div>
       </section>
@@ -98,44 +106,59 @@ export default function HomeClean() {
         </div>
       </section>
 
-      {/* Como funciona */}
+      {/* Encontre seu perfil */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-black mb-6">
-              Como funciona a Evento+
+              Encontre seu perfil na Evento+
             </h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Calendar className="w-8 h-8 text-[#3C5BFA]" />
+            <div className="text-center p-8 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl">
+              <div className="w-16 h-16 bg-[#3C5BFA] rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Users className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Cadastre sua empresa</h3>
-              <p className="text-gray-600">
-                Crie seu perfil completo e mostre seus serviços para milhares de organizadores.
+              <h3 className="text-xl font-semibold text-black mb-4">Prestadores de Serviços</h3>
+              <p className="text-gray-600 mb-6">
+                Ofereça seus serviços para eventos e amplie seu negócio com nossa plataforma.
               </p>
+              <Link href="/register?userType=prestador">
+                <Button className="bg-[#3C5BFA] hover:bg-[#2C46E8] text-white">
+                  Cadastrar como Prestador
+                </Button>
+              </Link>
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Users className="w-8 h-8 text-[#FFA94D]" />
+            <div className="text-center p-8 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl">
+              <div className="w-16 h-16 bg-[#FFA94D] rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Calendar className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Receba solicitações</h3>
-              <p className="text-gray-600">
-                Organizadores interessados entrarão em contato diretamente com você.
+              <h3 className="text-xl font-semibold text-black mb-4">Contratantes</h3>
+              <p className="text-gray-600 mb-6">
+                Encontre os melhores prestadores e espaços para realizar seu evento dos sonhos.
               </p>
+              <Link href="/register?userType=contratante">
+                <Button className="bg-[#FFA94D] hover:bg-orange-600 text-white">
+                  Cadastrar como Contratante
+                </Button>
+              </Link>
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Zap className="w-8 h-8 text-green-600" />
+            <div className="text-center p-8 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl">
+              <div className="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Shield className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-black mb-4">Feche contratos</h3>
-              <p className="text-gray-600">
-                Negocie valores, prazos e condições de forma segura pela plataforma.
+              <h3 className="text-xl font-semibold text-black mb-4">Anunciantes</h3>
+              <p className="text-gray-600 mb-6">
+                Anuncie seus espaços e aumente a visibilidade dos seus locais para eventos.
               </p>
+              <Link href="/register?userType=anunciante">
+                <Button className="bg-green-600 hover:bg-green-700 text-white">
+                  Cadastrar como Anunciante
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -152,57 +175,49 @@ export default function HomeClean() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Row 1 */}
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h4 className="font-semibold text-black mb-2">Arquitetura e decoração</h4>
-              <p className="text-gray-600 text-sm">Design e ambientação</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h4 className="font-semibold text-black mb-2">Fotografia e filmagem</h4>
-              <p className="text-gray-600 text-sm">Registro profissional</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h4 className="font-semibold text-black mb-2">Alimentação e bebidas</h4>
-              <p className="text-gray-600 text-sm">Buffets e catering</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h4 className="font-semibold text-black mb-2">Animação e música</h4>
-              <p className="text-gray-600 text-sm">DJs e entretenimento</p>
+            {/* Entretenimento */}
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-center mb-4">
+                <img src={microphoneIcon} alt="Entretenimento" className="w-12 h-12 object-contain" />
+              </div>
+              <h4 className="font-semibold text-black mb-2 text-center">Entretenimento</h4>
+              <p className="text-gray-600 text-sm text-center">DJ, Banda, MC, Animação, Karaokê</p>
             </div>
 
-            {/* Row 2 */}
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h4 className="font-semibold text-black mb-2">Cerimonial e protocolo</h4>
-              <p className="text-gray-600 text-sm">Coordenação profissional</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h4 className="font-semibold text-black mb-2">Flores e paisagismo</h4>
-              <p className="text-gray-600 text-sm">Decoração floral</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h4 className="font-semibold text-black mb-2">Segurança e limpeza</h4>
-              <p className="text-gray-600 text-sm">Serviços de apoio</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h4 className="font-semibold text-black mb-2">Transporte e logística</h4>
-              <p className="text-gray-600 text-sm">Mobilidade e organização</p>
+            {/* Alimentação */}
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-center mb-4">
+                <img src={foodIcon} alt="Alimentação" className="w-12 h-12 object-contain" />
+              </div>
+              <h4 className="font-semibold text-black mb-2 text-center">Alimentação</h4>
+              <p className="text-gray-600 text-sm text-center">Buffet, Chef, Bartender, Confeitaria</p>
             </div>
 
-            {/* Row 3 */}
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h4 className="font-semibold text-black mb-2">Espaços para eventos</h4>
-              <p className="text-gray-600 text-sm">Locais especiais</p>
+            {/* Organização */}
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-center mb-4">
+                <img src={organizationIcon} alt="Organização" className="w-12 h-12 object-contain" />
+              </div>
+              <h4 className="font-semibold text-black mb-2 text-center">Organização</h4>
+              <p className="text-gray-600 text-sm text-center">Cerimonial, Wedding Planner, Decoração</p>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h4 className="font-semibold text-black mb-2">Tecnologia e som</h4>
-              <p className="text-gray-600 text-sm">Equipamentos técnicos</p>
+
+            {/* Produção */}
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-center mb-4">
+                <img src={productionIcon} alt="Produção" className="w-12 h-12 object-contain" />
+              </div>
+              <h4 className="font-semibold text-black mb-2 text-center">Produção</h4>
+              <p className="text-gray-600 text-sm text-center">Foto/Vídeo, Som/Luz, Cerimônia</p>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h4 className="font-semibold text-black mb-2">Marketing e design</h4>
-              <p className="text-gray-600 text-sm">Comunicação visual</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h4 className="font-semibold text-black mb-2">Vestuário e beleza</h4>
-              <p className="text-gray-600 text-sm">Estilo e cuidados</p>
+
+            {/* Limpeza */}
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-center mb-4">
+                <img src={cleaningIcon} alt="Limpeza" className="w-12 h-12 object-contain" />
+              </div>
+              <h4 className="font-semibold text-black mb-2 text-center">Limpeza</h4>
+              <p className="text-gray-600 text-sm text-center">Limpeza pré e pós evento, Organização</p>
             </div>
           </div>
         </div>
