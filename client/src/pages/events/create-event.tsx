@@ -30,6 +30,8 @@ const createEventSchema = z.object({
   city: z.string().min(2, "Cidade é obrigatória"),
   state: z.string().min(2, "Estado é obrigatório"),
   cep: z.string().min(8, "CEP é obrigatório"),
+  street: z.string().optional(),
+  neighborhood: z.string().optional(),
   number: z.string().min(1, "Número é obrigatório"),
   totalBudget: z.string().min(1, "Orçamento total é obrigatório"),
   category: z.string().min(1, "Categoria é obrigatória"),
@@ -104,6 +106,8 @@ export default function CreateEvent() {
       city: "",
       state: "",
       cep: "",
+      street: "",
+      neighborhood: "",
       number: "",
       totalBudget: "",
       category: "",
@@ -275,18 +279,18 @@ export default function CreateEvent() {
                 
                 <CEPInput onAddressFound={handleCEPFound} />
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="cep"
+                    name="street"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>CEP</FormLabel>
+                        <FormLabel>Rua</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="00000-000" 
+                            placeholder="Nome da rua" 
                             {...field} 
-                            value={addressData.cep || field.value}
+                            value={addressData.street || field.value}
                             readOnly
                           />
                         </FormControl>
@@ -303,6 +307,46 @@ export default function CreateEvent() {
                         <FormLabel>Número</FormLabel>
                         <FormControl>
                           <Input placeholder="123" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="neighborhood"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bairro</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Nome do bairro" 
+                            {...field} 
+                            value={addressData.neighborhood || field.value}
+                            readOnly
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="cep"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>CEP</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="00000-000" 
+                            {...field} 
+                            value={addressData.cep || field.value}
+                            readOnly
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -449,13 +493,19 @@ export default function CreateEvent() {
                               <div className="relative">
                                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
                                 <Input
-                                  type="number"
-                                  step="0.01"
-                                  min="0"
-                                  placeholder="2.500,00"
+                                  type="text"
+                                  placeholder="0,00"
                                   className="pl-10"
-                                  {...field}
-                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                  value={field.value ? field.value.toString().replace('.', ',') : ''}
+                                  onChange={(e) => {
+                                    let value = e.target.value.replace(/[^\d]/g, '');
+                                    if (value === '') {
+                                      field.onChange(0);
+                                      return;
+                                    }
+                                    value = (parseFloat(value) / 100).toFixed(2);
+                                    field.onChange(parseFloat(value));
+                                  }}
                                 />
                               </div>
                             </FormControl>
@@ -481,29 +531,22 @@ export default function CreateEvent() {
                 ))}
               </div>
 
-              <FormField
-                control={form.control}
-                name="totalBudget"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Orçamento Total do Evento</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          placeholder="15.000,00"
-                          className="pl-10"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <FormLabel className="text-lg font-semibold">Orçamento Total do Evento</FormLabel>
+                <p className="text-sm text-gray-600 mb-2">Calculado automaticamente baseado nos serviços</p>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                  <Input
+                    type="text"
+                    readOnly
+                    className="pl-10 bg-white font-semibold text-lg"
+                    value={services.reduce((total, service) => total + (service.budget || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Este valor é privado e usado apenas para análises internas
+                </p>
+              </div>
 
               <div className="space-y-4">
                 <FormLabel>Imagens do Evento</FormLabel>
