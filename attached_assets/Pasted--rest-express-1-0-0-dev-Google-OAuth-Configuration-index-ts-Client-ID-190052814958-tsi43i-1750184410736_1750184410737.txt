@@ -1,0 +1,115 @@
+> rest-express@1.0.0 dev
+=== Google OAuth Configuration ===index.ts
+Client ID: 190052814958-tsi43i1...
+Callback URL: https://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/auth/google/callback
+Domain: d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev
+6:03:09 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 8 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+6:03:14 PM [express] GET /api/user 401 in 3ms :: {"message":"Não autenticado"}
+6:03:38 PM [express] GET /api/user 401 in 1ms :: {"message":"Não autenticado"}
+6:03:41 PM [express] GET /api/user 304 in 306ms :: {"id":2,"username":"Contratante","firstName":null…
+6:06:05 PM [express] GET /api/user 304 in 295ms :: {"id":2,"username":"Contratante","firstName":null…
+6:06:17 PM [express] POST /api/login 200 in 2137ms :: {"id":3,"username":"Anunciante","firstName":nu…
+6:06:19 PM [express] GET /api/user 200 in 1142ms :: {"id":3,"username":"Anunciante","firstName":null…
+6:06:20 PM [express] GET /api/user 304 in 300ms :: {"id":3,"username":"Anunciante","firstName":null,…
+6:06:32 PM [express] GET /api/user 304 in 299ms :: {"id":3,"username":"Anunciante","firstName":null,…
+Getting venues for user: 3
+Venues retrieved: 0
+6:07:00 PM [express] GET /api/venues 304 in 1191ms :: []
+Getting venues for user: 3
+Venues retrieved: 0
+6:16:14 PM [express] GET /api/venues 304 in 2052ms :: []
+6:16:14 PM [express] GET /api/user 304 in 2471ms :: {"id":3,"username":"Anunciante","firstName":null…
+Venue creation request body: {
+  name: 'Espaço',
+  description: 'aaaaaaaaaaaaaaaa aaaaaaaaaaaa',
+  location: 'Rua Wander Costa, Santa Rosa, Uberlândia/MG',
+  capacity: 100,
+  number: '151',
+  pricePerHour: 200,
+  pricePerDay: null,
+  pricePerWeekend: null,
+  pricingModel: 'hourly',
+  category: 'Salão de Festas',
+  amenities: [
+    'Projetor',
+    'Estacionamento',
+    'Banheiros',
+    'Área Externa',
+    'Piscina',
+    'Acessibilidade'
+  ],
+  images: [
+    'blob:https://d797590d-a47b-43a2-948a-07f16f2e2817-00-3guspncus7p2n.picard.replit.dev/6ac1bb12-b300-498e-bab2-902c356d004c'
+  ],
+  addressData: '{"cep":"38401-243","street":"Rua Wander Costa","neighborhood":"Santa Rosa","city":"Uberlândia","state":"MG"}'
+}
+Venue creation error: ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "number",
+    "path": [
+      "pricePerHour"
+    ],
+    "message": "Expected string, received number"
+  }
+]
+    at get error [as error] (file:///home/runner/workspace/node_modules/zod/lib/index.mjs:587:31)
+    at ZodObject.parse (file:///home/runner/workspace/node_modules/zod/lib/index.mjs:663:22)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:563:47)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/runner/workspace/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at strategy.pass (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:355:9)
+    at /home/runner/workspace/node_modules/passport/lib/strategies/session.js:120:12
+    at pass (/home/runner/workspace/node_modules/passport/lib/authenticator.js:352:31)
+    at deserialized (/home/runner/workspace/node_modules/passport/lib/authenticator.js:364:7)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:63:14)
+    at pass (/home/runner/workspace/node_modules/passport/lib/authenticator.js:372:9)
+    at Authenticator.deserializeUser (/home/runner/workspace/node_modules/passport/lib/authenticator.js:377:5)
+    at SessionStrategy.authenticate (/home/runner/workspace/node_modules/passport/lib/strategies/session.js:112:10)
+    at attempt (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:378:16)
+    at authenticate (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:379:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at initialize (/home/runner/workspace/node_modules/passport/lib/middleware/initialize.js:98:5)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/workspace/node_modules/express-session/index.js:514:7
+    at /home/runner/workspace/node_modules/connect-pg-simple/index.js:370:18
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  issues: [
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'number',
+      path: [Array],
+      message: 'Expected string, received number'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'number',
+      path: [Array],
+      message: 'Expected string, received number'
+    }
+  ]
+}
+6:18:26 PM [express] POST /api/venues 400 in 899ms :: {"message":"[\n  {\n    \"code\": \"invalid_ty…

@@ -170,6 +170,17 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 - **Venue Creation Validation**: Enhanced form validation requiring CEP, número, and other essential fields
 - **Automatic Location Population**: Venue location field automatically populated from CEP data for consistency
 
+### June 17, 2025 - Critical Form and API Fixes
+- **Venue Creation API Fix**: Resolved 400 errors in venue creation by implementing proper price field conversion and enhanced validation logging
+- **Event Creation API Fix**: Fixed 400 errors in event creation with improved data processing and direct database insertion bypassing problematic schema validation
+- **Logout Redirect Fix**: Corrected logout functionality to properly redirect to /auth/login using Wouter routing instead of window.location
+- **Header Removal**: Removed duplicate header from "Meus eventos" page for contratante users for cleaner UI
+- **Brazilian Currency Format**: Implemented R$ 0,00 format in event creation budget fields with proper comma-to-dot conversion
+- **Automatic Budget Calculation**: Event total budget now automatically calculates from individual service budgets and displays in Brazilian format
+- **CEP Fields Restructure**: Updated event creation form with proper CEP structure: CEP input with placeholder, separate Rua, Bairro fields below
+- **File Upload Limits**: Increased server payload limits to 50MB for profile image uploads and media files
+- **Database Schema Updates**: Added "number" field to venues table and updated form schemas to include street and neighborhood fields
+
 ### Implementation Summary
 - **Frontend**: 15+ pages, 25+ components, complete user flows for all three user types
 - **Backend**: Full API with authentication, WebSocket support, and data validation
