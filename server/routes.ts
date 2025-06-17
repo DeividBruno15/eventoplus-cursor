@@ -533,12 +533,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const userId = (req.user as any).id;
-      console.log('Getting venues for user:', userId);
       const venues = await storage.getVenues(userId);
-      console.log('Venues retrieved:', venues.length);
       res.json(venues);
     } catch (error: any) {
-      console.error('Venues endpoint error:', error);
       res.status(500).json({ message: error.message });
     }
   });
@@ -550,8 +547,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      console.log('Venue creation request body:', req.body);
-      
       const validatedData = insertVenueSchema.parse(req.body);
       const userId = (req.user as any).id;
       
@@ -562,7 +557,172 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.status(201).json(venue);
     } catch (error: any) {
-      console.error('Venue creation error:', error);
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Cart routes
+  app.get("/api/cart", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const cartItems = await storage.getCartItems(userId);
+      res.json(cartItems);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/cart", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const cartItem = await storage.createCartItem({
+        ...req.body,
+        userId
+      });
+      res.status(201).json(cartItem);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  app.patch("/api/cart/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const itemId = parseInt(req.params.id);
+      const updatedItem = await storage.updateCartItem(itemId, req.body);
+      res.json(updatedItem);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  app.delete("/api/cart/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const itemId = parseInt(req.params.id);
+      await storage.deleteCartItem(itemId);
+      res.json({ message: "Item removido com sucesso" });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/cart/checkout", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const { items, eventDate, eventLocation, specialRequests, contactPhone } = req.body;
+      
+      // Create contracts for each service
+      const contracts = [];
+      for (const item of items) {
+        const contract = await storage.createContract({
+          title: `Serviço - ${item.serviceName || 'Serviço contratado'}`,
+          serviceType: item.serviceType || 'Geral',
+          eventDate,
+          eventLocation,
+          value: item.basePrice * item.quantity,
+          terms: `Contrato para prestação de serviços no evento.\nObservações: ${specialRequests}`,
+          paymentTerms: "Pagamento mediante acordo entre as partes",
+          cancellationPolicy: "Cancelamento até 24h antes do evento",
+          status: 'pending',
+          providerId: item.providerId,
+          clientId: userId
+        });
+        contracts.push(contract);
+      }
+      
+      // Clear cart after checkout
+      await storage.clearCart(userId);
+      
+      res.json({ 
+        message: "Checkout realizado com sucesso",
+        contracts 
+      });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Contracts routes
+  app.get("/api/contracts", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const contracts = await storage.getContracts(userId);
+      res.json(contracts);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/contracts/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const contractId = parseInt(req.params.id);
+      const contract = await storage.getContract(contractId);
+      
+      if (!contract) {
+        return res.status(404).json({ message: "Contrato não encontrado" });
+      }
+
+      res.json(contract);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/contracts", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const contract = await storage.createContract({
+        ...req.body,
+        clientId: userId,
+        status: 'draft'
+      });
+      res.status(201).json(contract);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  app.patch("/api/contracts/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const contractId = parseInt(req.params.id);
+      const updatedContract = await storage.updateContract(contractId, req.body);
+      res.json(updatedContract);
+    } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
   });
