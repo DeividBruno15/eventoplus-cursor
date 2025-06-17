@@ -23,6 +23,7 @@ interface Venue {
   name: string;
   description: string;
   location: string;
+  category: string;
   capacity: number;
   pricePerHour?: number;
   pricePerDay?: number;

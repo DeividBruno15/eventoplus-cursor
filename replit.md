@@ -113,7 +113,7 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 
 ## Changelog
 
-### June 16, 2025 - Complete Platform Implementation
+### June 17, 2025 - Complete Platform Implementation with Advanced Features
 - **Institutional Homepage Redesign**: Clean, modern design following Figma reference with proper section organization, pricing tables, FAQ, and service categories
 - **Layout Architecture Fix**: Separated public routes (no sidebar) from protected routes (with sidebar) to eliminate topbar duplication
 - **Core Marketplace Features**: Complete event creation, service provider listings, application system, and detailed event pages with real-time updates
@@ -134,6 +134,25 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 - **Database Schema**: Complete schema with all relationships, proper indexing, and data integrity
 - **Dynamic Navigation**: User type-specific navigation with role-based menu items and access controls
 - **Professional UI/UX**: Consistent design system with custom brand colors (#3C5BFA primary, #FFA94D secondary) and responsive layouts
+
+### June 17, 2025 - Enhanced Authentication & Registration System
+- **3-Step Registration Flow**: Complete redesign based on reference images with user type selection, personal/business data, and service type selection
+- **Person Type Selection**: Added física/jurídica options for Contratantes and Anunciantes with appropriate field validation
+- **CPF/CNPJ Validation**: Real-time validation with visual feedback and proper formatting masks
+- **Password Strength Validation**: Visual strength indicator with requirements checklist matching reference design
+- **CEP API Integration**: Automatic address completion using ViaCEP API across all forms
+- **Profile Image Upload**: Fixed saving and preview stretching issues with proper database persistence
+- **Authentication Performance**: Optimized with user caching (5-minute TTL) for faster login/logout
+- **Logout Redirect Fix**: Proper redirection to login page after logout
+- **Service Type Selection**: Prestadores can select up to 3 services, specific service options per user type
+
+### June 17, 2025 - Venue Management Enhancements
+- **Venue Availability Calendar**: System for anunciantes to manage venue availability by date
+- **Multiple Pricing Models**: Support for hourly, daily, and weekend pricing options
+- **Media Upload Support**: Up to 10 images/videos per venue with proper preview and storage
+- **Venue Creation Fix**: Resolved issue where created venues weren't appearing in "Meus espaços"
+- **Enhanced Venue Schema**: Added category, pricing models, and media support
+- **Address Integration**: Full CEP integration for venue location management
 
 ### Implementation Summary
 - **Frontend**: 15+ pages, 25+ components, complete user flows for all three user types
