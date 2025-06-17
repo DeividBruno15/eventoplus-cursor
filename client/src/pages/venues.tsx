@@ -72,6 +72,7 @@ export default function Venues() {
     queryKey: ["/api/venues"],
     queryFn: async () => {
       const response = await apiRequest("GET", "/api/venues");
+      console.log('Venues API response:', response);
       return response;
     },
   });
@@ -238,6 +239,7 @@ export default function Venues() {
   };
 
   // Filter venues
+  console.log('Venues data:', venues, 'Type:', typeof venues, 'Is Array:', Array.isArray(venues));
   const filteredVenues = Array.isArray(venues) ? venues.filter((venue: Venue) => {
     const matchesSearch = venue.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          venue.description.toLowerCase().includes(searchTerm.toLowerCase());
