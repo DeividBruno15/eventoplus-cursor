@@ -564,6 +564,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced services endpoint with filters for providers page
+  app.get("/api/services", async (req, res) => {
+    try {
+      const { providerId, category, search, city } = req.query;
+      let services = await storage.getServices(providerId ? parseInt(providerId as string) : undefined);
+      
+      // Filter by category for providers page
+      if (category && category !== "Todos") {
+        services = services.filter(service => service.category === category);
+      }
+      
+      // Filter by search term for providers page  
+      if (search) {
+        const searchTerm = (search as string).toLowerCase();
+        services = services.filter(service => 
+          service.title?.toLowerCase().includes(searchTerm) ||
+          service.description?.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      res.json(services);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Public API endpoints for external access
+  app.get("/api/public/events", async (req, res) => {
+    try {
+      const { category, location, page = 1, limit = 10 } = req.query;
+      let events = await storage.getEvents();
+      
+      // Filter only active events for public API
+      events = events.filter(event => event.status === 'active');
+      
+      if (category) {
+        events = events.filter(event => event.category === category);
+      }
+      
+      if (location) {
+        events = events.filter(event => 
+          event.location?.toLowerCase().includes((location as string).toLowerCase())
+        );
+      }
+      
+      // Pagination
+      const startIdx = (parseInt(page as string) - 1) * parseInt(limit as string);
+      const endIdx = startIdx + parseInt(limit as string);
+      const paginatedEvents = events.slice(startIdx, endIdx);
+      
+      res.json({
+        events: paginatedEvents,
+        pagination: {
+          page: parseInt(page as string),
+          limit: parseInt(limit as string),
+          total: events.length,
+          totalPages: Math.ceil(events.length / parseInt(limit as string))
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/public/services", async (req, res) => {
+    try {
+      const { category, location, rating } = req.query;
+      const services = await storage.getServices();
+      
+      let filteredServices = services;
+      
+      if (category) {
+        filteredServices = filteredServices.filter(service => service.category === category);
+      }
+      
+      res.json({ services: filteredServices });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/public/venues", async (req, res) => {
+    try {
+      const { capacity, location, amenities } = req.query;
+      const venues = await storage.getVenues();
+      
+      let filteredVenues = venues;
+      
+      if (capacity) {
+        filteredVenues = filteredVenues.filter(venue => 
+          venue.capacity >= parseInt(capacity as string)
+        );
+      }
+      
+      if (location) {
+        filteredVenues = filteredVenues.filter(venue => 
+          venue.location?.toLowerCase().includes((location as string).toLowerCase())
+        );
+      }
+      
+      res.json({ venues: filteredVenues });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Webhook endpoint for external integrations
+  app.post("/api/public/webhook", webhookLimiter, async (req, res) => {
+    try {
+      const { event_type, data, timestamp } = req.body;
+      
+      console.log(`Webhook recebido: ${event_type} em ${timestamp}`);
+      console.log('Dados:', data);
+      
+      res.status(200).json({ 
+        status: 'success',
+        message: 'Webhook processado com sucesso',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // WebSocket setup
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });

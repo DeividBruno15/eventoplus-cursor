@@ -73,7 +73,7 @@ export default function CreateService() {
   const form = useForm<ServiceFormData>({
     resolver: zodResolver(serviceSchema),
     defaultValues: {
-      name: "",
+      title: "",
       description: "",
       category: "",
       price: "",

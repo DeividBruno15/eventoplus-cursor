@@ -29,8 +29,9 @@ export default function Providers() {
 
   const providersArray = Array.isArray(providers) ? providers : [];
   const filteredProviders = providersArray.filter((provider: any) => {
-    const matchesSearch = provider.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         provider.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = !searchTerm || 
+      provider.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      provider.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "Todos" || provider.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
