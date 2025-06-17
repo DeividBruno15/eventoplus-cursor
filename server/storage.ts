@@ -75,6 +75,7 @@ export interface IStorage {
   
   // Chat Messages
   getChatMessages(senderId: number, receiverId: number): Promise<ChatMessage[]>;
+  getChatContacts(userId: number): Promise<any[]>;
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
   
   // Reviews
