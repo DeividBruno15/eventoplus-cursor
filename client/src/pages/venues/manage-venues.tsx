@@ -72,7 +72,13 @@ export default function ManageVenues() {
     pricePerWeekend: "",
     pricingModel: "hourly",
     amenities: [] as string[],
-    active: true
+    active: true,
+    cep: "",
+    rua: "",
+    numero: "",
+    bairro: "",
+    cidade: "",
+    estado: ""
   });
 
   const { data: venues, isLoading } = useQuery({
@@ -145,8 +151,46 @@ export default function ManageVenues() {
       pricePerWeekend: "",
       pricingModel: "hourly",
       amenities: [],
-      active: true
+      active: true,
+      cep: "",
+      rua: "",
+      numero: "",
+      bairro: "",
+      cidade: "",
+      estado: ""
     });
+  };
+
+  const fetchAddressByCEP = async (cep: string) => {
+    if (cep.length === 8) {
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await response.json();
+        
+        if (!data.erro) {
+          setFormData(prev => ({
+            ...prev,
+            rua: data.logradouro || "",
+            bairro: data.bairro || "",
+            cidade: data.localidade || "",
+            estado: data.uf || "",
+            location: `${data.localidade}, ${data.uf}`
+          }));
+        }
+      } catch (error) {
+        console.error("Erro ao buscar CEP:", error);
+      }
+    }
+  };
+
+  const handleCEPChange = (value: string) => {
+    const cleanCEP = value.replace(/\D/g, "");
+    if (cleanCEP.length <= 8) {
+      setFormData(prev => ({ ...prev, cep: cleanCEP }));
+      if (cleanCEP.length === 8) {
+        fetchAddressByCEP(cleanCEP);
+      }
+    }
   };
 
   const handleSubmit = () => {
@@ -285,12 +329,13 @@ export default function ManageVenues() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="location">Localização *</Label>
+                  <Label htmlFor="cep">CEP *</Label>
                   <Input
-                    id="location"
-                    value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    placeholder="Ex: São Paulo, SP"
+                    id="cep"
+                    value={formData.cep}
+                    onChange={(e) => handleCEPChange(e.target.value)}
+                    placeholder="12345678"
+                    maxLength={8}
                   />
                 </div>
                 <div>
@@ -301,6 +346,61 @@ export default function ManageVenues() {
                     value={formData.capacity}
                     onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
                     placeholder="100"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-2">
+                  <Label htmlFor="rua">Rua</Label>
+                  <Input
+                    id="rua"
+                    value={formData.rua}
+                    onChange={(e) => setFormData({ ...formData, rua: e.target.value })}
+                    placeholder="Preenchido automaticamente"
+                    readOnly
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="numero">Número *</Label>
+                  <Input
+                    id="numero"
+                    value={formData.numero}
+                    onChange={(e) => setFormData({ ...formData, numero: e.target.value })}
+                    placeholder="123"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="bairro">Bairro</Label>
+                  <Input
+                    id="bairro"
+                    value={formData.bairro}
+                    onChange={(e) => setFormData({ ...formData, bairro: e.target.value })}
+                    placeholder="Preenchido automaticamente"
+                    readOnly
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="cidade">Cidade</Label>
+                  <Input
+                    id="cidade"
+                    value={formData.cidade}
+                    onChange={(e) => setFormData({ ...formData, cidade: e.target.value })}
+                    placeholder="Preenchido automaticamente"
+                    readOnly
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="estado">Estado</Label>
+                  <Input
+                    id="estado"
+                    value={formData.estado}
+                    onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+                    placeholder="SP"
+                    readOnly
                   />
                 </div>
               </div>

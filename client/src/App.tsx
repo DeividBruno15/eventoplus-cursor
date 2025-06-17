@@ -42,8 +42,21 @@ import Agenda from "@/pages/agenda";
 import HelpCenter from "@/pages/help-center";
 import Support from "@/pages/support";
 import NotificationsPage from "@/pages/notifications";
+import AdvertiserAnalytics from "@/pages/analytics-advertiser";
 import AuthGuard from "@/components/auth/auth-guard";
 import NotFound from "@/pages/not-found";
+import { useAuth } from "@/hooks/use-auth";
+
+// Analytics Wrapper Component
+function AnalyticsWrapper() {
+  const { user } = useAuth();
+  
+  if (user?.userType === 'anunciante') {
+    return <AdvertiserAnalytics />;
+  }
+  
+  return <Analytics />;
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -193,7 +206,7 @@ function Router() {
       <Route path="/analytics">
         <Layout>
           <AuthGuard>
-            <Analytics />
+            <AnalyticsWrapper />
           </AuthGuard>
         </Layout>
       </Route>
