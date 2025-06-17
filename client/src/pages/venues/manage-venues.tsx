@@ -83,7 +83,7 @@ export default function ManageVenues() {
 
   const { data: venues, isLoading } = useQuery({
     queryKey: ['/api/venues', user?.id],
-    queryFn: () => apiRequest(`/api/venues?ownerId=${user?.id}`).then(res => res.json()),
+    queryFn: () => apiRequest("GET", `/api/venues?ownerId=${user?.id}`).then(res => res.json()),
     enabled: !!user?.id && user?.userType === 'anunciante'
   });
 

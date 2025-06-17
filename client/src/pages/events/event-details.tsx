@@ -69,7 +69,7 @@ export default function EventDetails() {
 
   const { data: event, isLoading } = useQuery({
     queryKey: ['/api/events', id],
-    queryFn: () => apiRequest(`/api/events/${id}`).then(res => res.json()),
+    queryFn: () => apiRequest("GET", `/api/events/${id}`).then(res => res.json()),
   });
 
   const applyMutation = useMutation({
@@ -157,7 +157,7 @@ export default function EventDetails() {
 
   const isOrganizer = user?.id === event.organizerId;
   const isPrestador = user?.userType === "prestador";
-  const hasApplied = event.applications?.some(app => app.providerId === user?.id);
+  const hasApplied = event.applications?.some((app: any) => app.providerId === user?.id);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -233,7 +233,7 @@ export default function EventDetails() {
                     </p>
                   ) : (
                     <div className="space-y-4">
-                      {event.applications.map((application) => (
+                      {event.applications.map((application: any) => (
                         <Card key={application.id} className="p-4">
                           <div className="flex justify-between items-start mb-3">
                             <div>

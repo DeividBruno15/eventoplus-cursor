@@ -91,7 +91,7 @@ export default function ManageServices() {
 
   const { data: services, isLoading } = useQuery({
     queryKey: ['/api/services', user?.id],
-    queryFn: () => apiRequest(`/api/services?providerId=${user?.id}`).then(res => res.json()),
+    queryFn: () => apiRequest("GET", `/api/services?providerId=${user?.id}`).then(res => res.json()),
     enabled: !!user?.id && user?.userType === 'prestador'
   });
 

@@ -220,7 +220,7 @@ export default function ManageSubscription() {
 
   const { data: currentSubscription } = useQuery({
     queryKey: ['/api/user/subscription'],
-    queryFn: () => apiRequest('/api/user/subscription').then(res => res.json()),
+    queryFn: () => apiRequest("GET", '/api/user/subscription').then(res => res.json()),
     enabled: !!user
   });
 
