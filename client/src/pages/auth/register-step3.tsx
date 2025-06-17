@@ -6,29 +6,77 @@ import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Check } from "lucide-react";
+import { Check, ArrowLeft } from "lucide-react";
 
-const prestadorServices = [
-  { id: "fotografo", label: "Fotógrafo", description: "Fotografia profissional para eventos" },
-  { id: "videomaker", label: "Videomaker", description: "Filmagem e edição de vídeos" },
-  { id: "dj", label: "DJ", description: "Música e animação para festas" },
-  { id: "banda", label: "Banda", description: "Música ao vivo" },
-  { id: "decoracao", label: "Decoração", description: "Decoração e ambientação" },
-  { id: "buffet", label: "Buffet", description: "Serviços de alimentação" },
-  { id: "cerimonialista", label: "Cerimonialista", description: "Organização de cerimônias" },
-  { id: "seguranca", label: "Segurança", description: "Serviços de segurança" },
-  { id: "limpeza", label: "Limpeza", description: "Serviços de limpeza" },
-  { id: "transporte", label: "Transporte", description: "Transporte de convidados" },
-  { id: "floricultura", label: "Floricultura", description: "Arranjos florais" },
-  { id: "maquiagem", label: "Maquiagem", description: "Serviços de beleza" }
-];
-
-const contratanteServices = [
-  { id: "contratar-servicos", label: "Contratar Serviços", description: "Contratar prestadores para eventos" }
-];
-
-const anuncianteServices = [
-  { id: "anunciar-espacos", label: "Anunciar Espaços", description: "Divulgar espaços para eventos" }
+const serviceCategories = [
+  {
+    id: "entretenimento",
+    name: "Entretenimento e animação",
+    icon: "🎭",
+    services: [
+      "DJ",
+      "Cantores",
+      "Banda",
+      "Apresentador / Mestre de cerimônias",
+      "Performers (malabaristas, mágicos, dançarinos, etc.)",
+      "Animador infantil / Palhaço / Recreador",
+      "Personagens vivos (cosplay, mascotes, etc.)",
+      "Show pirotécnico (fogos de artifício, efeitos especiais)"
+    ]
+  },
+  {
+    id: "alimentacao",
+    name: "Alimentação e bebidas",
+    icon: "🍽️",
+    services: [
+      "Cozinheiro / Chef de cozinha",
+      "Churrasqueiro",
+      "Garçom / Barman / Barista",
+      "Buffet e Catering",
+      "Bartender",
+      "Sommelier (vinhos e bebidas especiais)",
+      "Food Trucks / Carrinhos Gourmet (churros, pipoca, hambúrguer, etc.)"
+    ]
+  },
+  {
+    id: "organizacao",
+    name: "Organização e suporte",
+    icon: "📋",
+    services: [
+      "Cerimonialista / Assessoria de eventos",
+      "Hostess / Recepcionista",
+      "Promotor de eventos",
+      "Segurança / Brigadista / Bombeiro civil",
+      "Valet / Manobrista"
+    ]
+  },
+  {
+    id: "producao",
+    name: "Produção e visual",
+    icon: "📹",
+    services: [
+      "Fotógrafo / Videomaker",
+      "Decorador / Designer de eventos",
+      "Iluminação e Som (técnico de som, operador de luz)",
+      "Montagem de Palco e Estruturas",
+      "Locação de móveis e utensílios (mesas, cadeiras, talheres)",
+      "Locação de equipamentos (telões, projetores, geradores, climatização)"
+    ]
+  },
+  {
+    id: "limpeza",
+    name: "Limpeza e manutenção",
+    icon: "🧽",
+    services: [
+      "Limpeza pré-evento (antes da montagem)",
+      "Limpeza durante o evento (equipe de suporte para manter o ambiente organizado)",
+      "Limpeza pós-evento (remoção de lixo, higienização do espaço)",
+      "Sanitização de banheiros",
+      "Equipe de manutenção geral (reparos emergenciais, eletricista, encanador)",
+      "Serviço de descarte e reciclagem (coleta seletiva, gestão sustentável de resíduos)",
+      "Repositor de materiais (sabão, papel higiênico, copos, etc.)"
+    ]
+  }
 ];
 
 export default function RegisterStep3() {
@@ -37,6 +85,7 @@ export default function RegisterStep3() {
   const [userType, setUserType] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [registrationData, setRegistrationData] = useState<any>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -52,55 +101,43 @@ export default function RegisterStep3() {
   }, []);
 
   const registerMutation = useMutation({
-    mutationFn: async (data: any) => {
-      return apiRequest("POST", "/api/register", data);
+    mutationFn: async (userData: any) => {
+      const response = await apiRequest("POST", "/api/register", userData);
+      return response.json();
     },
     onSuccess: () => {
       localStorage.removeItem("registrationData");
       toast({
-        title: "Cadastro realizado com sucesso!",
-        description: "Você pode fazer login agora.",
+        title: "Conta criada com sucesso!",
+        description: "Bem-vindo ao Evento+",
       });
-      setLocation("/auth/login");
+      setLocation("/dashboard");
     },
     onError: (error: any) => {
       toast({
-        title: "Erro no cadastro",
-        description: error.message || "Ocorreu um erro inesperado",
+        title: "Erro ao criar conta",
+        description: error.message || "Tente novamente",
         variant: "destructive",
       });
     },
   });
 
-  const getServicesForUserType = () => {
-    switch (userType) {
-      case "prestador":
-        return prestadorServices;
-      case "contratante":
-        return contratanteServices;
-      case "anunciante":
-        return anuncianteServices;
-      default:
-        return [];
+  const handleServiceToggle = (serviceId: string) => {
+    if (selectedServices.includes(serviceId)) {
+      setSelectedServices(selectedServices.filter(id => id !== serviceId));
+    } else if (selectedServices.length < 3) {
+      setSelectedServices([...selectedServices, serviceId]);
+    } else {
+      toast({
+        title: "Limite atingido",
+        description: "Você pode selecionar no máximo 3 serviços",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleServiceToggle = (serviceId: string) => {
-    if (userType === "prestador") {
-      if (selectedServices.includes(serviceId)) {
-        setSelectedServices(selectedServices.filter(id => id !== serviceId));
-      } else if (selectedServices.length < 3) {
-        setSelectedServices([...selectedServices, serviceId]);
-      } else {
-        toast({
-          title: "Limite atingido",
-          description: "Você pode selecionar no máximo 3 serviços",
-          variant: "destructive",
-        });
-      }
-    } else {
-      setSelectedServices([serviceId]);
-    }
+  const handleCategorySelect = (categoryId: string) => {
+    setSelectedCategory(categoryId);
   };
 
   const handleFinish = () => {
@@ -125,13 +162,11 @@ export default function RegisterStep3() {
     setLocation(`/auth/register-step2?userType=${userType}`);
   };
 
-  const services = getServicesForUserType();
-  const maxServices = userType === "prestador" ? 3 : 1;
-  const canSelectMore = selectedServices.length < maxServices;
+  const canSelectMore = selectedServices.length < 3;
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
-      <div className="max-w-3xl w-full">
+      <div className="max-w-4xl w-full">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-black mb-2">Cadastrar conta</h1>
           <p className="text-gray-600">
@@ -155,7 +190,7 @@ export default function RegisterStep3() {
               </div>
               <span className="ml-2 text-sm font-medium text-green-600">Dados de cadastro</span>
             </div>
-            <div className="w-16 h-0.5 bg-green-500"></div>
+            <div className="w-16 h-0.5 bg-blue-600"></div>
             <div className="flex items-center">
               <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
                 3
@@ -165,80 +200,137 @@ export default function RegisterStep3() {
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {userType === "prestador" && "Selecione até 3 tipos de serviços que você oferece"}
-              {userType === "contratante" && "Confirme o serviço que você deseja utilizar"}
-              {userType === "anunciante" && "Confirme o serviço que você deseja utilizar"}
-            </CardTitle>
-            {userType === "prestador" && (
-              <p className="text-sm text-gray-600">
-                Selecionados: {selectedServices.length}/3
-              </p>
-            )}
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {services.map((service) => {
-                const isSelected = selectedServices.includes(service.id);
-                const isDisabled = !canSelectMore && !isSelected;
-                
-                return (
-                  <div
-                    key={service.id}
-                    className={`relative border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                      isSelected 
-                        ? "border-blue-500 bg-blue-50" 
-                        : isDisabled
-                        ? "border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed"
-                        : "border-gray-200 hover:border-blue-300 bg-white"
-                    }`}
-                    onClick={() => !isDisabled && handleServiceToggle(service.id)}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <Checkbox
-                        checked={isSelected}
-                        disabled={isDisabled}
-                        className="mt-1"
-                      />
-                      <div className="flex-1">
-                        <h3 className={`font-medium mb-1 ${
-                          isSelected ? "text-blue-700" : "text-gray-900"
-                        }`}>
-                          {service.label}
-                        </h3>
-                        <p className={`text-sm ${
-                          isSelected ? "text-blue-600" : "text-gray-600"
-                        }`}>
-                          {service.description}
-                        </p>
-                      </div>
-                      {isSelected && (
-                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                          <Check className="w-3 h-3 text-white" />
-                        </div>
-                      )}
-                    </div>
+        {userType === "prestador" ? (
+          <>
+            {!selectedCategory ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Escolha sua área de atuação</CardTitle>
+                  <div className="text-sm text-gray-600">
+                    Selecione o nicho de serviços que você oferece
                   </div>
-                );
-              })}
-            </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {serviceCategories.map((category) => (
+                      <div
+                        key={category.id}
+                        className="p-8 border-2 rounded-2xl cursor-pointer transition-all hover:border-blue-300 hover:shadow-lg bg-white hover:bg-blue-50"
+                        onClick={() => handleCategorySelect(category.id)}
+                      >
+                        <div className="text-center">
+                          <div className="text-5xl mb-4">{category.icon}</div>
+                          <h3 className="font-semibold text-blue-600 text-lg leading-tight">
+                            {category.name}
+                          </h3>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
-            <div className="flex justify-between pt-8">
-              <Button variant="outline" onClick={handleBack}>
-                Voltar
-              </Button>
-              <Button 
-                onClick={handleFinish}
-                disabled={selectedServices.length === 0 || registerMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                {registerMutation.isPending ? "Finalizando..." : "Finalizar Cadastro"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+                  <div className="flex justify-between pt-8">
+                    <Button variant="outline" onClick={handleBack}>
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Voltar
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Selecione seus serviços</CardTitle>
+                  <div className="text-sm text-gray-600">
+                    Selecione até 3 serviços específicos que você oferece em{" "}
+                    <span className="font-medium text-blue-600">
+                      {serviceCategories.find(c => c.id === selectedCategory)?.name}
+                    </span>
+                  </div>
+                  <div className="text-sm text-blue-600 font-medium">
+                    {selectedServices.length} de 3 selecionados
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 mb-6">
+                    {serviceCategories
+                      .find(cat => cat.id === selectedCategory)
+                      ?.services.map((service: string, index: number) => {
+                        const serviceId = `${selectedCategory}-${index}`;
+                        const isSelected = selectedServices.includes(serviceId);
+                        const isDisabled = !canSelectMore && !isSelected;
+                        
+                        return (
+                          <div
+                            key={serviceId}
+                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                              isSelected
+                                ? "border-blue-500 bg-blue-50"
+                                : "border-gray-200 hover:border-gray-300"
+                            } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                            onClick={() => !isDisabled && handleServiceToggle(serviceId)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-gray-900 text-sm">{service}</span>
+                              {isSelected && (
+                                <Check className="w-5 h-5 text-blue-600" />
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+
+                  <div className="flex justify-between pt-6">
+                    <Button variant="outline" onClick={() => setSelectedCategory(null)}>
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Voltar para categorias
+                    </Button>
+                    <Button 
+                      onClick={handleFinish}
+                      disabled={registerMutation.isPending || selectedServices.length === 0}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      {registerMutation.isPending ? "Criando conta..." : "Finalizar cadastro"}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </>
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle>Confirmação</CardTitle>
+              <div className="text-sm text-gray-600">
+                {userType === "contratante" 
+                  ? "Você poderá contratar serviços de prestadores para seus eventos"
+                  : "Você poderá anunciar seus espaços para eventos"
+                }
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-between pt-6">
+                <Button variant="outline" onClick={handleBack}>
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Voltar
+                </Button>
+                <Button 
+                  onClick={() => {
+                    const finalData = {
+                      ...registrationData,
+                      selectedServices: userType === "contratante" ? ["contratar-servicos"] : ["anunciar-espacos"]
+                    };
+                    registerMutation.mutate(finalData);
+                  }}
+                  disabled={registerMutation.isPending}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  {registerMutation.isPending ? "Criando conta..." : "Finalizar cadastro"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
