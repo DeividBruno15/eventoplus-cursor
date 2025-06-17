@@ -159,13 +159,16 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 - **Consistent Branding**: Applied new Evento+ logo across all institutional pages and maintained brand color consistency
 - **Responsive Design**: All new sections and pages fully responsive with proper mobile layouts
 
-### June 17, 2025 - Venue Management Enhancements
-- **Venue Availability Calendar**: System for anunciantes to manage venue availability by date
-- **Multiple Pricing Models**: Support for hourly, daily, and weekend pricing options
-- **Media Upload Support**: Up to 10 images/videos per venue with proper preview and storage
-- **Venue Creation Fix**: Resolved issue where created venues weren't appearing in "Meus espaços"
-- **Enhanced Venue Schema**: Added category, pricing models, and media support
-- **Address Integration**: Full CEP integration for venue location management
+### June 17, 2025 - System-Wide Bug Fixes and UX Improvements
+- **Critical Database Fix**: Resolved "pricing_model" column error preventing venue operations
+- **Enhanced Address System**: Complete CEP integration with automatic field population (Rua, Número, Bairro, Cidade, Estado) for venue creation and user profiles
+- **Currency Format Standardization**: Implemented Brazilian currency format (R$ 0,00) across all price fields in venues and events
+- **Service Categories Update**: Updated event creation form to use the same 33 service types from registration (5 categories: Entretenimento, Alimentação, Organização, Produção, Limpeza)
+- **Analytics for Advertisers**: Created dedicated analytics dashboard for anunciante user type with venue performance metrics and insights
+- **Navigation Improvements**: Fixed duplicate icons by changing "Meus Eventos" to use CalendarDays icon, added notifications to all user type menus
+- **Logo Size Optimization**: Reduced logo size across all components (header, sidebar, institutional pages) for better visual balance
+- **Venue Creation Validation**: Enhanced form validation requiring CEP, número, and other essential fields
+- **Automatic Location Population**: Venue location field automatically populated from CEP data for consistency
 
 ### Implementation Summary
 - **Frontend**: 15+ pages, 25+ components, complete user flows for all three user types
