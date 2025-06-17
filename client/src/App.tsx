@@ -169,7 +169,7 @@ function Router() {
       <Route path="/services/create">
         <Layout>
           <AuthGuard>
-            <CreateService />
+            <ManageServices />
           </AuthGuard>
         </Layout>
       </Route>

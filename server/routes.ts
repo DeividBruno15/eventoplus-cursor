@@ -529,6 +529,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Venue reservations endpoint for bookings page
+  app.get("/api/venue-reservations", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const user = req.user as any;
+      
+      if (user.userType === "anunciante") {
+        // Get reservations for venues owned by this user
+        const venues = await storage.getVenues(userId);
+        const allReservations = [];
+        
+        for (const venue of venues) {
+          const reservations = await storage.getVenueReservations(venue.id);
+          allReservations.push(...reservations.map(r => ({
+            ...r,
+            venueName: venue.name,
+            clientName: "Cliente"
+          })));
+        }
+        
+        res.json(allReservations);
+      } else {
+        // Get reservations made by this user
+        const reservations = await storage.getVenueReservations(userId);
+        res.json(reservations);
+      }
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // WebSocket setup
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
