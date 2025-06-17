@@ -5,15 +5,23 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  companyName: text("company_name"),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   userType: varchar("user_type", { length: 20 }).notNull(), // prestador, contratante, anunciante
+  personType: varchar("person_type", { length: 20 }).default("fisica"), // fisica, juridica
+  cpf: text("cpf"),
+  cnpj: text("cnpj"),
+  birthDate: text("birth_date"),
   profileImage: text("profile_image"),
   phone: text("phone"),
   address: text("address"),
   zipCode: text("zip_code"),
   city: text("city"),
   state: text("state"),
+  selectedServices: text("selected_services").array(),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   planType: varchar("plan_type", { length: 20 }).default("free"), // free, professional, premium
