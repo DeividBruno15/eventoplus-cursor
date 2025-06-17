@@ -164,6 +164,14 @@ function Router() {
         </Layout>
       </Route>
       
+      <Route path="/services/create">
+        <Layout>
+          <AuthGuard>
+            <CreateService />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
       <Route path="/venues/manage">
         <Layout>
           <AuthGuard>

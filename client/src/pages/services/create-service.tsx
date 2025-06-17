@@ -79,7 +79,7 @@ export default function CreateService() {
         description: "Seu serviço foi adicionado ao catálogo com sucesso.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/services"] });
-      navigate("/services");
+      setLocation("/services");
     },
     onError: (error: any) => {
       toast({
@@ -139,7 +139,7 @@ export default function CreateService() {
         <div className="mb-6">
           <Button
             variant="ghost"
-            onClick={() => navigate("/services")}
+            onClick={() => setLocation("/services")}
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -446,7 +446,7 @@ export default function CreateService() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate("/services")}
+                    onClick={() => setLocation("/services")}
                   >
                     Cancelar
                   </Button>

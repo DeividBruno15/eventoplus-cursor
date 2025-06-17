@@ -68,7 +68,7 @@ export default function EventDetail() {
   // Mutation para aprovar/rejeitar candidatura
   const updateApplicationMutation = useMutation({
     mutationFn: async ({ applicationId, status }: { applicationId: number; status: string }) => {
-      return apiRequest("PATCH", `/api/applications/${applicationId}`, { status });
+      return apiRequest("PUT", `/api/event-applications/${applicationId}`, { status });
     },
     onSuccess: () => {
       toast({

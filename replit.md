@@ -113,6 +113,14 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 
 ## Changelog
 
+### June 17, 2025 - Critical Platform Fixes and Feature Implementation
+- **System-Wide Bug Fixes**: Resolved critical endpoint mismatches preventing event applications (/api/events/:id/apply endpoint created)
+- **Database Schema Synchronization**: Fixed missing columns in event_applications table (service_id, estimated_hours, available_date, portfolio, rejection_reason, contract_id, updated_at)
+- **Currency Configuration Fix**: Corrected Stripe integration from USD to BRL for Brazilian market compliance
+- **Data Field Alignment**: Fixed frontend-backend field mismatches (expectedAttendees → guestCount, proposedPrice → price formatting)
+- **Service Catalog System**: Implemented complete service creation interface for prestadores with categories, pricing, portfolio, and tag management
+- **Schema Validation Updates**: Corrected insertEventApplicationSchema to allow status field updates for proper application workflow
+
 ### June 17, 2025 - Complete Platform Implementation with Advanced Features
 - **Institutional Homepage Redesign**: Clean, modern design following Figma reference with proper section organization, pricing tables, FAQ, and service categories
 - **Layout Architecture Fix**: Separated public routes (no sidebar) from protected routes (with sidebar) to eliminate topbar duplication
