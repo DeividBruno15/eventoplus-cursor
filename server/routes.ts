@@ -18,6 +18,7 @@ import {
   insertEventApplicationSchema, 
   insertUserSchema, 
   insertVenueSchema, 
+  insertServiceSchema,
   insertChatMessageSchema
 } from "@shared/schema";
 
