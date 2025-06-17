@@ -508,9 +508,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const userId = (req.user as any).id;
+      console.log('Getting venues for user:', userId);
       const venues = await storage.getVenues(userId);
+      console.log('Venues retrieved:', venues.length);
       res.json(venues);
     } catch (error: any) {
+      console.error('Venues endpoint error:', error);
       res.status(500).json({ message: error.message });
     }
   });
