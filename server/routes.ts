@@ -638,7 +638,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           serviceType: item.serviceType || 'Geral',
           eventDate,
           eventLocation,
-          value: item.basePrice * item.quantity,
+          value: String(item.basePrice * item.quantity),
           terms: `Contrato para prestação de serviços no evento.\nObservações: ${specialRequests}`,
           paymentTerms: "Pagamento mediante acordo entre as partes",
           cancellationPolicy: "Cancelamento até 24h antes do evento",

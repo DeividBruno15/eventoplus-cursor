@@ -268,7 +268,6 @@ export const insertCartItemSchema = createInsertSchema(cartItems).omit({
 
 export const insertContractSchema = createInsertSchema(contracts).omit({
   id: true,
-  status: true,
   signedAt: true,
   createdAt: true,
 });
