@@ -685,6 +685,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Services endpoints
+  app.get("/api/services", async (req, res) => {
+    try {
+      const providerId = req.query.providerId ? parseInt(req.query.providerId as string) : undefined;
+      const services = await storage.getServices(providerId);
+      res.json(services);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/services", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const validatedData = insertServiceSchema.parse(req.body);
+      const userId = (req.user as any).id;
+      
+      const service = await storage.createService({
+        ...validatedData,
+        providerId: userId
+      });
+
+      res.status(201).json(service);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   // Create venue endpoint
   app.post("/api/venues", async (req, res) => {
     if (!req.isAuthenticated()) {
