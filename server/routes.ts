@@ -623,6 +623,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Dashboard analytics endpoint
+  app.get("/api/dashboard/stats", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const userType = (req.user as any).userType;
+      
+      let stats = {};
+      
+      if (userType === "prestador") {
+        const services = await storage.getServices(userId);
+        const applications = await storage.getEventApplications(0);
+        const userApplications = applications.filter(app => app.providerId === userId);
+        
+        stats = {
+          servicesCount: services.length,
+          applicationsCount: userApplications.length,
+          averageRating: "5.0"
+        };
+      } else if (userType === "contratante") {
+        const events = await storage.getEvents();
+        const userEvents = events.filter(event => event.organizerId === userId);
+        
+        stats = {
+          eventsCount: userEvents.length,
+          totalBudget: userEvents.reduce((sum, event) => sum + parseFloat(event.budget || "0"), 0),
+          providersCount: 0
+        };
+      } else if (userType === "anunciante") {
+        const venues = await storage.getVenues(userId);
+        
+        stats = {
+          venuesCount: venues.length,
+          reservationsCount: 0,
+          occupancyRate: 0
+        };
+      }
+      
+      res.json(stats);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Get user venues endpoint
   app.get("/api/venues", async (req, res) => {
     if (!req.isAuthenticated()) {

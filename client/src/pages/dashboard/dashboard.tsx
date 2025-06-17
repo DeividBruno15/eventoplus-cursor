@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,12 @@ import { Calendar, Users, MapPin, TrendingUp, Plus } from "lucide-react";
 
 export default function Dashboard() {
   const { user } = useAuth();
+
+  // Buscar estatísticas do dashboard
+  const { data: stats } = useQuery({
+    queryKey: ["/api/dashboard/stats"],
+    enabled: !!user,
+  });
 
   if (!user) {
     return <div>Loading...</div>;
@@ -19,9 +26,9 @@ export default function Dashboard() {
           title: "Dashboard do Prestador",
           description: "Gerencie seus serviços e candidaturas",
           stats: [
-            { label: "Candidaturas Ativas", value: "0", icon: Calendar },
-            { label: "Serviços Cadastrados", value: "0", icon: Users },
-            { label: "Avaliação Média", value: "5.0", icon: TrendingUp },
+            { label: "Candidaturas Ativas", value: stats?.applicationsCount?.toString() || "0", icon: Calendar },
+            { label: "Serviços Cadastrados", value: stats?.servicesCount?.toString() || "0", icon: Users },
+            { label: "Avaliação Média", value: stats?.averageRating || "5.0", icon: TrendingUp },
           ],
           actions: [
             { label: "Cadastrar Serviço", href: "/services/create", icon: Plus },
@@ -33,9 +40,9 @@ export default function Dashboard() {
           title: "Dashboard do Organizador",
           description: "Organize e gerencie seus eventos",
           stats: [
-            { label: "Eventos Ativos", value: "0", icon: Calendar },
-            { label: "Prestadores Contratados", value: "0", icon: Users },
-            { label: "Orçamento Total", value: "R$ 0", icon: TrendingUp },
+            { label: "Eventos Ativos", value: stats?.eventsCount?.toString() || "0", icon: Calendar },
+            { label: "Prestadores Contratados", value: stats?.providersCount?.toString() || "0", icon: Users },
+            { label: "Orçamento Total", value: `R$ ${stats?.totalBudget?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00'}`, icon: TrendingUp },
           ],
           actions: [
             { label: "Criar Evento", href: "/events/create", icon: Plus },
@@ -47,9 +54,9 @@ export default function Dashboard() {
           title: "Dashboard do Anunciante",
           description: "Gerencie seus espaços e reservas",
           stats: [
-            { label: "Espaços Cadastrados", value: "0", icon: MapPin },
-            { label: "Reservas Ativas", value: "0", icon: Calendar },
-            { label: "Taxa de Ocupação", value: "0%", icon: TrendingUp },
+            { label: "Espaços Cadastrados", value: stats?.venuesCount?.toString() || "0", icon: MapPin },
+            { label: "Reservas Ativas", value: stats?.reservationsCount?.toString() || "0", icon: Calendar },
+            { label: "Taxa de Ocupação", value: `${stats?.occupancyRate || 0}%`, icon: TrendingUp },
           ],
           actions: [
             { label: "Cadastrar Espaço", href: "/venues/create", icon: Plus },
