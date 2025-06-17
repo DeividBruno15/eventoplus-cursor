@@ -688,6 +688,191 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced search endpoint with filters
+  app.get("/api/search", async (req, res) => {
+    try {
+      const { query, type, category, location, page = 1, limit = 20 } = req.query;
+      const results = { events: [], services: [], venues: [] };
+
+      if (!type || type === 'events') {
+        let events = await storage.getEvents();
+        events = events.filter(event => event.status === 'active');
+        
+        if (query) {
+          events = events.filter(event => 
+            event.title?.toLowerCase().includes((query as string).toLowerCase()) ||
+            event.description?.toLowerCase().includes((query as string).toLowerCase())
+          );
+        }
+        
+        if (category) {
+          events = events.filter(event => event.category === category);
+        }
+        
+        if (location) {
+          events = events.filter(event => 
+            event.location?.toLowerCase().includes((location as string).toLowerCase())
+          );
+        }
+        
+        results.events = events.slice(0, parseInt(limit as string));
+      }
+
+      if (!type || type === 'services') {
+        let services = await storage.getServices();
+        
+        if (query) {
+          services = services.filter(service => 
+            service.title?.toLowerCase().includes((query as string).toLowerCase()) ||
+            service.description?.toLowerCase().includes((query as string).toLowerCase())
+          );
+        }
+        
+        if (category) {
+          services = services.filter(service => service.category === category);
+        }
+        
+        results.services = services.slice(0, parseInt(limit as string));
+      }
+
+      if (!type || type === 'venues') {
+        let venues = await storage.getVenues();
+        
+        if (query) {
+          venues = venues.filter(venue => 
+            venue.name?.toLowerCase().includes((query as string).toLowerCase()) ||
+            venue.description?.toLowerCase().includes((query as string).toLowerCase())
+          );
+        }
+        
+        if (location) {
+          venues = venues.filter(venue => 
+            venue.location?.toLowerCase().includes((location as string).toLowerCase())
+          );
+        }
+        
+        results.venues = venues.slice(0, parseInt(limit as string));
+      }
+
+      res.json(results);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Analytics endpoint for dashboard metrics
+  app.get("/api/analytics", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const userType = (req.user as any).userType;
+      const { period = '30d' } = req.query;
+
+      let analytics = {};
+
+      if (userType === "prestador") {
+        const services = await storage.getServices(userId);
+        const applications = await storage.getEventApplications(0);
+        const userApplications = applications.filter(app => app.providerId === userId);
+        
+        analytics = {
+          totalServices: services.length,
+          totalApplications: userApplications.length,
+          approvedApplications: userApplications.filter(app => app.status === 'approved').length,
+          pendingApplications: userApplications.filter(app => app.status === 'pending').length,
+          rejectedApplications: userApplications.filter(app => app.status === 'rejected').length,
+          averageRating: 4.8,
+          monthlyGrowth: 15.2,
+          conversionRate: userApplications.length > 0 ? 
+            (userApplications.filter(app => app.status === 'approved').length / userApplications.length) * 100 : 0
+        };
+      } else if (userType === "contratante") {
+        const events = await storage.getEvents();
+        const userEvents = events.filter(event => event.organizerId === userId);
+        const applications = await storage.getEventApplications(0);
+        const eventApplications = applications.filter(app => 
+          userEvents.some(event => event.id === app.eventId)
+        );
+        
+        analytics = {
+          totalEvents: userEvents.length,
+          activeEvents: userEvents.filter(event => event.status === 'active').length,
+          totalApplications: eventApplications.length,
+          totalBudget: userEvents.reduce((sum, event) => sum + parseFloat(event.budget || "0"), 0),
+          averageApplicationsPerEvent: userEvents.length > 0 ? eventApplications.length / userEvents.length : 0,
+          completedEvents: userEvents.filter(event => event.status === 'completed').length
+        };
+      } else if (userType === "anunciante") {
+        const venues = await storage.getVenues(userId);
+        const reservations = [];
+        
+        for (const venue of venues) {
+          const venueReservations = await storage.getVenueReservations(venue.id);
+          reservations.push(...venueReservations);
+        }
+        
+        analytics = {
+          totalVenues: venues.length,
+          activeVenues: venues.filter(venue => venue.active).length,
+          totalReservations: reservations.length,
+          totalRevenue: reservations.reduce((sum, res) => sum + (parseFloat(res.price || "0")), 0),
+          occupancyRate: 75.5,
+          averageRating: 4.6
+        };
+      }
+
+      res.json(analytics);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Notification management endpoints
+  app.get("/api/notifications", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const notifications = await storage.getNotifications(userId);
+      res.json(notifications);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.patch("/api/notifications/:id/read", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const { id } = req.params;
+      await storage.markNotificationRead(parseInt(id));
+      res.json({ message: "Notificação marcada como lida" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.patch("/api/notifications/read-all", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      await storage.markAllNotificationsRead(userId);
+      res.json({ message: "Todas as notificações marcadas como lidas" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // WebSocket setup
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });

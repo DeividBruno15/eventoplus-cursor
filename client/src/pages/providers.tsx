@@ -170,7 +170,7 @@ export default function Providers() {
       </div>
 
       {/* Estado vazio personalizado para quando não há prestadores cadastrados */}
-      {filteredProviders.length === 0 && providers.length === 0 && (
+      {filteredProviders.length === 0 && providersArray.length === 0 && (
         <div className="text-center py-12">
           <div className="text-muted-foreground mb-4">
             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />

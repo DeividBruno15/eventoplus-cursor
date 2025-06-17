@@ -170,7 +170,7 @@ export default function CreateService() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="title"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nome do Serviço</FormLabel>
@@ -211,7 +211,7 @@ export default function CreateService() {
               {selectedCategory && (
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="category"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Tipo de Serviço</FormLabel>
