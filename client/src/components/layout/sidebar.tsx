@@ -51,31 +51,38 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const menuItems = {
     contratante: [
       { icon: Home, label: "Dashboard", path: "/dashboard" },
+      { icon: Search, label: "Buscar", path: "/search" },
       { icon: Calendar, label: "Meus Eventos", path: "/events" },
       { icon: Plus, label: "Criar Evento", path: "/events/create" },
       { icon: Users, label: "Prestadores", path: "/services" },
       { icon: MapPin, label: "Espaços", path: "/venues" },
       { icon: MessageSquare, label: "Chat", path: "/chat" },
+      { icon: ShoppingCart, label: "Carrinho", path: "/cart" },
+      { icon: FileText, label: "Contratos", path: "/contracts" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
     ],
     prestador: [
       { icon: Home, label: "Dashboard", path: "/dashboard" },
+      { icon: Search, label: "Buscar", path: "/search" },
       { icon: Calendar, label: "Eventos", path: "/events" },
-      { icon: Star, label: "Meus Serviços", path: "/services" },
+      { icon: Star, label: "Gerenciar Serviços", path: "/services/manage" },
       { icon: MessageSquare, label: "Chat", path: "/chat" },
+      { icon: FileText, label: "Contratos", path: "/contracts" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
     ],
     anunciante: [
       { icon: Home, label: "Dashboard", path: "/dashboard" },
-      { icon: MapPin, label: "Meus Espaços", path: "/venues" },
+      { icon: Search, label: "Buscar", path: "/search" },
+      { icon: MapPin, label: "Gerenciar Espaços", path: "/venues/manage" },
       { icon: Calendar, label: "Eventos", path: "/events" },
       { icon: MessageSquare, label: "Chat", path: "/chat" },
+      { icon: FileText, label: "Contratos", path: "/contracts" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
     ]
   };
 
   const supportItems = [
-    { icon: CreditCard, label: "Assinatura", path: "/subscription" },
+    { icon: CreditCard, label: "Assinatura", path: "/subscription/manage" },
     { icon: HelpCircle, label: "Central de Ajuda", path: "/help" },
     { icon: HeadphonesIcon, label: "Suporte", path: "/support" },
   ];

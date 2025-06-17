@@ -329,6 +329,51 @@ export class DatabaseStorage implements IStorage {
     );
   }
 
+  async getChatContacts(userId: number): Promise<any[]> {
+    // Get all users that have exchanged messages with the current user
+    const contacts = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImage: users.profileImage,
+        userType: users.userType,
+        lastMessageId: chatMessages.id,
+        lastMessage: chatMessages.message,
+        lastMessageDate: chatMessages.createdAt,
+        isOnline: users.isOnline
+      })
+      .from(chatMessages)
+      .innerJoin(users, or(
+        and(eq(chatMessages.senderId, users.id), eq(chatMessages.receiverId, userId)),
+        and(eq(chatMessages.receiverId, users.id), eq(chatMessages.senderId, userId))
+      ))
+      .where(or(
+        eq(chatMessages.senderId, userId),
+        eq(chatMessages.receiverId, userId)
+      ))
+      .orderBy(desc(chatMessages.createdAt))
+      .groupBy(users.id, users.username, users.firstName, users.lastName, users.profileImage, users.userType, users.isOnline, chatMessages.id, chatMessages.message, chatMessages.createdAt);
+
+    // Transform to include unread count and format properly
+    return contacts.map(contact => ({
+      id: contact.id,
+      username: contact.username,
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      profileImage: contact.profileImage,
+      userType: contact.userType,
+      isOnline: contact.isOnline || false,
+      lastMessage: contact.lastMessage ? {
+        id: contact.lastMessageId,
+        message: contact.lastMessage,
+        createdAt: contact.lastMessageDate
+      } : null,
+      unreadCount: 0 // Simplified for now
+    }));
+  }
+
   async createChatMessage(messageData: InsertChatMessage): Promise<ChatMessage> {
     const result = await db.insert(chatMessages).values(messageData).returning();
     return result[0];

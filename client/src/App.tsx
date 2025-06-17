@@ -21,10 +21,14 @@ import Dashboard from "@/pages/dashboard/dashboard";
 import Events from "@/pages/events/events";
 import CreateEvent from "@/pages/events/create-event";
 import EventDetail from "@/pages/events/event-detail";
+import EventDetails from "@/pages/events/event-details";
+import ManageServices from "@/pages/services/manage-services";
+import ManageVenues from "@/pages/venues/manage-venues";
+import ManageSubscription from "@/pages/subscription/manage-subscription";
+import Chat from "@/pages/chat/chat";
 import Services from "@/pages/services";
 import Venues from "@/pages/venues";
 import Analytics from "@/pages/analytics";
-import Chat from "@/pages/chat";
 import Subscribe from "@/pages/subscribe";
 import SubscriptionManagement from "@/pages/subscription-management-simple";
 import Profile from "@/pages/profile";
@@ -125,6 +129,38 @@ function Router() {
         <Layout>
           <AuthGuard>
             <EventDetail />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/event/:id">
+        <Layout>
+          <AuthGuard>
+            <EventDetails />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/services/manage">
+        <Layout>
+          <AuthGuard>
+            <ManageServices />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/venues/manage">
+        <Layout>
+          <AuthGuard>
+            <ManageVenues />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/subscription/manage">
+        <Layout>
+          <AuthGuard>
+            <ManageSubscription />
           </AuthGuard>
         </Layout>
       </Route>
