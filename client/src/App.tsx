@@ -25,6 +25,7 @@ import EventDetails from "@/pages/events/event-details";
 import ManageServices from "@/pages/services/manage-services";
 import CreateService from "@/pages/services/create-service";
 import ManageVenues from "@/pages/venues/manage-venues";
+import CreateVenue from "@/pages/venues/create-venue";
 import ManageSubscription from "@/pages/subscription/manage-subscription";
 import Chat from "@/pages/chat/chat";
 import Services from "@/pages/services";
@@ -176,6 +177,14 @@ function Router() {
         <Layout>
           <AuthGuard>
             <ManageVenues />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/venues/create">
+        <Layout>
+          <AuthGuard>
+            <CreateVenue />
           </AuthGuard>
         </Layout>
       </Route>
