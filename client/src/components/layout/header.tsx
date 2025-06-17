@@ -138,14 +138,14 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link href="/login">
+                <Link href="/auth/login">
                   <Button variant="ghost" className="text-gray-600 hover:text-primary font-medium">
                     Entrar
                   </Button>
                 </Link>
-                <Link href="/register">
+                <Link href="/auth/register">
                   <Button className="bg-primary text-white hover:bg-blue-700 font-medium">
-                    Começar Agora
+                    Cadastrar
                   </Button>
                 </Link>
               </>

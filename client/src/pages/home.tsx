@@ -23,7 +23,7 @@ export default function Home() {
                   A plataforma completa que conecta organizadores com prestadores de serviços e espaços para eventos únicos.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/register">
+                  <Link href="/auth/register">
                     <Button size="lg" className="bg-white text-[#3C5BFA] hover:bg-gray-100 text-lg px-8 py-4">
                       Começar Gratuitamente
                     </Button>
@@ -214,7 +214,7 @@ export default function Home() {
             Junte-se a milhares de organizadores e prestadores que já transformaram seus negócios.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register">
+            <Link href="/auth/register">
               <Button size="lg" className="bg-white text-[#3C5BFA] hover:bg-gray-100 text-lg px-8 py-4">
                 Começar Gratuitamente
               </Button>

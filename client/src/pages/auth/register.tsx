@@ -21,7 +21,7 @@ export default function Register() {
           <p className="text-sm text-gray-600">
             Já tem uma conta?{" "}
             <button
-              onClick={() => setLocation("/login")}
+              onClick={() => setLocation("/auth/login")}
               className="text-primary hover:underline font-medium"
             >
               Fazer login
