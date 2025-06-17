@@ -9,7 +9,13 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { storage } from "./storage";
-import { insertEventSchema, insertEventApplicationSchema, insertUserSchema, insertVenueSchema, insertChatMessageSchema } from "@shared/schema";
+import { 
+  insertEventSchema, 
+  insertEventApplicationSchema, 
+  insertUserSchema, 
+  insertVenueSchema, 
+  insertChatMessageSchema
+} from "@shared/schema";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -576,6 +582,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(message);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Search endpoints - simplified using storage functions
+  app.get("/api/search/events", async (req, res) => {
+    try {
+      const events = await storage.getEvents();
+      const { q, category, location } = req.query;
+      
+      let filteredEvents = events;
+      
+      if (q) {
+        const query = (q as string).toLowerCase();
+        filteredEvents = filteredEvents.filter(event => 
+          event.title.toLowerCase().includes(query) || 
+          event.description?.toLowerCase().includes(query)
+        );
+      }
+      
+      if (category) {
+        filteredEvents = filteredEvents.filter(event => event.category === category);
+      }
+      
+      if (location) {
+        const loc = (location as string).toLowerCase();
+        filteredEvents = filteredEvents.filter(event => 
+          event.location?.toLowerCase().includes(loc)
+        );
+      }
+
+      res.json(filteredEvents.slice(0, 20));
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/search/services", async (req, res) => {
+    try {
+      const services = await storage.getServices();
+      const { q, category, location } = req.query;
+      
+      let filteredServices = services;
+      
+      if (q) {
+        const query = (q as string).toLowerCase();
+        filteredServices = filteredServices.filter(service => 
+          service.name.toLowerCase().includes(query) || 
+          service.description?.toLowerCase().includes(query)
+        );
+      }
+      
+      if (category) {
+        filteredServices = filteredServices.filter(service => service.category === category);
+      }
+      
+      if (location) {
+        const loc = (location as string).toLowerCase();
+        filteredServices = filteredServices.filter(service => 
+          service.location?.toLowerCase().includes(loc)
+        );
+      }
+
+      res.json(filteredServices.slice(0, 20));
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/search/venues", async (req, res) => {
+    try {
+      const venues = await storage.getVenues();
+      const { q, category, location } = req.query;
+      
+      let filteredVenues = venues.filter(venue => venue.active);
+      
+      if (q) {
+        const query = (q as string).toLowerCase();
+        filteredVenues = filteredVenues.filter(venue => 
+          venue.name.toLowerCase().includes(query) || 
+          venue.description?.toLowerCase().includes(query)
+        );
+      }
+      
+      if (category) {
+        filteredVenues = filteredVenues.filter(venue => venue.category === category);
+      }
+      
+      if (location) {
+        const loc = (location as string).toLowerCase();
+        filteredVenues = filteredVenues.filter(venue => 
+          venue.location?.toLowerCase().includes(loc)
+        );
+      }
+
+      res.json(filteredVenues.slice(0, 20));
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   });
 
