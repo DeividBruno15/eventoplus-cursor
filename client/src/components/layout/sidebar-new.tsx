@@ -73,24 +73,37 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     if (!profileImage) return;
 
     try {
-      const formData = new FormData();
-      formData.append('profileImage', profileImage);
-
-      await apiRequest("POST", "/api/user/profile-image", formData);
+      // Convert image to base64
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const imageData = reader.result as string;
+          
+          await apiRequest("POST", "/api/user/profile-image", { imageData });
+          
+          toast({
+            title: "Sucesso",
+            description: "Foto de perfil atualizada com sucesso!",
+          });
+          
+          setIsProfileDialogOpen(false);
+          setProfileImage(null);
+          setProfileImagePreview(null);
+          window.location.reload();
+        } catch (error) {
+          toast({
+            title: "Erro",
+            description: "Erro ao atualizar foto de perfil",
+            variant: "destructive",
+          });
+        }
+      };
       
-      toast({
-        title: "Sucesso",
-        description: "Foto de perfil atualizada com sucesso!",
-      });
-      
-      setIsProfileDialogOpen(false);
-      setProfileImage(null);
-      setProfileImagePreview(null);
-      window.location.reload();
+      reader.readAsDataURL(profileImage);
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Erro ao atualizar foto de perfil",
+        description: "Erro ao processar imagem",
         variant: "destructive",
       });
     }
