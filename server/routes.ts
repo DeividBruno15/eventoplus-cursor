@@ -642,7 +642,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           terms: `Contrato para prestação de serviços no evento.\nObservações: ${specialRequests}`,
           paymentTerms: "Pagamento mediante acordo entre as partes",
           cancellationPolicy: "Cancelamento até 24h antes do evento",
-          status: 'pending',
           providerId: item.providerId,
           clientId: userId
         });
