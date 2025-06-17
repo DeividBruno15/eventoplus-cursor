@@ -7,7 +7,6 @@ import Layout from "@/components/layout/layout";
 // Public Pages
 import Home from "@/pages/home-clean";
 import Login from "@/pages/auth/login";
-import Register from "@/pages/auth/register";
 import RegisterStep1 from "@/pages/auth/register-step1";
 import RegisterStep2 from "@/pages/auth/register-step2";
 import RegisterStep3 from "@/pages/auth/register-step3";
@@ -52,7 +51,7 @@ function Router() {
       {/* Public Routes - No Layout */}
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
+
       <Route path="/auth/register-step1" component={RegisterStep1} />
       <Route path="/auth/register-step2" component={RegisterStep2} />
       <Route path="/auth/register-step3" component={RegisterStep3} />
