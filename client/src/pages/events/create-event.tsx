@@ -11,8 +11,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
-import Header from "@/components/layout/header";
 import { apiRequest } from "@/lib/queryClient";
+import { CEPInput } from "@/components/ui/cep-input";
+import { MediaUpload } from "@/components/ui/media-upload";
 
 const createEventSchema = z.object({
   title: z.string().min(5, "Título deve ter pelo menos 5 caracteres"),
@@ -30,6 +31,14 @@ export default function CreateEvent() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [eventImages, setEventImages] = useState<any[]>([]);
+  const [addressData, setAddressData] = useState({
+    cep: "",
+    street: "",
+    neighborhood: "",
+    city: "",
+    state: ""
+  });
 
   const form = useForm<CreateEventForm>({
     resolver: zodResolver(createEventSchema),
@@ -44,8 +53,37 @@ export default function CreateEvent() {
     },
   });
 
+  const handleCEPFound = (address: any) => {
+    setAddressData({
+      cep: address.cep,
+      street: address.street,
+      neighborhood: address.neighborhood,
+      city: address.city,
+      state: address.state
+    });
+    
+    // Update location field with full address
+    const fullAddress = `${address.street}, ${address.neighborhood}, ${address.city}/${address.state}`;
+    form.setValue('location', fullAddress);
+  };
+
   const createEventMutation = useMutation({
     mutationFn: async (data: CreateEventForm) => {
+      const formData = new FormData();
+      
+      // Add event data
+      Object.keys(data).forEach(key => {
+        formData.append(key, data[key as keyof CreateEventForm]);
+      });
+      
+      // Add address data
+      formData.append('addressData', JSON.stringify(addressData));
+      
+      // Add event images
+      eventImages.forEach((image, index) => {
+        formData.append(`image_${index}`, image.file);
+      });
+      
       const eventData = {
         ...data,
         budget: parseFloat(data.budget),
