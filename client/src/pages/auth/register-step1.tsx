@@ -40,7 +40,12 @@ export default function RegisterStep1() {
   };
 
   const handleBack = () => {
-    setLocation("/auth/login");
+    // Go back to previous page or home if no history
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      setLocation("/");
+    }
   };
 
   return (
