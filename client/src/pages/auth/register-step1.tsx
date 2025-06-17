@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { User, Building, Megaphone } from "lucide-react";
 import { useLocation } from "wouter";
+import eventoLogo from "@assets/logo evennto_1750165135991.png";
 
 export default function RegisterStep1() {
   const [, setLocation] = useLocation();
@@ -46,6 +47,13 @@ export default function RegisterStep1() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="max-w-4xl w-full">
         <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <img 
+              src={eventoLogo} 
+              alt="Evento+"
+              className="h-12 object-contain"
+            />
+          </div>
           <h1 className="text-3xl font-bold text-black mb-2">Cadastrar conta</h1>
           <p className="text-gray-600">
             Conte-nos como você deseja utilizar nossa plataforma

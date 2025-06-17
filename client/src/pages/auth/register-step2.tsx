@@ -12,6 +12,7 @@ import { useLocation } from "wouter";
 import { CEPInput } from "@/components/ui/cep-input";
 import { CPFCNPJInput } from "@/components/ui/cpf-cnpj-input";
 import { PasswordStrength } from "@/components/ui/password-strength";
+import eventoLogo from "@assets/logo evennto_1750165135991.png";
 
 const registerStep2Schema = z.object({
   personType: z.enum(["fisica", "juridica"]),

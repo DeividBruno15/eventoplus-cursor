@@ -11,6 +11,7 @@ import { Link, useLocation } from "wouter";
 import { Calendar } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
 import { useAuth } from "@/hooks/use-auth";
+import eventoLogo from "@assets/logo evennto_1750165135991.png";
 
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -65,11 +66,12 @@ export default function Login() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-10 h-10 bg-[#3C5BFA] rounded-lg flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-black">Evento+</span>
+          <div className="flex justify-center mb-4">
+            <img 
+              src={eventoLogo} 
+              alt="Evento+"
+              className="h-12 object-contain"
+            />
           </div>
         </div>
 
