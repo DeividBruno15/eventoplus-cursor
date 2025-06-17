@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { eq, and, or, desc } from "drizzle-orm";
+import { eq, and, or, desc, sql } from "drizzle-orm";
 import { 
   users, 
   events, 
@@ -342,7 +342,7 @@ export class DatabaseStorage implements IStorage {
         lastMessageId: chatMessages.id,
         lastMessage: chatMessages.message,
         lastMessageDate: chatMessages.createdAt,
-        isOnline: users.isOnline
+        isOnline: sql`false`
       })
       .from(chatMessages)
       .innerJoin(users, or(
@@ -354,7 +354,7 @@ export class DatabaseStorage implements IStorage {
         eq(chatMessages.receiverId, userId)
       ))
       .orderBy(desc(chatMessages.createdAt))
-      .groupBy(users.id, users.username, users.firstName, users.lastName, users.profileImage, users.userType, users.isOnline, chatMessages.id, chatMessages.message, chatMessages.createdAt);
+      .groupBy(users.id, users.username, users.firstName, users.lastName, users.profileImage, users.userType, chatMessages.id, chatMessages.message, chatMessages.createdAt);
 
     // Transform to include unread count and format properly
     return contacts.map(contact => ({
