@@ -45,9 +45,23 @@ passport.serializeUser((user: any, done) => {
   done(null, user.id);
 });
 
+// Optimize user deserialization with caching
+const userCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 passport.deserializeUser(async (id: number, done) => {
   try {
+    // Check cache first for performance
+    const cached = userCache.get(id);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      return done(null, cached.user);
+    }
+
     const user = await storage.getUser(id);
+    if (user) {
+      // Cache user for faster subsequent requests
+      userCache.set(id, { user, timestamp: Date.now() });
+    }
     done(null, user);
   } catch (error) {
     done(error, null);
