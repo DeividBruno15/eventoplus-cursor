@@ -48,6 +48,7 @@ import AuthGuard from "@/components/auth/auth-guard";
 import NotFound from "@/pages/not-found";
 import Providers from "@/pages/providers";
 import Bookings from "@/pages/bookings";
+import OfflinePage from "@/pages/offline";
 import { useAuth } from "@/hooks/use-auth";
 
 // Analytics Wrapper Component
