@@ -484,6 +484,7 @@ export class DatabaseStorage implements IStorage {
 
   // Profile updates
   async updateUser(userId: number, data: Partial<User>): Promise<User> {
+    console.log('Updating user:', userId, 'with data keys:', Object.keys(data));
     const result = await db
       .update(users)
       .set(data)
@@ -491,6 +492,7 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     if (!result[0]) throw new Error("User not found");
+    console.log('User updated successfully');
     return result[0];
   }
 

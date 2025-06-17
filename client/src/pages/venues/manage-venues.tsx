@@ -454,10 +454,14 @@ export default function ManageVenues() {
                       type="text"
                       value={formData.pricePerHour}
                       onChange={(e) => {
-                        let value = e.target.value.replace(/\D/g, '');
-                        value = (parseFloat(value) / 100).toFixed(2).replace('.', ',');
-                        if (value === '0,00') value = '';
-                        setFormData({ ...formData, pricePerHour: value });
+                        let value = e.target.value.replace(/[^\d]/g, '');
+                        if (value === '') {
+                          setFormData({ ...formData, pricePerHour: '' });
+                          return;
+                        }
+                        value = (parseFloat(value) / 100).toFixed(2);
+                        const formatted = value.replace('.', ',');
+                        setFormData({ ...formData, pricePerHour: formatted });
                       }}
                       placeholder="0,00"
                       className="pl-10"
@@ -473,10 +477,14 @@ export default function ManageVenues() {
                       type="text"
                       value={formData.pricePerDay}
                       onChange={(e) => {
-                        let value = e.target.value.replace(/\D/g, '');
-                        value = (parseFloat(value) / 100).toFixed(2).replace('.', ',');
-                        if (value === '0,00') value = '';
-                        setFormData({ ...formData, pricePerDay: value });
+                        let value = e.target.value.replace(/[^\d]/g, '');
+                        if (value === '') {
+                          setFormData({ ...formData, pricePerDay: '' });
+                          return;
+                        }
+                        value = (parseFloat(value) / 100).toFixed(2);
+                        const formatted = value.replace('.', ',');
+                        setFormData({ ...formData, pricePerDay: formatted });
                       }}
                       placeholder="0,00"
                       className="pl-10"
@@ -492,10 +500,14 @@ export default function ManageVenues() {
                       type="text"
                       value={formData.pricePerWeekend}
                       onChange={(e) => {
-                        let value = e.target.value.replace(/\D/g, '');
-                        value = (parseFloat(value) / 100).toFixed(2).replace('.', ',');
-                        if (value === '0,00') value = '';
-                        setFormData({ ...formData, pricePerWeekend: value });
+                        let value = e.target.value.replace(/[^\d]/g, '');
+                        if (value === '') {
+                          setFormData({ ...formData, pricePerWeekend: '' });
+                          return;
+                        }
+                        value = (parseFloat(value) / 100).toFixed(2);
+                        const formatted = value.replace('.', ',');
+                        setFormData({ ...formData, pricePerWeekend: formatted });
                       }}
                       placeholder="0,00"
                       className="pl-10"
