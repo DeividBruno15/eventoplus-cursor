@@ -29,10 +29,10 @@ export default function AdvertiserAnalytics() {
   });
 
   // Analytics calculations
-  const totalVenues = venues.length;
-  const activeVenues = venues.filter((v: any) => v.active).length;
-  const totalReservations = reservations.length;
-  const totalRevenue = reservations.reduce((sum: number, r: any) => sum + parseFloat(r.totalAmount || 0), 0);
+  const totalVenues = (venues as any[])?.length || 0;
+  const activeVenues = (venues as any[])?.filter((v: any) => v.active).length || 0;
+  const totalReservations = (reservations as any[])?.length || 0;
+  const totalRevenue = (reservations as any[])?.reduce((sum: number, r: any) => sum + parseFloat(r.totalAmount || 0), 0) || 0;
 
   // Monthly data for charts
   const monthlyData = [
