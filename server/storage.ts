@@ -56,6 +56,7 @@ export interface IStorage {
   // Events
   getEvents(): Promise<Event[]>;
   getEvent(id: number): Promise<Event | undefined>;
+  getEventWithApplications(id: number): Promise<any>;
   createEvent(event: InsertEvent & { organizerId: number }): Promise<Event>;
   updateEvent(id: number, event: Partial<Event>): Promise<Event>;
   

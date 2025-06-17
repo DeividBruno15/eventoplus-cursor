@@ -55,10 +55,17 @@ export const eventApplications = pgTable("event_applications", {
   id: serial("id").primaryKey(),
   eventId: integer("event_id").references(() => events.id).notNull(),
   providerId: integer("provider_id").references(() => users.id).notNull(),
+  serviceId: integer("service_id").references(() => services.id),
   proposal: text("proposal").notNull(),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  status: varchar("status", { length: 20 }).default("pending"), // pending, approved, rejected
+  estimatedHours: integer("estimated_hours"),
+  availableDate: timestamp("available_date"),
+  portfolio: text("portfolio").array(),
+  status: varchar("status", { length: 20 }).default("pending"), // pending, approved, rejected, withdrawn
+  rejectionReason: text("rejection_reason"),
+  contractId: integer("contract_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const services = pgTable("services", {
@@ -67,9 +74,26 @@ export const services = pgTable("services", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   category: varchar("category", { length: 50 }).notNull(),
+  subcategory: varchar("subcategory", { length: 100 }),
   basePrice: decimal("base_price", { precision: 10, scale: 2 }),
+  priceType: varchar("price_type", { length: 20 }).default("fixed"), // fixed, hourly, daily, negotiable
+  minPrice: decimal("min_price", { precision: 10, scale: 2 }),
+  maxPrice: decimal("max_price", { precision: 10, scale: 2 }),
+  duration: integer("duration"), // in hours
+  location: text("location"),
+  serviceArea: text("service_area").array(), // cities/regions served
+  portfolio: text("portfolio").array(), // image/video URLs
+  requirements: text("requirements"),
+  includes: text("includes").array(), // what's included in the service
+  excludes: text("excludes").array(), // what's not included
+  tags: text("tags").array(),
+  rating: decimal("rating", { precision: 3, scale: 2 }).default("0"),
+  reviewCount: integer("review_count").default(0),
+  bookingCount: integer("booking_count").default(0),
   active: boolean("active").default(true),
+  featured: boolean("featured").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const venues = pgTable("venues", {

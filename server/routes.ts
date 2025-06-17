@@ -364,7 +364,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/events/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const event = await storage.getEvent(id);
+      const event = await storage.getEventWithApplications(id);
       
       if (!event) {
         return res.status(404).json({ message: "Evento não encontrado" });
@@ -383,6 +383,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(applications);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Event Applications routes
+  app.post("/api/event-applications", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const validatedData = insertEventApplicationSchema.parse(req.body);
+      const userId = (req.user as any).id;
+
+      const application = await storage.createEventApplication({
+        ...validatedData,
+        providerId: userId
+      });
+
+      res.status(201).json(application);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  app.put("/api/event-applications/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const applicationId = parseInt(req.params.id);
+      const updateData = req.body;
+
+      const application = await storage.updateEventApplication(applicationId, updateData);
+      res.json(application);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
     }
   });
 
