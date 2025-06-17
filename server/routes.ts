@@ -21,6 +21,7 @@ import {
   insertServiceSchema,
   insertChatMessageSchema
 } from "@shared/schema";
+import { apiLimiter, authLimiter, createLimiter, webhookLimiter } from "./rateLimiter";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
