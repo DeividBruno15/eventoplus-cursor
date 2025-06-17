@@ -136,6 +136,13 @@ export default function RegisterStep2() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
       <div className="max-w-2xl w-full">
         <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <img 
+              src={eventoLogo} 
+              alt="Evento+"
+              className="h-12 object-contain"
+            />
+          </div>
           <h1 className="text-3xl font-bold text-black mb-2">Cadastrar conta</h1>
           <p className="text-gray-600">
             Informe seus dados de cadastro

@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Check, ArrowLeft } from "lucide-react";
+import eventoLogo from "@assets/logo evennto_1750165135991.png";
 
 // Import service category icons
 import microphoneIcon from "@assets/Microphone, Mic, Rec_1750126816998.png";
@@ -175,6 +176,13 @@ export default function RegisterStep3() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
       <div className="max-w-4xl w-full">
         <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <img 
+              src={eventoLogo} 
+              alt="Evento+"
+              className="h-12 object-contain"
+            />
+          </div>
           <h1 className="text-3xl font-bold text-black mb-2">Cadastrar conta</h1>
           <p className="text-gray-600">
             Selecione os tipos de serviços
