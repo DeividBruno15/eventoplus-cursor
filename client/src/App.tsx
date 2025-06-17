@@ -75,7 +75,8 @@ function Router() {
     <Switch>
       {/* Public Routes - No Layout */}
       <Route path="/" component={Home} />
-      <Route path="/login" component={Login} />
+      <Route path="/auth/login" component={Login} />
+      <Route path="/auth/register" component={RegisterStep1} />
 
       <Route path="/auth/register-step1" component={RegisterStep1} />
       <Route path="/auth/register-step2" component={RegisterStep2} />
