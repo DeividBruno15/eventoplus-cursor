@@ -161,22 +161,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post("/api/register", async (req, res) => {
     try {
-      const validatedData = insertUserSchema.parse(req.body);
-      
+      const {
+        userType,
+        personType,
+        firstName,
+        lastName,
+        companyName,
+        cpf,
+        cnpj,
+        birthDate,
+        email,
+        password,
+        phone,
+        zipCode,
+        addressData,
+        selectedServices
+      } = req.body;
+
       // Check if user already exists
-      const existingUser = await storage.getUserByEmail(validatedData.email);
+      const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
         return res.status(400).json({ message: "Email já está em uso" });
       }
 
       // Hash password
-      const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
       
+      // Build user data based on person type
+      const userData: any = {
+        username: personType === "juridica" ? companyName : `${firstName} ${lastName}`,
+        email,
+        password: hashedPassword,
+        userType,
+        personType: personType || "fisica",
+        phone,
+        zipCode,
+        selectedServices: selectedServices || []
+      };
+
+      if (personType === "fisica" || !personType) {
+        userData.firstName = firstName;
+        userData.lastName = lastName;
+        userData.cpf = cpf;
+        userData.birthDate = birthDate;
+      } else {
+        userData.companyName = companyName;
+        userData.cnpj = cnpj;
+      }
+
+      if (addressData) {
+        const parsedAddress = JSON.parse(addressData);
+        userData.address = `${parsedAddress.street}, ${parsedAddress.neighborhood}`;
+        userData.city = parsedAddress.city;
+        userData.state = parsedAddress.state;
+      }
+
       // Create user
-      const user = await storage.createUser({
-        ...validatedData,
-        password: hashedPassword
-      });
+      const user = await storage.createUser(userData);
 
       // Auto-login after registration
       req.login(user, (err) => {

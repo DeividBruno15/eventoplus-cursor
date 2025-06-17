@@ -84,10 +84,7 @@ export default function CreateEvent() {
     },
   });
 
-  const { fields, append, remove } = useForm({
-    name: "services" as const,
-    control: form.control,
-  });
+  const services = form.watch("services");
 
   const handleCEPFound = (address: any) => {
     setAddressData({
@@ -367,7 +364,7 @@ export default function CreateEvent() {
                   </Button>
                 </div>
                 
-                {form.watch("services").map((service, index) => (
+                {services.map((service, index) => (
                   <Card key={index} className="p-4">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                       <FormField
@@ -435,7 +432,7 @@ export default function CreateEvent() {
                       />
 
                       <div>
-                        {form.watch("services").length > 1 && (
+                        {services.length > 1 && (
                           <Button
                             type="button"
                             variant="outline"
