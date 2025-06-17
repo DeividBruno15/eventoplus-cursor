@@ -1250,11 +1250,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Map to public format
       const publicServices = filteredServices.map(service => ({
         id: service.id,
-        name: service.name,
+        name: service.title,
         category: service.category,
         rating: 4.5, // Would calculate from reviews in real implementation
         location: service.location,
-        priceRange: `${service.priceMin || 0}-${service.priceMax || 999999}`
+        priceRange: `${service.price || 0}-${service.price || 999999}`
       }));
 
       res.json({ services: publicServices });
@@ -1319,6 +1319,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
+      const apiKey = authHeader.replace('Bearer ', '');
+      const user = await storage.validateApiKey(apiKey);
+      
+      if (!user) {
+        return res.status(401).json({ message: "API key inválida" });
+      }
+
       const { event_type, data, timestamp } = req.body;
 
       if (!event_type || !data) {
@@ -1329,12 +1336,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const webhookId = `webhook_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
       // Log webhook for debugging
-      console.log(`Webhook received: ${event_type}`, { data, timestamp, webhookId });
+      console.log(`Webhook received: ${event_type}`, { data, timestamp, webhookId, userId: user.id });
 
       res.json({
         success: true,
         message: "Webhook processado com sucesso",
         id: webhookId
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // API Key Management Routes
+  app.get("/api/user/api-key", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const user = req.user as any;
+      
+      res.json({
+        hasApiKey: !!user.apiKey,
+        lastUsed: user.apiKeyLastUsed,
+        keyPreview: user.apiKey ? `${user.apiKey.slice(0, 8)}...` : null
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/user/api-key/generate", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const user = req.user as any;
+      const apiKey = await storage.generateApiKey(user.id);
+      
+      res.json({
+        apiKey,
+        message: "API key gerada com sucesso. Guarde-a em local seguro, pois não será mostrada novamente."
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.delete("/api/user/api-key", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const user = req.user as any;
+      
+      await storage.updateUser(user.id, {
+        apiKey: null,
+        apiKeyLastUsed: null
+      });
+      
+      res.json({
+        success: true,
+        message: "API key removida com sucesso"
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });

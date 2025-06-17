@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { eq, and, or, desc, sql } from "drizzle-orm";
+import crypto from "crypto";
 import { 
   users, 
   events, 
