@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { insertServiceSchema } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
@@ -64,12 +65,25 @@ const servicesByCategory = {
   "Limpeza": cleaningServices,
 };
 
+// Helper function to format Brazilian currency
+const formatCurrency = (value: string) => {
+  const numericValue = value.replace(/\D/g, '');
+  const number = parseFloat(numericValue) / 100;
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2,
+  }).format(number);
+};
+
 export default function CreateService() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  const [mediaPreview, setMediaPreview] = useState<string[]>([]);
 
   const form = useForm<ServiceFormData>({
     resolver: zodResolver(serviceSchema),
@@ -130,6 +144,53 @@ export default function CreateService() {
 
   const removeTag = (tagToRemove: string) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleMediaUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    
+    if (mediaFiles.length + files.length > 5) {
+      toast({
+        title: "Limite de arquivos",
+        description: "Máximo 5 arquivos de mídia permitidos",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const validFiles = files.filter(file => {
+      const isValid = file.type.startsWith('image/') || file.type.startsWith('video/');
+      if (!isValid) {
+        toast({
+          title: "Arquivo inválido",
+          description: `${file.name} não é um arquivo de imagem ou vídeo`,
+          variant: "destructive",
+        });
+      }
+      return isValid;
+    });
+
+    setMediaFiles([...mediaFiles, ...validFiles]);
+    
+    // Create preview URLs
+    const newPreviews = validFiles.map(file => URL.createObjectURL(file));
+    setMediaPreview([...mediaPreview, ...newPreviews]);
+  };
+
+  const removeMedia = (index: number) => {
+    const newFiles = mediaFiles.filter((_, i) => i !== index);
+    const newPreviews = mediaPreview.filter((_, i) => i !== index);
+    
+    // Revoke the URL to prevent memory leaks
+    URL.revokeObjectURL(mediaPreview[index]);
+    
+    setMediaFiles(newFiles);
+    setMediaPreview(newPreviews);
+  };
+
+  const handlePriceChange = (value: string, onChange: (value: string) => void) => {
+    const formatted = formatCurrency(value);
+    onChange(formatted);
   };
 
   const formatPrice = (value: string) => {
@@ -263,8 +324,8 @@ export default function CreateService() {
                     <FormControl>
                       <Input
                         placeholder="R$ 0,00"
-                        value={field.value ? formatPrice(field.value) : ""}
-                        onChange={(e) => field.onChange(e.target.value)}
+                        value={field.value}
+                        onChange={(e) => handlePriceChange(e.target.value, field.onChange)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -288,6 +349,65 @@ export default function CreateService() {
                   </FormItem>
                 )}
               />
+
+              {/* Media Upload Section */}
+              <div className="space-y-4">
+                <div>
+                  <Label>Mídia (Fotos e Vídeos) - Máximo 5 arquivos</Label>
+                  <div className="mt-2">
+                    <input
+                      type="file"
+                      accept="image/*,video/*"
+                      multiple
+                      onChange={handleMediaUpload}
+                      className="hidden"
+                      id="media-upload"
+                    />
+                    <label
+                      htmlFor="media-upload"
+                      className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 transition-colors"
+                    >
+                      <div className="text-center">
+                        <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                        <p className="text-sm text-gray-600">
+                          Clique para adicionar fotos e vídeos
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {mediaFiles.length}/5 arquivos
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Media Preview */}
+                {mediaFiles.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {mediaPreview.map((preview, index) => (
+                      <div key={index} className="relative group">
+                        {mediaFiles[index].type.startsWith('image/') ? (
+                          <img
+                            src={preview}
+                            alt={`Preview ${index + 1}`}
+                            className="w-full h-24 object-cover rounded-lg"
+                          />
+                        ) : (
+                          <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center">
+                            <Video className="w-8 h-8 text-gray-400" />
+                          </div>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeMedia(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Tags */}
               <div className="space-y-3">

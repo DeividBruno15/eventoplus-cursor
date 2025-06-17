@@ -198,6 +198,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         selectedServices
       } = req.body;
 
+      // Check for email duplicates
+      const existingUserByEmail = await storage.getUserByEmail(email);
+      if (existingUserByEmail) {
+        return res.status(400).json({
+          message: "Este email já está em uso. Tente fazer login ou use outro email.",
+          field: "email"
+        });
+      }
+
+      // Check for CPF duplicates (if provided)
+      if (cpf) {
+        const existingUserByCpf = await storage.getUserByCpf(cpf);
+        if (existingUserByCpf) {
+          return res.status(400).json({
+            message: "Este CPF já está cadastrado na plataforma.",
+            field: "cpf"
+          });
+        }
+      }
+
+      // Check for CNPJ duplicates (if provided)
+      if (cnpj) {
+        const existingUserByCnpj = await storage.getUserByCnpj(cnpj);
+        if (existingUserByCnpj) {
+          return res.status(400).json({
+            message: "Este CNPJ já está cadastrado na plataforma.",
+            field: "cnpj"
+          });
+        }
+      }
+
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
