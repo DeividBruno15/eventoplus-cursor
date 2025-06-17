@@ -173,7 +173,7 @@ export default function HomeClean() {
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
             {/* Row 1 */}
             {/* Entretenimento */}
             <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
@@ -816,14 +816,25 @@ export default function HomeClean() {
             Pronto para começar?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Junte-se a milhares de organizadores que já transformaram seus eventos.
+            Escolha seu perfil e comece a transformar seus eventos hoje mesmo.
           </p>
-          <Link href="/register">
-            <Button size="lg" className="bg-white text-[#3C5BFA] hover:bg-gray-100 px-8 py-4 text-lg">
-              Começar gratuitamente
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/register?userType=prestador">
+              <Button size="lg" className="bg-white text-[#3C5BFA] hover:bg-gray-100 px-6 py-3 text-base">
+                Cadastrar como Prestador
+              </Button>
+            </Link>
+            <Link href="/register?userType=contratante">
+              <Button size="lg" className="bg-[#FFA94D] text-white hover:bg-orange-600 px-6 py-3 text-base">
+                Cadastrar como Contratante
+              </Button>
+            </Link>
+            <Link href="/register?userType=anunciante">
+              <Button size="lg" className="bg-green-600 text-white hover:bg-green-700 px-6 py-3 text-base">
+                Cadastrar como Anunciante
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

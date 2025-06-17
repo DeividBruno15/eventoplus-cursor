@@ -148,6 +148,17 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 - **Custom Service Icons**: Implemented PNG icons matching brand colors for all service categories and replaced with custom Evento+ logo across the entire platform
 - **Brand Logo Implementation**: Updated all components (header, footer, sidebar, authentication pages) to use the official Evento+ logo PNG image
 
+### June 17, 2025 - Institutional Website Redesign & Mobile App Integration
+- **Service Categories Redesign**: Updated "Tudo para seu evento perfeito" section with real service categories (Entretenimento, Alimentação, Organização, Produção, Limpeza) including custom PNG icons
+- **User Profile Section**: Replaced "Como funciona" with "Encontre seu perfil na Evento+" featuring dedicated cards for each user type with direct registration links
+- **Mobile App Integration**: Replaced hero section buttons with App Store/Google Play download image for mobile app promotion
+- **Navigation Enhancement**: Added "Como funciona", "Quem somos", and "Contato" menu items with dedicated pages
+- **Header Updates**: Changed "Começar grátis" button to "Cadastrar" for clearer call-to-action
+- **CTA Section Redesign**: Replaced single "Começar gratuitamente" button with three specific registration buttons (Prestador, Contratante, Anunciante)
+- **New Page Creation**: Complete pages for "Como funciona", "Quem somos", and "Contato" with comprehensive content and functional contact form
+- **Consistent Branding**: Applied new Evento+ logo across all institutional pages and maintained brand color consistency
+- **Responsive Design**: All new sections and pages fully responsive with proper mobile layouts
+
 ### June 17, 2025 - Venue Management Enhancements
 - **Venue Availability Calendar**: System for anunciantes to manage venue availability by date
 - **Multiple Pricing Models**: Support for hourly, daily, and weekend pricing options

@@ -12,6 +12,9 @@ import RegisterStep2 from "@/pages/auth/register-step2";
 import RegisterStep3 from "@/pages/auth/register-step3";
 import SelectUserType from "@/pages/auth/select-user-type";
 import Pricing from "@/pages/pricing";
+import ComoFunciona from "@/pages/como-funciona";
+import QuemSomos from "@/pages/quem-somos";
+import Contato from "@/pages/contato";
 
 // Protected Pages
 import Dashboard from "@/pages/dashboard/dashboard";
@@ -57,6 +60,9 @@ function Router() {
       <Route path="/auth/register-step3" component={RegisterStep3} />
       <Route path="/select-user-type" component={SelectUserType} />
       <Route path="/pricing" component={Pricing} />
+      <Route path="/como-funciona" component={ComoFunciona} />
+      <Route path="/quem-somos" component={QuemSomos} />
+      <Route path="/contato" component={Contato} />
       
       {/* Protected Routes - With Layout */}
       <Route path="/dashboard">
