@@ -5,12 +5,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Calendar, MapPin, Plus, Users } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Events() {
   const { user } = useAuth();
   
-  const { data: events, isLoading } = useQuery({
+  const { data: events = [], isLoading } = useQuery({
     queryKey: ["/api/events"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/events");
+      return await response.json();
+    },
   });
 
   if (!user) {
@@ -47,7 +52,7 @@ export default function Events() {
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
           </div>
-        ) : events && events.length > 0 ? (
+        ) : Array.isArray(events) && events.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event: any) => (
               <Card key={event.id} className="hover:shadow-md transition-shadow">
