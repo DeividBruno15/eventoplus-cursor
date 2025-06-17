@@ -15,11 +15,11 @@ import { PasswordStrength } from "@/components/ui/password-strength";
 
 const registerStep2Schema = z.object({
   personType: z.enum(["fisica", "juridica"]),
-  firstName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres").optional(),
-  lastName: z.string().min(2, "Sobrenome deve ter pelo menos 2 caracteres").optional(),
-  companyName: z.string().min(2, "Nome da empresa deve ter pelo menos 2 caracteres").optional(),
-  cpf: z.string().min(11, "CPF deve ter 11 dígitos").optional(),
-  cnpj: z.string().min(14, "CNPJ deve ter 14 dígitos").optional(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  companyName: z.string().optional(),
+  cpf: z.string().optional(),
+  cnpj: z.string().optional(),
   birthDate: z.string().optional(),
   email: z.string().email("Email inválido"),
   password: z.string().min(8, "Senha deve ter pelo menos 8 caracteres"),
@@ -36,10 +36,14 @@ const registerStep2Schema = z.object({
   path: ["confirmPassword"],
 }).refine((data) => {
   if (data.personType === "fisica") {
-    return data.firstName && data.lastName && data.cpf && data.birthDate;
+    return data.firstName && data.firstName.length >= 2 && 
+           data.lastName && data.lastName.length >= 2 && 
+           data.cpf && data.cpf.length >= 11 && 
+           data.birthDate;
   }
   if (data.personType === "juridica") {
-    return data.companyName && data.cnpj;
+    return data.companyName && data.companyName.length >= 2 && 
+           data.cnpj && data.cnpj.length >= 14;
   }
   // For prestador users who don't have personType selection
   return true;
@@ -111,10 +115,6 @@ export default function RegisterStep2() {
   };
 
   const handleContinue = (data: RegisterStep2Form) => {
-    console.log("Form submitted with data:", data);
-    console.log("User type:", userType);
-    console.log("Address data:", addressData);
-    
     const registrationData = {
       userType,
       ...data,
@@ -122,7 +122,6 @@ export default function RegisterStep2() {
     };
     
     localStorage.setItem("registrationData", JSON.stringify(registrationData));
-    console.log("Navigating to step 3...");
     setLocation(`/auth/register-step3?userType=${userType}`);
   };
 
@@ -174,9 +173,7 @@ export default function RegisterStep2() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleContinue, (errors) => {
-                console.log("Form validation errors:", errors);
-              })} className="space-y-6">
+              <form onSubmit={form.handleSubmit(handleContinue)} className="space-y-6">
                 {/* Person Type Selection */}
                 {showPersonTypeSelection && (
                   <FormField
@@ -469,12 +466,7 @@ export default function RegisterStep2() {
                     type="submit"
                     disabled={!isPasswordValid}
                     className="bg-blue-600 hover:bg-blue-700"
-                    onClick={() => {
-                      console.log("Continuar button clicked");
-                      console.log("Password valid:", isPasswordValid);
-                      console.log("Form state:", form.formState);
-                      console.log("Form errors:", form.formState.errors);
-                    }}
+
                   >
                     Continuar
                   </Button>
