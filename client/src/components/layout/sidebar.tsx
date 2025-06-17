@@ -88,7 +88,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   const supportItems = [
     { icon: CreditCard, label: "Assinatura", path: "/subscription/manage" },
-    { icon: HelpCircle, label: "Central de Ajuda", path: "/help" },
+    { icon: HelpCircle, label: "Central de Ajuda", path: "/help-center" },
     { icon: HeadphonesIcon, label: "Suporte", path: "/support" },
   ];
 

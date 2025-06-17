@@ -113,6 +113,14 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 
 ## Changelog
 
+### June 17, 2025 - Correção Completa de Erros 404 e Sistema PWA
+- **Eliminação de Erros 404**: Criadas todas as páginas faltantes (/services/index.tsx, /venues/index.tsx, /offline.tsx) que causavam navegação quebrada
+- **Sistema PWA Completo**: Service worker implementado com cache inteligente, sync em background e notificações push para funcionalidade offline robusta
+- **IndexedDB Offline Storage**: Sistema completo de armazenamento offline com sincronização automática quando voltar online
+- **Rotas Corrigidas**: App.tsx atualizado com imports corretos e rota offline adicionada para melhor experiência do usuário
+- **Páginas de Listagem**: Services e Venues agora possuem interfaces completas com filtros, busca e exibição de dados do banco
+- **Funcionalidade Offline**: Usuários podem navegar e usar funcionalidades básicas mesmo sem conexão à internet
+
 ### June 17, 2025 - Critical Security and Performance Improvements
 - **Comprehensive Rate Limiting**: Implemented rate limiting across all critical endpoints (authentication, resource creation, webhooks) to prevent abuse and brute force attacks
 - **Type Safety Enhancement**: Fixed all dashboard analytics type errors with proper TypeScript definitions and type casting for production stability
