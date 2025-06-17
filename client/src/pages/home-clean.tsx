@@ -9,6 +9,7 @@ import {
 import { Link } from "wouter";
 import { ArrowRight, Calendar, Users, Zap, Shield, Star, Play } from "lucide-react";
 import { useState } from "react";
+import eventoLogo from "@assets/logo evennto_1750165135991.png";
 
 export default function HomeClean() {
   const [activeUserType, setActiveUserType] = useState<'prestadores' | 'contratantes' | 'anunciantes'>('prestadores');
@@ -21,10 +22,11 @@ export default function HomeClean() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-[#3C5BFA] rounded-lg flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-black">Evento+</span>
+                <img 
+                  src={eventoLogo} 
+                  alt="Evento+"
+                  className="h-8 object-contain"
+                />
               </div>
             </div>
             <div className="flex items-center space-x-8">
@@ -816,10 +818,11 @@ export default function HomeClean() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-[#3C5BFA] rounded-lg flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-black">Evento+</span>
+                <img 
+                  src={eventoLogo} 
+                  alt="Evento+"
+                  className="h-8 object-contain"
+                />
               </div>
               <p className="text-gray-600">
                 A plataforma completa para eventos únicos e memoráveis.
