@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 // IndexedDB wrapper for offline storage
 class OfflineStorage {
   private dbName = 'evento-plus-offline';
