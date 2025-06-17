@@ -529,7 +529,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const validatedData = insertVenueSchema.parse(req.body);
+      console.log('Venue creation request body:', req.body);
+      
+      // Convert string prices to numbers if they exist
+      const processedBody = {
+        ...req.body,
+        pricePerHour: req.body.pricePerHour ? parseFloat(req.body.pricePerHour) : null,
+        pricePerDay: req.body.pricePerDay ? parseFloat(req.body.pricePerDay) : null,
+        pricePerWeekend: req.body.pricePerWeekend ? parseFloat(req.body.pricePerWeekend) : null,
+      };
+      
+      const validatedData = insertVenueSchema.parse(processedBody);
       const userId = (req.user as any).id;
       
       const venue = await storage.createVenue({
@@ -539,6 +549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.status(201).json(venue);
     } catch (error: any) {
+      console.error('Venue creation error:', error);
       res.status(400).json({ message: error.message });
     }
   });

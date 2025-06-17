@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { useLocation } from "wouter";
 
 interface User {
   id: number;
@@ -23,6 +24,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   const { data: user, isLoading } = useQuery<User | null>({
     queryKey: ["/api/user"],
@@ -86,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       queryClient.setQueryData(["/api/user"], null);
       queryClient.clear();
       // Redirect to login after logout
-      window.location.href = "/auth/login";
+      setLocation("/auth/login");
     },
   });
 
