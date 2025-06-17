@@ -32,7 +32,9 @@ import {
   Search,
   ShoppingCart,
   FileText,
-  Shield
+  Shield,
+  HelpCircle,
+  Headphones
 } from "lucide-react";
 
 interface SidebarProps {
@@ -136,7 +138,6 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { href: "/dashboard", icon: Home, label: "Dashboard" },
       { href: "/agenda", icon: Calendar, label: "Agenda" },
       { href: "/chat", icon: MessageSquare, label: "Chat" },
-      { href: "/profile", icon: Star, label: "Perfil" },
     ];
 
     switch (user.userType) {
@@ -146,7 +147,6 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
           { href: "/events", icon: Calendar, label: "Oportunidades" },
           { href: "/services", icon: CreditCard, label: "Meus Serviços" },
           { href: "/analytics", icon: BarChart3, label: "Análises" },
-          { href: "/cart", icon: ShoppingCart, label: "Carrinho" },
           { href: "/contracts", icon: FileText, label: "Contratos" },
         ];
       
@@ -156,7 +156,6 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
           { href: "/events", icon: Calendar, label: "Meus Eventos" },
           { href: "/search", icon: Search, label: "Buscar Prestadores" },
           { href: "/venues", icon: MapPin, label: "Buscar Espaços" },
-          { href: "/cart", icon: ShoppingCart, label: "Carrinho" },
           { href: "/contracts", icon: FileText, label: "Contratos" },
         ];
       
@@ -316,6 +315,28 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
         {/* Bottom Section */}
         <div className="p-2 space-y-1">
+          <Link href="/help-center">
+            <a className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+              location === "/help-center" 
+                ? "bg-[#3C5BFA] text-white" 
+                : "text-gray-600 hover:bg-gray-100"
+            } ${collapsed ? 'justify-center' : ''}`}>
+              <User className="h-5 w-5" />
+              {!collapsed && <span>Central de Ajuda</span>}
+            </a>
+          </Link>
+          
+          <Link href="/support">
+            <a className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+              location === "/support" 
+                ? "bg-[#3C5BFA] text-white" 
+                : "text-gray-600 hover:bg-gray-100"
+            } ${collapsed ? 'justify-center' : ''}`}>
+              <Headphones className="h-5 w-5" />
+              {!collapsed && <span>Suporte</span>}
+            </a>
+          </Link>
+          
           <Link href="/settings">
             <a className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
               location === "/settings" 
@@ -324,17 +345,6 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
             } ${collapsed ? 'justify-center' : ''}`}>
               <Settings className="h-5 w-5" />
               {!collapsed && <span>Configurações</span>}
-            </a>
-          </Link>
-          
-          <Link href="/two-factor">
-            <a className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-              location === "/two-factor" 
-                ? "bg-[#3C5BFA] text-white" 
-                : "text-gray-600 hover:bg-gray-100"
-            } ${collapsed ? 'justify-center' : ''}`}>
-              <Shield className="h-5 w-5" />
-              {!collapsed && <span>Autenticação 2FA</span>}
             </a>
           </Link>
           

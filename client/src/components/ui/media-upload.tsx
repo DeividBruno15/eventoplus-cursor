@@ -1,134 +1,109 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Upload, X, Image, Video, FileText } from "lucide-react";
+import { Upload, X, Image, Video, FileImage } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface MediaFile {
   id: string;
   file: File;
-  preview: string;
+  url: string;
   type: 'image' | 'video';
-  uploaded?: boolean;
 }
 
 interface MediaUploadProps {
+  onMediaChange: (files: MediaFile[]) => void;
   maxFiles?: number;
-  acceptedTypes?: string[];
-  onFilesChange?: (files: MediaFile[]) => void;
-  value?: MediaFile[];
-  disabled?: boolean;
+  initialMedia?: MediaFile[];
+  className?: string;
 }
 
-export default function MediaUpload({ 
+export function MediaUpload({ 
+  onMediaChange, 
   maxFiles = 10, 
-  acceptedTypes = ['image/*', 'video/*'],
-  onFilesChange,
-  value = [],
-  disabled = false 
+  initialMedia = [], 
+  className = "" 
 }: MediaUploadProps) {
-  const [files, setFiles] = useState<MediaFile[]>(value);
-  const [isDragging, setIsDragging] = useState(false);
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>(initialMedia);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  const handleFileSelect = (selectedFiles: FileList | null) => {
-    if (!selectedFiles) return;
+  const acceptedTypes = {
+    'image/*': ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
+    'video/*': ['.mp4', '.webm', '.ogg', '.mov']
+  };
 
-    const newFiles: MediaFile[] = [];
-    const currentCount = files.length;
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    
+    if (mediaFiles.length + files.length > maxFiles) {
+      toast({
+        title: "Limite excedido",
+        description: `Você pode enviar no máximo ${maxFiles} arquivos`,
+        variant: "destructive",
+      });
+      return;
+    }
 
-    for (let i = 0; i < selectedFiles.length && (currentCount + newFiles.length) < maxFiles; i++) {
-      const file = selectedFiles[i];
+    const newMediaFiles: MediaFile[] = [];
+
+    files.forEach((file) => {
+      // Validar tipo de arquivo
+      const isImage = file.type.startsWith('image/');
+      const isVideo = file.type.startsWith('video/');
       
-      // Validate file type
-      if (!acceptedTypes.some(type => file.type.match(type.replace('*', '.*')))) {
+      if (!isImage && !isVideo) {
         toast({
           title: "Tipo de arquivo não suportado",
-          description: `${file.name} não é um tipo de arquivo válido`,
+          description: `${file.name} não é um arquivo de imagem ou vídeo válido`,
           variant: "destructive",
         });
-        continue;
+        return;
       }
 
-      // Validate file size (50MB max)
-      if (file.size > 50 * 1024 * 1024) {
+      // Validar tamanho (máximo 50MB para vídeos, 10MB para imagens)
+      const maxSize = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+      if (file.size > maxSize) {
+        const sizeLimitText = isVideo ? '50MB' : '10MB';
         toast({
           title: "Arquivo muito grande",
-          description: `${file.name} excede o limite de 50MB`,
+          description: `${file.name} excede o limite de ${sizeLimitText}`,
           variant: "destructive",
         });
-        continue;
+        return;
       }
 
       const mediaFile: MediaFile = {
-        id: `${file.name}-${Date.now()}-${Math.random()}`,
+        id: Date.now() + Math.random().toString(),
         file,
-        preview: URL.createObjectURL(file),
-        type: file.type.startsWith('image/') ? 'image' : 'video',
+        url: URL.createObjectURL(file),
+        type: isImage ? 'image' : 'video'
       };
 
-      newFiles.push(mediaFile);
-    }
+      newMediaFiles.push(mediaFile);
+    });
 
-    if (newFiles.length > 0) {
-      const updatedFiles = [...files, ...newFiles];
-      setFiles(updatedFiles);
-      onFilesChange?.(updatedFiles);
+    const updatedFiles = [...mediaFiles, ...newMediaFiles];
+    setMediaFiles(updatedFiles);
+    onMediaChange(updatedFiles);
 
-      toast({
-        title: "Arquivos adicionados",
-        description: `${newFiles.length} arquivo(s) adicionado(s) com sucesso`,
-      });
-    }
-
-    if (currentCount + newFiles.length >= maxFiles) {
-      toast({
-        title: "Limite atingido",
-        description: `Máximo de ${maxFiles} arquivos permitidos`,
-        variant: "destructive",
-      });
+    // Limpar input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
-  const removeFile = (fileId: string) => {
-    const updatedFiles = files.filter(f => f.id !== fileId);
-    setFiles(updatedFiles);
-    onFilesChange?.(updatedFiles);
-
-    // Revoke object URL to free memory
-    const fileToRemove = files.find(f => f.id === fileId);
-    if (fileToRemove) {
-      URL.revokeObjectURL(fileToRemove.preview);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (!disabled) {
-      setIsDragging(true);
-    }
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
+  const removeFile = (id: string) => {
+    const updatedFiles = mediaFiles.filter(file => {
+      if (file.id === id) {
+        URL.revokeObjectURL(file.url);
+        return false;
+      }
+      return true;
+    });
     
-    if (!disabled) {
-      handleFileSelect(e.dataTransfer.files);
-    }
-  };
-
-  const getFileIcon = (type: string) => {
-    if (type.startsWith('image/')) return <Image className="h-4 w-4" />;
-    if (type.startsWith('video/')) return <Video className="h-4 w-4" />;
-    return <FileText className="h-4 w-4" />;
+    setMediaFiles(updatedFiles);
+    onMediaChange(updatedFiles);
   };
 
   const formatFileSize = (bytes: number) => {
@@ -140,108 +115,108 @@ export default function MediaUpload({
   };
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${className}`}>
       {/* Upload Area */}
-      <Card 
-        className={`border-2 border-dashed transition-colors cursor-pointer ${
-          isDragging 
-            ? 'border-[#3C5BFA] bg-[#3C5BFA]/5' 
-            : 'border-gray-300 hover:border-gray-400'
-        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => !disabled && fileInputRef.current?.click()}
+      <div 
+        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
+        onClick={() => fileInputRef.current?.click()}
       >
-        <CardContent className="p-8 text-center">
-          <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-700 mb-2">
-            Adicionar Mídias
-          </h3>
-          <p className="text-gray-500 mb-4">
-            Arraste e solte arquivos aqui ou clique para selecionar
-          </p>
-          <div className="text-sm text-gray-400 space-y-1">
-            <p>Máximo {maxFiles} arquivos • Até 50MB cada</p>
-            <p>Formatos: JPG, PNG, MP4, MOV</p>
-            <p>{files.length}/{maxFiles} arquivos carregados</p>
-          </div>
-          
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            accept={acceptedTypes.join(',')}
-            onChange={(e) => handleFileSelect(e.target.files)}
-            className="hidden"
-            disabled={disabled}
-          />
-        </CardContent>
-      </Card>
+        <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+        <p className="text-lg font-medium text-gray-900 mb-2">
+          Adicionar fotos e vídeos
+        </p>
+        <p className="text-sm text-gray-500 mb-4">
+          Clique aqui ou arraste arquivos para enviar
+        </p>
+        <p className="text-xs text-gray-400">
+          Máximo {maxFiles} arquivos • Imagens até 10MB • Vídeos até 50MB
+        </p>
+        <Button 
+          type="button" 
+          variant="outline" 
+          className="mt-4"
+          onClick={(e) => {
+            e.stopPropagation();
+            fileInputRef.current?.click();
+          }}
+        >
+          <Upload className="w-4 h-4 mr-2" />
+          Escolher arquivos
+        </Button>
+      </div>
 
-      {/* Files List */}
-      {files.length > 0 && (
-        <div className="space-y-3">
-          <h4 className="font-medium text-gray-700">Arquivos Selecionados</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {files.map((file) => (
-              <Card key={file.id} className="relative overflow-hidden">
-                <CardContent className="p-0">
-                  {file.type === 'image' ? (
-                    <div className="aspect-video bg-gray-100 relative">
-                      <img
-                        src={file.preview}
-                        alt={file.file.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept="image/*,video/*"
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+
+      {/* Media Preview Grid */}
+      {mediaFiles.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {mediaFiles.map((media) => (
+            <Card key={media.id} className="relative group">
+              <CardContent className="p-2">
+                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden relative">
+                  {media.type === 'image' ? (
+                    <img
+                      src={media.url}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
-                    <div className="aspect-video bg-gray-900 relative flex items-center justify-center">
-                      <Video className="h-12 w-12 text-white" />
+                    <div className="w-full h-full flex items-center justify-center bg-gray-900">
+                      <Video className="w-8 h-8 text-white" />
                       <video
-                        src={file.preview}
+                        src={media.url}
                         className="absolute inset-0 w-full h-full object-cover opacity-50"
                         muted
                       />
                     </div>
                   )}
                   
-                  <div className="p-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          {getFileIcon(file.file.type)}
-                          <span className="text-sm font-medium truncate">
-                            {file.file.name}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            {file.type}
-                          </Badge>
-                          <span className="text-xs text-gray-500">
-                            {formatFileSize(file.file.size)}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeFile(file.id)}
-                        className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                        disabled={disabled}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
+                  {/* Remove button */}
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    className="absolute top-1 right-1 w-6 h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => removeFile(media.id)}
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+
+                  {/* File type indicator */}
+                  <div className="absolute bottom-1 left-1">
+                    {media.type === 'image' ? (
+                      <FileImage className="w-4 h-4 text-white drop-shadow" />
+                    ) : (
+                      <Video className="w-4 h-4 text-white drop-shadow" />
+                    )}
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                </div>
+                
+                <div className="mt-2">
+                  <p className="text-xs text-gray-600 truncate">
+                    {media.file.name}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {formatFileSize(media.file.size)}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
+
+      {/* File count indicator */}
+      <div className="text-sm text-gray-500 text-center">
+        {mediaFiles.length} de {maxFiles} arquivos enviados
+      </div>
     </div>
   );
 }
