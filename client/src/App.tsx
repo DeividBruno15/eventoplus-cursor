@@ -27,8 +27,8 @@ import ManageVenues from "@/pages/venues/manage-venues";
 import CreateVenue from "@/pages/venues/create-venue";
 import ManageSubscription from "@/pages/subscription/manage-subscription";
 import Chat from "@/pages/chat/chat";
-import Services from "@/pages/services";
-import Venues from "@/pages/venues";
+import Services from "@/pages/services/index";
+import Venues from "@/pages/venues/index";
 import Analytics from "@/pages/analytics";
 import Subscribe from "@/pages/subscribe";
 import SubscriptionManagement from "@/pages/subscription-management-simple";
@@ -317,6 +317,11 @@ function Router() {
             <Bookings />
           </AuthGuard>
         </Layout>
+      </Route>
+      
+      {/* PWA Offline page */}
+      <Route path="/offline">
+        <OfflinePage />
       </Route>
       
       {/* 404 */}
