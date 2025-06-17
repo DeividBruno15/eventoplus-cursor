@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { insertServiceSchema } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
-import { ArrowLeft, Plus, X } from "lucide-react";
+import { ArrowLeft, Plus, X, Upload, Image, Video } from "lucide-react";
 import { Link } from "wouter";
 import { z } from "zod";
 
@@ -23,6 +23,7 @@ const serviceSchema = z.object({
   category: z.string().min(1, "Categoria é obrigatória"),
   price: z.string().min(1, "Preço é obrigatório"),
   portfolio: z.string().optional(),
+  mediaFiles: z.array(z.string()).max(5, "Máximo 5 arquivos de mídia").optional(),
 });
 
 type ServiceFormData = z.infer<typeof serviceSchema>;
