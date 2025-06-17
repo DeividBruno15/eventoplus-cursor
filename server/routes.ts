@@ -552,15 +552,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('Venue creation request body:', req.body);
       
-      // Convert string prices to numbers if they exist
-      const processedBody = {
-        ...req.body,
-        pricePerHour: req.body.pricePerHour ? parseFloat(req.body.pricePerHour) : null,
-        pricePerDay: req.body.pricePerDay ? parseFloat(req.body.pricePerDay) : null,
-        pricePerWeekend: req.body.pricePerWeekend ? parseFloat(req.body.pricePerWeekend) : null,
-      };
-      
-      const validatedData = insertVenueSchema.parse(processedBody);
+      const validatedData = insertVenueSchema.parse(req.body);
       const userId = (req.user as any).id;
       
       const venue = await storage.createVenue({

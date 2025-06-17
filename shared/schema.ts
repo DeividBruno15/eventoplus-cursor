@@ -245,6 +245,10 @@ export const insertVenueSchema = createInsertSchema(venues).omit({
   ownerId: true,
   active: true,
   createdAt: true,
+}).extend({
+  pricePerHour: z.union([z.string(), z.number()]).optional().nullable(),
+  pricePerDay: z.union([z.string(), z.number()]).optional().nullable(),
+  pricePerWeekend: z.union([z.string(), z.number()]).optional().nullable(),
 });
 
 export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({

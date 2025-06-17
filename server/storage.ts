@@ -306,10 +306,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createVenue(venueData: InsertVenue & { ownerId: number }): Promise<Venue> {
-    const result = await db.insert(venues).values({
-      ...venueData,
-      active: true
-    }).returning();
+    // Ensure all price fields are properly converted to strings for decimal database fields
+    const processedData: any = {
+      name: venueData.name,
+      description: venueData.description,
+      location: venueData.location,
+      number: venueData.number || null,
+      category: venueData.category,
+      capacity: venueData.capacity,
+      pricePerHour: venueData.pricePerHour ? String(venueData.pricePerHour) : null,
+      pricePerDay: venueData.pricePerDay ? String(venueData.pricePerDay) : null,
+      pricePerWeekend: venueData.pricePerWeekend ? String(venueData.pricePerWeekend) : null,
+      pricingModel: venueData.pricingModel || "hourly",
+      amenities: venueData.amenities || [],
+      images: venueData.images || [],
+      addressData: venueData.addressData || null,
+      ownerId: venueData.ownerId
+    };
+    
+    const result = await db.insert(venues).values(processedData).returning();
     return result[0];
   }
 
