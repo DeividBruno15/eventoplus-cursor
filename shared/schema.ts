@@ -69,7 +69,12 @@ export const venues = pgTable("venues", {
   location: text("location").notNull(),
   capacity: integer("capacity").notNull(),
   pricePerHour: decimal("price_per_hour", { precision: 10, scale: 2 }),
+  pricePerDay: decimal("price_per_day", { precision: 10, scale: 2 }),
+  pricePerWeekend: decimal("price_per_weekend", { precision: 10, scale: 2 }),
+  pricingModel: varchar("pricing_model", { length: 20 }).default("hourly"),
   amenities: text("amenities").array(),
+  images: text("images").array(),
+  addressData: text("address_data"),
   active: boolean("active").default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

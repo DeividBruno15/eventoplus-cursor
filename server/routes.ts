@@ -377,6 +377,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
 
+  // Profile image upload endpoint
+  app.post("/api/user/profile-image", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const { imageData } = req.body;
+      const userId = (req.user as any).id;
+      
+      // Update user with profile image data
+      const updatedUser = await storage.updateUser(userId, { 
+        profileImage: imageData 
+      });
+      
+      // Clear user cache to refresh data
+      userCache.delete(userId);
+      
+      res.json({ message: "Imagem de perfil atualizada com sucesso", user: updatedUser });
+    } catch (error: any) {
+      res.status(500).json({ message: "Erro ao atualizar imagem de perfil" });
+    }
+  });
+
+  // Get user venues endpoint
+  app.get("/api/venues", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const venues = await storage.getVenues(userId);
+      res.json(venues);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Create venue endpoint
+  app.post("/api/venues", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const validatedData = insertVenueSchema.parse(req.body);
+      const userId = (req.user as any).id;
+      
+      const venue = await storage.createVenue({
+        ...validatedData,
+        ownerId: userId
+      });
+
+      res.status(201).json(venue);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   wss.on('connection', (ws: WebSocket) => {
     console.log('New WebSocket connection');
 
