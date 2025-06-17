@@ -194,21 +194,37 @@ export default function ManageVenues() {
   };
 
   const handleSubmit = () => {
-    if (!formData.name || !formData.description || !formData.location || !formData.category || !formData.capacity) {
+    if (!formData.name || !formData.description || !formData.category || !formData.capacity || !formData.cep || !formData.numero) {
       toast({
         title: "Campos obrigatórios",
-        description: "Preencha todos os campos obrigatórios",
+        description: "Preencha todos os campos obrigatórios (Nome, Descrição, Categoria, Capacidade, CEP e Número)",
         variant: "destructive",
       });
       return;
     }
 
+    const addressData = {
+      cep: formData.cep,
+      rua: formData.rua,
+      numero: formData.numero,
+      bairro: formData.bairro,
+      cidade: formData.cidade,
+      estado: formData.estado
+    };
+
     const venueData = {
-      ...formData,
+      name: formData.name,
+      description: formData.description,
+      location: formData.location,
+      category: formData.category,
       capacity: parseInt(formData.capacity),
       pricePerHour: formData.pricePerHour ? parseFloat(formData.pricePerHour) : null,
       pricePerDay: formData.pricePerDay ? parseFloat(formData.pricePerDay) : null,
       pricePerWeekend: formData.pricePerWeekend ? parseFloat(formData.pricePerWeekend) : null,
+      pricingModel: formData.pricingModel,
+      amenities: formData.amenities,
+      active: formData.active,
+      addressData: JSON.stringify(addressData)
     };
 
     if (editingVenue) {
@@ -220,6 +236,7 @@ export default function ManageVenues() {
 
   const handleEdit = (venue: Venue) => {
     setEditingVenue(venue);
+    const addressData = venue.addressData ? JSON.parse(venue.addressData) : {};
     setFormData({
       name: venue.name,
       description: venue.description,
@@ -231,7 +248,13 @@ export default function ManageVenues() {
       pricePerWeekend: venue.pricePerWeekend?.toString() || "",
       pricingModel: venue.pricingModel,
       amenities: venue.amenities || [],
-      active: venue.active
+      active: venue.active,
+      cep: addressData.cep || "",
+      rua: addressData.rua || "",
+      numero: addressData.numero || "",
+      bairro: addressData.bairro || "",
+      cidade: addressData.cidade || "",
+      estado: addressData.estado || ""
     });
     setIsCreateDialogOpen(true);
   };
@@ -423,34 +446,52 @@ export default function ManageVenues() {
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="pricePerHour">Preço por hora (R$)</Label>
-                  <Input
-                    id="pricePerHour"
-                    type="number"
-                    value={formData.pricePerHour}
-                    onChange={(e) => setFormData({ ...formData, pricePerHour: e.target.value })}
-                    placeholder="0.00"
-                  />
+                  <Label htmlFor="pricePerHour">Preço por hora</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                    <Input
+                      id="pricePerHour"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.pricePerHour}
+                      onChange={(e) => setFormData({ ...formData, pricePerHour: e.target.value })}
+                      placeholder="0,00"
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <Label htmlFor="pricePerDay">Preço por dia (R$)</Label>
-                  <Input
-                    id="pricePerDay"
-                    type="number"
-                    value={formData.pricePerDay}
-                    onChange={(e) => setFormData({ ...formData, pricePerDay: e.target.value })}
-                    placeholder="0.00"
-                  />
+                  <Label htmlFor="pricePerDay">Preço por dia</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                    <Input
+                      id="pricePerDay"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.pricePerDay}
+                      onChange={(e) => setFormData({ ...formData, pricePerDay: e.target.value })}
+                      placeholder="0,00"
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <Label htmlFor="pricePerWeekend">Preço fim de semana (R$)</Label>
-                  <Input
-                    id="pricePerWeekend"
-                    type="number"
-                    value={formData.pricePerWeekend}
-                    onChange={(e) => setFormData({ ...formData, pricePerWeekend: e.target.value })}
-                    placeholder="0.00"
-                  />
+                  <Label htmlFor="pricePerWeekend">Preço fim de semana</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                    <Input
+                      id="pricePerWeekend"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.pricePerWeekend}
+                      onChange={(e) => setFormData({ ...formData, pricePerWeekend: e.target.value })}
+                      placeholder="0,00"
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
               </div>
 

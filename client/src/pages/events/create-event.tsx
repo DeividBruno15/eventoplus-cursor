@@ -40,14 +40,42 @@ const createEventSchema = z.object({
 type CreateEventForm = z.infer<typeof createEventSchema>;
 
 const serviceTypes = [
+  // Entretenimento
+  "DJ/Som",
+  "Banda/Música ao vivo",
+  "Animadores",
   "Fotógrafo",
-  "Videomaker", 
-  "DJ",
-  "Banda",
-  "Decoração",
-  "Buffet",
+  "Videomaker",
+  "Mágico",
+  "Palhaço",
+  // Alimentação
+  "Buffet completo",
+  "Serviço de garçons",
+  "Bartender",
+  "Coffee break",
+  "Doces e sobremesas",
+  "Churrasco",
+  "Food truck",
+  // Organização
   "Cerimonialista",
+  "Wedding planner",
+  "Coordenação geral",
+  "Recepcionistas",
   "Segurança",
+  "Manobrista",
+  "Tradução simultânea",
+  // Produção
+  "Decoração",
+  "Floricultura",
+  "Cenografia",
+  "Iluminação",
+  "Estruturas (tendas/palcos)",
+  "Mobiliário",
+  "Equipamentos audiovisuais",
+  // Limpeza
+  "Limpeza pré-evento",
+  "Limpeza pós-evento",
+  "Manutenção durante evento",
   "Limpeza",
   "Transporte",
   "Floricultura",
@@ -453,14 +481,19 @@ export default function CreateEvent() {
                 name="totalBudget"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Orçamento Total do Evento (R$)</FormLabel>
+                    <FormLabel>Orçamento Total do Evento</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="15000.00"
-                        {...field}
-                      />
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          placeholder="15.000,00"
+                          className="pl-10"
+                          {...field}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
