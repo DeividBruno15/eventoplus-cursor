@@ -139,12 +139,13 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 - **3-Step Registration Flow**: Complete redesign based on reference images with user type selection, personal/business data, and service type selection
 - **Person Type Selection**: Added física/jurídica options for Contratantes and Anunciantes with appropriate field validation
 - **CPF/CNPJ Validation**: Real-time validation with visual feedback and proper formatting masks
-- **Password Strength Validation**: Visual strength indicator with requirements checklist matching reference design
-- **CEP API Integration**: Automatic address completion using ViaCEP API across all forms
+- **Password Strength Validation**: Visual strength indicator with Portuguese requirements ("Pelo menos 8 caracteres", "Pelo menos 1 letra maiúscula", "Pelo menos 1 número")
+- **CEP Address System**: Complete integration with ViaCEP API for automatic address population with separate fields (Rua, Número, Bairro, Cidade, Estado)
 - **Profile Image Upload**: Fixed saving and preview stretching issues with proper database persistence
 - **Authentication Performance**: Optimized with user caching (5-minute TTL) for faster login/logout
 - **Logout Redirect Fix**: Proper redirection to login page after logout
-- **Service Type Selection**: Prestadores can select up to 3 services, specific service options per user type
+- **5-Niche Service Selection**: Prestadores select from 5 service categories (Entretenimento, Alimentação, Organização, Produção, Limpeza) with 33 specific services total
+- **Custom Service Icons**: Implemented SVG icons matching brand colors (#3C5BFA) for all service categories
 
 ### June 17, 2025 - Venue Management Enhancements
 - **Venue Availability Calendar**: System for anunciantes to manage venue availability by date
