@@ -23,6 +23,7 @@ import CreateEvent from "@/pages/events/create-event";
 import EventDetail from "@/pages/events/event-detail";
 import EventDetails from "@/pages/events/event-details";
 import ManageServices from "@/pages/services/manage-services";
+import CreateService from "@/pages/services/create-service";
 import ManageVenues from "@/pages/venues/manage-venues";
 import ManageSubscription from "@/pages/subscription/manage-subscription";
 import Chat from "@/pages/chat/chat";

@@ -215,7 +215,7 @@ export default function EventDetail() {
                     <Label className="text-sm font-medium text-gray-500">Participantes</Label>
                     <div className="flex items-center gap-1">
                       <Users className="h-4 w-4" />
-                      <span>{event.expectedAttendees} pessoas esperadas</span>
+                      <span>{event.guestCount} pessoas esperadas</span>
                     </div>
                   </div>
                 </div>
@@ -322,7 +322,7 @@ export default function EventDetail() {
                                 <div className="flex items-center gap-4 text-sm">
                                   <div className="flex items-center gap-1">
                                     <DollarSign className="h-3 w-3" />
-                                    <span className="font-medium">R$ {application.proposedPrice?.toLocaleString('pt-BR')}</span>
+                                    <span className="font-medium">R$ {parseFloat(application.price)?.toLocaleString('pt-BR')}</span>
                                   </div>
                                   <span className="text-gray-500">
                                     {new Date(application.createdAt).toLocaleDateString('pt-BR')}
