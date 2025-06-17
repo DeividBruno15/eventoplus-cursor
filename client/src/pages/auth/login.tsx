@@ -38,23 +38,39 @@ export default function Login() {
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     try {
-      await login(data.email, data.password);
+      const result = await login(data.email, data.password);
       
-      // Aguarda um momento para garantir que o estado foi atualizado
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo de volta ao Evento+",
-      });
-      
-      // Força o redirecionamento
-      window.location.href = "/dashboard";
-      
+      if (result.success) {
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Bem-vindo de volta ao Evento+",
+        });
+        
+        setTimeout(() => {
+          setLocation("/dashboard");
+        }, 1000);
+      } else {
+        // Tratamento específico de erros
+        let errorMessage = "Erro ao fazer login. Tente novamente.";
+        
+        if (result.error?.includes("não encontrado") || result.error?.includes("not found")) {
+          errorMessage = "Email não cadastrado. Verifique o email ou registre-se.";
+        } else if (result.error?.includes("senha") || result.error?.includes("password") || result.error?.includes("Credenciais")) {
+          errorMessage = "Senha incorreta. Tente novamente.";
+        } else if (result.error?.includes("muitas tentativas") || result.error?.includes("many attempts")) {
+          errorMessage = "Muitas tentativas de login. Tente novamente em alguns minutos.";
+        }
+        
+        toast({
+          title: "Erro no login",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     } catch (error: any) {
       toast({
-        title: "Erro no login",
-        description: error.message || "Credenciais inválidas",
+        title: "Erro de conexão",
+        description: "Verifique sua internet e tente novamente.",
         variant: "destructive",
       });
     } finally {
