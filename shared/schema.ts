@@ -8,6 +8,12 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   userType: varchar("user_type", { length: 20 }).notNull(), // prestador, contratante, anunciante
+  profileImage: text("profile_image"),
+  phone: text("phone"),
+  address: text("address"),
+  zipCode: text("zip_code"),
+  city: text("city"),
+  state: text("state"),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   planType: varchar("plan_type", { length: 20 }).default("free"), // free, professional, premium

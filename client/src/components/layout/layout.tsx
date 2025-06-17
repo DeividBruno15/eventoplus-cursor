@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import Sidebar from "./sidebar";
-import Topbar from "./topbar";
-import Header from "./header";
+import Sidebar from "./sidebar-new";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,8 +18,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar collapsed={sidebarCollapsed} onToggle={setSidebarCollapsed} />
-      <Topbar sidebarCollapsed={sidebarCollapsed} />
-      <main className={`pt-16 transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+      <main className={`transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
         <div className="p-6">
           {children}
         </div>

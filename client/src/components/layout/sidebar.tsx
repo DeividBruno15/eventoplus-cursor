@@ -1,9 +1,16 @@
 
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { 
   Home, 
   Calendar, 
@@ -19,7 +26,15 @@ import {
   ChevronRight,
   Star,
   CreditCard,
-  Plus
+  Plus,
+  User,
+  ChevronDown,
+  Camera,
+  RefreshCw,
+  Search,
+  ShoppingCart,
+  FileText,
+  Shield
 } from "lucide-react";
 
 interface SidebarProps {
