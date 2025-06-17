@@ -56,16 +56,21 @@ export default function Chat() {
   // Fetch contacts
   const { data: contacts } = useQuery({
     queryKey: ['/api/chat/contacts'],
-    queryFn: () => apiRequest('/api/chat/contacts').then(res => res.json()),
+    queryFn: async () => {
+      const response = await apiRequest("GET", '/api/chat/contacts');
+      return await response.json();
+    },
     enabled: !!user
   });
 
   // Fetch messages for selected contact
   const { data: messages, isLoading: messagesLoading } = useQuery({
     queryKey: ['/api/chat/messages', selectedContact?.id],
-    queryFn: () => selectedContact 
-      ? apiRequest(`/api/chat/messages?contactId=${selectedContact.id}`).then(res => res.json())
-      : [],
+    queryFn: async () => {
+      if (!selectedContact) return [];
+      const response = await apiRequest("GET", `/api/chat/messages?contactId=${selectedContact.id}`);
+      return await response.json();
+    },
     enabled: !!selectedContact && !!user
   });
 

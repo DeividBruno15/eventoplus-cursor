@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import Stripe from "stripe";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import passport from "passport";
@@ -522,6 +523,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Profile image upload error:", error);
       res.status(500).json({ message: "Erro ao atualizar imagem de perfil: " + error.message });
+    }
+  });
+
+  // Mobile Authentication Routes
+  app.post("/api/mobile/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user || !bcrypt.compareSync(password, user.password)) {
+        return res.status(401).json({ message: "Credenciais inválidas" });
+      }
+
+      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'default-secret', { expiresIn: '7d' });
+      
+      res.json({ 
+        user: { ...user, password: undefined }, 
+        token 
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/mobile/register", async (req, res) => {
+    try {
+      const { username, email, password, userType, firstName, lastName } = req.body;
+      
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "Email já está em uso" });
+      }
+
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      const newUser = await storage.createUser({
+        username,
+        email,
+        password: hashedPassword,
+        userType,
+        firstName,
+        lastName
+      });
+
+      const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET || 'default-secret', { expiresIn: '7d' });
+      
+      res.json({ 
+        user: { ...newUser, password: undefined }, 
+        token 
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/mobile/address/:cep", async (req, res) => {
+    try {
+      const { cep } = req.params;
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+      res.json(data);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   });
 
