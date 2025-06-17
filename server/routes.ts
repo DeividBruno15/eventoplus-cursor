@@ -1254,7 +1254,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         category: service.category,
         rating: 4.5, // Would calculate from reviews in real implementation
         location: service.location,
-        priceRange: `${service.price || 0}-${service.price || 999999}`
+        priceRange: `${service.basePrice || 0}-${service.maxPrice || service.basePrice || 999999}`
       }));
 
       res.json({ services: publicServices });
