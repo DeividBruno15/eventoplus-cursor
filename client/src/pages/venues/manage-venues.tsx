@@ -218,9 +218,9 @@ export default function ManageVenues() {
       location: formData.location,
       category: formData.category,
       capacity: parseInt(formData.capacity),
-      pricePerHour: formData.pricePerHour ? parseFloat(formData.pricePerHour) : null,
-      pricePerDay: formData.pricePerDay ? parseFloat(formData.pricePerDay) : null,
-      pricePerWeekend: formData.pricePerWeekend ? parseFloat(formData.pricePerWeekend) : null,
+      pricePerHour: formData.pricePerHour ? parseFloat(formData.pricePerHour.replace(',', '.')) : null,
+      pricePerDay: formData.pricePerDay ? parseFloat(formData.pricePerDay.replace(',', '.')) : null,
+      pricePerWeekend: formData.pricePerWeekend ? parseFloat(formData.pricePerWeekend.replace(',', '.')) : null,
       pricingModel: formData.pricingModel,
       amenities: formData.amenities,
       active: formData.active,
@@ -451,11 +451,14 @@ export default function ManageVenues() {
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
                     <Input
                       id="pricePerHour"
-                      type="number"
-                      step="0.01"
-                      min="0"
+                      type="text"
                       value={formData.pricePerHour}
-                      onChange={(e) => setFormData({ ...formData, pricePerHour: e.target.value })}
+                      onChange={(e) => {
+                        let value = e.target.value.replace(/\D/g, '');
+                        value = (parseFloat(value) / 100).toFixed(2).replace('.', ',');
+                        if (value === '0,00') value = '';
+                        setFormData({ ...formData, pricePerHour: value });
+                      }}
                       placeholder="0,00"
                       className="pl-10"
                     />
@@ -467,11 +470,14 @@ export default function ManageVenues() {
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
                     <Input
                       id="pricePerDay"
-                      type="number"
-                      step="0.01"
-                      min="0"
+                      type="text"
                       value={formData.pricePerDay}
-                      onChange={(e) => setFormData({ ...formData, pricePerDay: e.target.value })}
+                      onChange={(e) => {
+                        let value = e.target.value.replace(/\D/g, '');
+                        value = (parseFloat(value) / 100).toFixed(2).replace('.', ',');
+                        if (value === '0,00') value = '';
+                        setFormData({ ...formData, pricePerDay: value });
+                      }}
                       placeholder="0,00"
                       className="pl-10"
                     />
@@ -483,11 +489,14 @@ export default function ManageVenues() {
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
                     <Input
                       id="pricePerWeekend"
-                      type="number"
-                      step="0.01"
-                      min="0"
+                      type="text"
                       value={formData.pricePerWeekend}
-                      onChange={(e) => setFormData({ ...formData, pricePerWeekend: e.target.value })}
+                      onChange={(e) => {
+                        let value = e.target.value.replace(/\D/g, '');
+                        value = (parseFloat(value) / 100).toFixed(2).replace('.', ',');
+                        if (value === '0,00') value = '';
+                        setFormData({ ...formData, pricePerWeekend: value });
+                      }}
                       placeholder="0,00"
                       className="pl-10"
                     />

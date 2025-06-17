@@ -316,14 +316,14 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
             
             return (
               <Link key={item.href} href={item.href}>
-                <a className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                <div className={`flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer ${
                   isActive 
                     ? "bg-[#3C5BFA] text-white" 
                     : "text-gray-600 hover:bg-gray-100"
                 } ${collapsed ? 'justify-center' : ''}`}>
                   <Icon className="h-5 w-5" />
                   {!collapsed && <span className="font-medium">{item.label}</span>}
-                </a>
+                </div>
               </Link>
             );
           })}
@@ -334,36 +334,36 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         {/* Bottom Section */}
         <div className="p-2 space-y-1">
           <Link href="/help-center">
-            <a className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+            <div className={`flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer ${
               location === "/help-center" 
                 ? "bg-[#3C5BFA] text-white" 
                 : "text-gray-600 hover:bg-gray-100"
             } ${collapsed ? 'justify-center' : ''}`}>
               <User className="h-5 w-5" />
               {!collapsed && <span>Central de Ajuda</span>}
-            </a>
+            </div>
           </Link>
           
           <Link href="/support">
-            <a className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+            <div className={`flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer ${
               location === "/support" 
                 ? "bg-[#3C5BFA] text-white" 
                 : "text-gray-600 hover:bg-gray-100"
             } ${collapsed ? 'justify-center' : ''}`}>
               <MessageSquare className="h-5 w-5" />
               {!collapsed && <span>Suporte</span>}
-            </a>
+            </div>
           </Link>
           
           <Link href="/settings">
-            <a className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+            <div className={`flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer ${
               location === "/settings" 
                 ? "bg-[#3C5BFA] text-white" 
                 : "text-gray-600 hover:bg-gray-100"
             } ${collapsed ? 'justify-center' : ''}`}>
               <Settings className="h-5 w-5" />
               {!collapsed && <span>Configurações</span>}
-            </a>
+            </div>
           </Link>
           
           <Button
