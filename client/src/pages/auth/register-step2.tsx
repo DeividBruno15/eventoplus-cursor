@@ -26,11 +26,11 @@ const registerStep2Schema = z.object({
   confirmPassword: z.string(),
   phone: z.string().min(10, "Telefone deve ter pelo menos 10 dígitos"),
   zipCode: z.string().min(8, "CEP deve ter 8 dígitos"),
-  street: z.string().min(1, "Rua é obrigatória"),
-  number: z.string().min(1, "Número é obrigatório"),
-  neighborhood: z.string().min(1, "Bairro é obrigatório"),
-  city: z.string().min(1, "Cidade é obrigatória"),
-  state: z.string().min(1, "Estado é obrigatório"),
+  street: z.string().optional(),
+  number: z.string().optional(),
+  neighborhood: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Senhas não conferem",
   path: ["confirmPassword"],
@@ -38,7 +38,11 @@ const registerStep2Schema = z.object({
   if (data.personType === "fisica") {
     return data.firstName && data.lastName && data.cpf && data.birthDate;
   }
-  return data.companyName && data.cnpj;
+  if (data.personType === "juridica") {
+    return data.companyName && data.cnpj;
+  }
+  // For prestador users who don't have personType selection
+  return true;
 }, {
   message: "Preencha todos os campos obrigatórios",
   path: ["personType"],
@@ -107,6 +111,10 @@ export default function RegisterStep2() {
   };
 
   const handleContinue = (data: RegisterStep2Form) => {
+    console.log("Form submitted with data:", data);
+    console.log("User type:", userType);
+    console.log("Address data:", addressData);
+    
     const registrationData = {
       userType,
       ...data,
@@ -114,6 +122,7 @@ export default function RegisterStep2() {
     };
     
     localStorage.setItem("registrationData", JSON.stringify(registrationData));
+    console.log("Navigating to step 3...");
     setLocation(`/auth/register-step3?userType=${userType}`);
   };
 
@@ -165,7 +174,9 @@ export default function RegisterStep2() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleContinue)} className="space-y-6">
+              <form onSubmit={form.handleSubmit(handleContinue, (errors) => {
+                console.log("Form validation errors:", errors);
+              })} className="space-y-6">
                 {/* Person Type Selection */}
                 {showPersonTypeSelection && (
                   <FormField
@@ -458,6 +469,12 @@ export default function RegisterStep2() {
                     type="submit"
                     disabled={!isPasswordValid}
                     className="bg-blue-600 hover:bg-blue-700"
+                    onClick={() => {
+                      console.log("Continuar button clicked");
+                      console.log("Password valid:", isPasswordValid);
+                      console.log("Form state:", form.formState);
+                      console.log("Form errors:", form.formState.errors);
+                    }}
                   >
                     Continuar
                   </Button>
