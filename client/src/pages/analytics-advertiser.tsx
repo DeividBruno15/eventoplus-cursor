@@ -45,7 +45,7 @@ export default function AdvertiserAnalytics() {
   ];
 
   // Venue performance
-  const venuePerformance = venues.map((venue: any) => ({
+  const venuePerformance = (venues as any[] || []).map((venue: any, index: number) => ({
     name: venue.name,
     reservations: Math.floor(Math.random() * 20) + 1,
     revenue: Math.floor(Math.random() * 5000) + 1000,

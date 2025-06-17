@@ -9,6 +9,9 @@ import connectPgSimple from "connect-pg-simple";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import speakeasy from "speakeasy";
+import qrcode from "qrcode";
+import crypto from "crypto";
 import { storage } from "./storage";
 import { 
   insertEventSchema, 
@@ -992,6 +995,181 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const notificationId = parseInt(req.params.id);
       // Note: We would need to add deleteNotification method to storage
       res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // 2FA Routes
+  app.get("/api/user/2fa-status", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const user = req.user as any;
+      const is2FAEnabled = user.twoFactorEnabled || false;
+      
+      res.json({
+        enabled: is2FAEnabled,
+        backupCodes: user.backupCodes || []
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/user/2fa-setup", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const user = req.user as any;
+      const secret = speakeasy.generateSecret({
+        name: `Evento+ (${user.email})`,
+        issuer: "Evento+",
+        length: 32
+      });
+
+      // Generate QR code
+      const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url!);
+
+      // Store temporary secret in user record (not enabled yet)
+      await storage.updateUser2FA(user.id, {
+        secret: secret.base32
+      });
+
+      res.json({
+        secret: secret.base32,
+        qrCode: qrCodeUrl,
+        manualEntryKey: secret.base32
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/user/2fa-verify", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const { code } = req.body;
+      const user = req.user as any;
+
+      if (!user.twoFactorSecret) {
+        return res.status(400).json({ message: "2FA não configurado" });
+      }
+
+      const verified = speakeasy.totp.verify({
+        secret: user.twoFactorSecret,
+        encoding: 'base32',
+        token: code,
+        window: 2
+      });
+
+      if (!verified) {
+        return res.status(400).json({ message: "Código inválido" });
+      }
+
+      // Generate backup codes
+      const backupCodes = Array.from({ length: 10 }, () => 
+        crypto.randomBytes(4).toString('hex').toUpperCase()
+      );
+
+      // Enable 2FA and save backup codes
+      await storage.updateUser2FA(user.id, {
+        enabled: true,
+        secret: user.twoFactorSecret,
+        backupCodes,
+        lastUsed: new Date()
+      });
+
+      res.json({ 
+        success: true,
+        backupCodes 
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/user/2fa-disable", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const { code } = req.body;
+      const user = req.user as any;
+
+      if (!user.twoFactorEnabled) {
+        return res.status(400).json({ message: "2FA não está ativado" });
+      }
+
+      // Verify with either TOTP code or backup code
+      let verified = false;
+
+      if (user.twoFactorSecret) {
+        verified = speakeasy.totp.verify({
+          secret: user.twoFactorSecret,
+          encoding: 'base32',
+          token: code,
+          window: 2
+        });
+      }
+
+      // Check backup codes if TOTP failed
+      if (!verified && user.backupCodes && user.backupCodes.includes(code.toUpperCase())) {
+        verified = true;
+        // Remove used backup code
+        const updatedBackupCodes = user.backupCodes.filter((c: string) => c !== code.toUpperCase());
+        await storage.updateUser2FA(user.id, {
+          backupCodes: updatedBackupCodes
+        });
+      }
+
+      if (!verified) {
+        return res.status(400).json({ message: "Código inválido" });
+      }
+
+      // Disable 2FA
+      await storage.updateUser2FA(user.id, {
+        enabled: false,
+        secret: null,
+        backupCodes: []
+      });
+
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/user/2fa-backup-codes", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const user = req.user as any;
+
+      if (!user.twoFactorEnabled) {
+        return res.status(400).json({ message: "2FA não está ativado" });
+      }
+
+      // Generate new backup codes
+      const backupCodes = Array.from({ length: 10 }, () => 
+        crypto.randomBytes(4).toString('hex').toUpperCase()
+      );
+
+      await storage.updateUser2FA(user.id, {
+        backupCodes
+      });
+
+      res.json({ backupCodes });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
