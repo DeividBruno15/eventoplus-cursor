@@ -1,5 +1,6 @@
 import { Calendar } from "lucide-react";
 import { Link } from "wouter";
+import eventoLogo from "@assets/logo evennto_1750165135991.png";
 
 export default function Footer() {
   return (
@@ -7,11 +8,12 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="w-8 h-8 gradient-hero rounded-lg flex items-center justify-center">
-                <Calendar className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-xl font-bold">Evento+</span>
+            <div className="flex items-center mb-6">
+              <img 
+                src={eventoLogo} 
+                alt="Evento+"
+                className="h-10 object-contain"
+              />
             </div>
             <p className="text-gray-400 mb-6">
               A plataforma completa para conectar organizadores com prestadores de serviços e espaços para eventos únicos.

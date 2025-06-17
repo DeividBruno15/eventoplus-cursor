@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import eventoLogo from "@assets/logo evennto_1750165135991.png";
 import { 
   Home, 
   Calendar, 
@@ -183,7 +184,11 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <div className="flex items-center justify-between">
             {!collapsed && (
               <div className="flex items-center gap-2">
-                <div className="text-xl font-bold text-[#3C5BFA]">Evento+</div>
+                <img 
+                  src={eventoLogo} 
+                  alt="Evento+"
+                  className="h-8 object-contain"
+                />
               </div>
             )}
             <Button

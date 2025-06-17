@@ -3,6 +3,7 @@ import { Calendar, Menu, MessageCircle, BarChart3, Building, Users, CalendarDays
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import NotificationCenter from "@/components/notifications/notification-center";
+import eventoLogo from "@assets/logo evennto_1750165135991.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,11 +20,12 @@ export default function Header() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-4">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 gradient-hero rounded-lg flex items-center justify-center">
-                <Calendar className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-xl font-bold text-black">Evento+</span>
+            <Link href="/" className="flex items-center">
+              <img 
+                src={eventoLogo} 
+                alt="Evento+"
+                className="h-8 object-contain"
+              />
             </Link>
           </div>
           
