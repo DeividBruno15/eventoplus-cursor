@@ -45,7 +45,7 @@ export default function HomeClickMax() {
               </Link>
               <Button variant="outline" size="lg" className="px-8 py-4 text-lg font-semibold rounded-xl border-2 hover:bg-gray-50">
                 <Play className="mr-2 h-5 w-5" />
-                Assistir demo
+                Baixar App
               </Button>
             </div>
             
@@ -483,8 +483,13 @@ export default function HomeClickMax() {
                 <h3 className="text-lg font-bold text-gray-900 mb-2">Espaços Únicos</h3>
                 <p className="text-gray-600 text-sm">Encontre o local perfeito para seu evento</p>
                 <div className="mt-4">
-                  <div className="bg-gray-100 rounded-lg h-20 flex items-center justify-center">
-                    <span className="text-gray-500 text-xs">Vista do Salão Premium</span>
+                  <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-3 border border-yellow-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-medium text-orange-600">🏆 #1 Ranking</span>
+                      <span className="text-xs text-gray-500">Premium</span>
+                    </div>
+                    <div className="text-sm font-medium text-gray-900">Salão Crystal Garden</div>
+                    <div className="text-xs text-gray-600">Primeiro lugar em avaliações</div>
                   </div>
                 </div>
               </div>
@@ -623,6 +628,10 @@ export default function HomeClickMax() {
                       <ul className="space-y-3 mb-8 text-left">
                         <li className="flex items-center">
                           <CheckCircle className="h-4 w-4 text-green-500 mr-3 flex-shrink-0" />
+                          <span className="text-gray-700 text-sm">1 candidatura</span>
+                        </li>
+                        <li className="flex items-center">
+                          <CheckCircle className="h-4 w-4 text-green-500 mr-3 flex-shrink-0" />
                           <span className="text-gray-700 text-sm">Perfil público básico</span>
                         </li>
                         <li className="flex items-center">
@@ -636,7 +645,7 @@ export default function HomeClickMax() {
                       </ul>
                       
                       <Link href="/auth/register">
-                        <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-lg font-semibold transition-all">
+                        <Button className="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold transition-all">
                           Começar Grátis
                         </Button>
                       </Link>
@@ -664,7 +673,11 @@ export default function HomeClickMax() {
                       <ul className="space-y-3 mb-8 text-left">
                         <li className="flex items-center">
                           <CheckCircle className="h-4 w-4 text-green-500 mr-3 flex-shrink-0" />
-                          <span className="text-gray-700 text-sm">Até 5 serviços ativos</span>
+                          <span className="text-gray-700 text-sm">5 candidaturas</span>
+                        </li>
+                        <li className="flex items-center">
+                          <CheckCircle className="h-4 w-4 text-green-500 mr-3 flex-shrink-0" />
+                          <span className="text-gray-700 text-sm">3 divulgações de serviços</span>
                         </li>
                         <li className="flex items-center">
                           <CheckCircle className="h-4 w-4 text-green-500 mr-3 flex-shrink-0" />
@@ -702,7 +715,11 @@ export default function HomeClickMax() {
                       <ul className="space-y-3 mb-8 text-left">
                         <li className="flex items-center">
                           <CheckCircle className="h-4 w-4 text-green-500 mr-3 flex-shrink-0" />
-                          <span className="text-gray-700 text-sm">Serviços ilimitados</span>
+                          <span className="text-gray-700 text-sm">Candidaturas ilimitadas</span>
+                        </li>
+                        <li className="flex items-center">
+                          <CheckCircle className="h-4 w-4 text-green-500 mr-3 flex-shrink-0" />
+                          <span className="text-gray-700 text-sm">Divulgações de serviços ilimitadas</span>
                         </li>
                         <li className="flex items-center">
                           <CheckCircle className="h-4 w-4 text-green-500 mr-3 flex-shrink-0" />
