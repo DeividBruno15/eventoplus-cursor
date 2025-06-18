@@ -48,6 +48,7 @@ import AuthGuard from "@/components/auth/auth-guard";
 import NotFound from "@/pages/not-found";
 import Providers from "@/pages/providers";
 import Bookings from "@/pages/bookings";
+import PixPayment from "@/pages/pix-payment";
 import OfflinePage from "@/pages/offline";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -244,6 +245,14 @@ function Router() {
         <Layout>
           <AuthGuard>
             <Subscribe />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/pix-payment">
+        <Layout>
+          <AuthGuard>
+            <PixPayment />
           </AuthGuard>
         </Layout>
       </Route>
