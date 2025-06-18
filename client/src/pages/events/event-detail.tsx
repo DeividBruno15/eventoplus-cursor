@@ -43,7 +43,7 @@ export default function EventDetail() {
     mutationFn: async ({ proposal, proposedPrice }: { proposal: string; proposedPrice: number }) => {
       return apiRequest("POST", `/api/events/${eventId}/apply`, {
         proposal,
-        proposedPrice
+        price: proposedPrice // Fix field name mismatch
       });
     },
     onSuccess: () => {

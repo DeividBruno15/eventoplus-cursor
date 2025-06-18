@@ -422,6 +422,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Apply to specific event - MISSING ENDPOINT FIX
+  app.post("/api/events/:id/apply", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const eventId = parseInt(req.params.id);
+      const userId = (req.user as any).id;
+      
+      const applicationData = {
+        eventId,
+        providerId: userId,
+        proposal: req.body.proposal,
+        price: req.body.price.toString(), // Convert to string for database
+        estimatedHours: req.body.estimatedHours ? parseInt(req.body.estimatedHours) : null,
+        availableDate: req.body.availableDate || null,
+        portfolio: req.body.portfolio || null,
+        status: "pending"
+      };
+
+      const application = await storage.createEventApplication(applicationData);
+      res.status(201).json(application);
+    } catch (error: any) {
+      console.error('Event application error:', error);
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   // Event Applications routes
   app.post("/api/event-applications", async (req, res) => {
     if (!req.isAuthenticated()) {
