@@ -247,14 +247,14 @@ export default function HomeClickMax() {
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <Badge className="mb-6 bg-blue-100 text-blue-800 px-4 py-2">
+            <Badge className="mb-6 bg-blue-100 text-blue-800 px-4 py-2 animate-bounce-in hover-lift">
               Recursos Poderosos
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 animate-fade-in-up animate-delay-200">
               Tudo que você precisa para o
-              <span className="block text-[#3C5BFA]">evento perfeito</span>
+              <span className="block text-[#3C5BFA] animate-gradient">evento perfeito</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in-up animate-delay-300">
               Uma plataforma completa que conecta organizadores, prestadores e espaços com eficiência e segurança
             </p>
           </div>
@@ -287,27 +287,27 @@ export default function HomeClickMax() {
               </CardContent>
             </Card>
             
-            {/* Feature 2 */}
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden">
+            {/* Feature 2 - Enhanced with Motion */}
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-500 group relative overflow-hidden hover-lift animate-fade-in-up animate-delay-300 will-change-transform">
               <CardContent className="p-8">
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-[#FFA94D] transition-colors">
-                  <Users className="h-6 w-6 text-[#FFA94D] group-hover:text-white" />
+                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-[#FFA94D] transition-all duration-300 animate-glow-orange">
+                  <Users className="h-6 w-6 text-[#FFA94D] group-hover:text-white transition-colors" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Rede de Prestadores Verificados</h3>
                 <p className="text-gray-600 mb-6">
                   Acesso aos melhores profissionais do mercado, todos verificados e avaliados pela nossa comunidade ativa.
                 </p>
                 <ul className="space-y-2">
-                  <li className="flex items-center text-sm text-gray-600">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                  <li className="flex items-center text-sm text-gray-600 animate-fade-in-left animate-delay-500">
+                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 animate-scale-pulse animate-delay-100" />
                     Perfis verificados
                   </li>
-                  <li className="flex items-center text-sm text-gray-600">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                  <li className="flex items-center text-sm text-gray-600 animate-fade-in-left animate-delay-700">
+                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 animate-scale-pulse animate-delay-200" />
                     Avaliações reais
                   </li>
-                  <li className="flex items-center text-sm text-gray-600">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                  <li className="flex items-center text-sm text-gray-600 animate-fade-in-left animate-delay-1000">
+                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 animate-scale-pulse animate-delay-300" />
                     Propostas competitivas
                   </li>
                 </ul>
@@ -573,29 +573,29 @@ export default function HomeClickMax() {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
-            <Badge className="mb-6 bg-[#3C5BFA]/10 text-[#3C5BFA] px-4 py-2 animate-fade-in">
+            <Badge className="mb-6 bg-[#3C5BFA]/10 text-[#3C5BFA] px-4 py-2 animate-bounce-in hover-lift">
               Planos e Preços
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 animate-fade-in-up">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 animate-fade-in-up animate-delay-200">
               Planos personalizados para
-              <span className="block text-[#3C5BFA]">cada tipo de usuário</span>
+              <span className="block text-[#3C5BFA] animate-gradient">cada tipo de usuário</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in-up">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in-up animate-delay-300">
               Escolha o plano ideal baseado no seu perfil profissional
             </p>
           </div>
           
-          {/* Tabs for User Types */}
-          <div className="flex justify-center mb-12">
-            <div className="bg-white rounded-xl p-2 shadow-lg border border-gray-100">
+          {/* Tabs for User Types with Motion */}
+          <div className="flex justify-center mb-12 animate-fade-in-up animate-delay-500">
+            <div className="bg-white rounded-xl p-2 shadow-lg border border-gray-100 hover-lift">
               <div className="grid grid-cols-3 gap-2">
-                <button className="px-6 py-3 rounded-lg bg-[#3C5BFA] text-white font-medium transition-all hover:bg-[#2A4AE8]">
+                <button className="px-6 py-3 rounded-lg bg-[#3C5BFA] text-white font-medium transition-all hover:bg-[#2A4AE8] btn-magnetic animate-glow">
                   Prestadores
                 </button>
-                <button className="px-6 py-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-all">
+                <button className="px-6 py-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-all hover-lift">
                   Contratantes
                 </button>
-                <button className="px-6 py-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-all">
+                <button className="px-6 py-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-all hover-lift">
                   Anunciantes
                 </button>
               </div>
@@ -605,15 +605,15 @@ export default function HomeClickMax() {
           {/* Prestadores Plans */}
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Essencial - Prestadores */}
-            <Card className="border-2 border-gray-200 hover:border-[#3C5BFA] transition-all duration-500 relative overflow-hidden group transform hover:scale-105 hover:shadow-2xl">
+            <Card className="border-2 border-gray-200 hover:border-[#3C5BFA] transition-all duration-500 relative overflow-hidden group transform hover:scale-105 hover:shadow-2xl animate-fade-in-up animate-delay-700 will-change-transform">
               <CardContent className="p-8">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-[#3C5BFA] transition-all duration-300">
-                    <Users className="w-8 h-8 text-gray-600 group-hover:text-white" />
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-[#3C5BFA] transition-all duration-300 animate-scale-pulse">
+                    <Users className="w-8 h-8 text-gray-600 group-hover:text-white transition-colors" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Essencial</h3>
                   <p className="text-gray-600 mb-6">Gratuito</p>
-                  <div className="mb-8">
+                  <div className="mb-8 animate-bounce-in animate-delay-1000">
                     <span className="text-4xl font-bold text-gray-900">R$ 0</span>
                     <span className="text-gray-600">/mês</span>
                   </div>
@@ -642,7 +642,7 @@ export default function HomeClickMax() {
                   </ul>
                   
                   <Link href="/auth/register">
-                    <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+                    <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 btn-magnetic hover-lift">
                       Começar Grátis
                     </Button>
                   </Link>
@@ -687,7 +687,7 @@ export default function HomeClickMax() {
                   </ul>
                   
                   <Link href="/auth/register">
-                    <Button className="w-full bg-[#3C5BFA] hover:bg-[#2A4AE8] text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+                    <Button className="w-full bg-[#3C5BFA] hover:bg-[#2A4AE8] text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 btn-magnetic hover-lift animate-glow">
                       Começar Teste Grátis
                     </Button>
                   </Link>
@@ -733,7 +733,7 @@ export default function HomeClickMax() {
                   </ul>
                   
                   <Link href="/auth/register">
-                    <Button className="w-full bg-[#FFA94D] hover:bg-[#E8941F] text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+                    <Button className="w-full bg-[#FFA94D] hover:bg-[#E8941F] text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 btn-magnetic hover-lift animate-glow-orange">
                       Assinar Premium
                     </Button>
                   </Link>
