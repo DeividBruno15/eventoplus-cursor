@@ -466,6 +466,13 @@ export default function HomeClickMax() {
             </Link>
           </div>
         </div>
+        
+        {/* Curved Separator */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg className="w-full h-16 text-gray-50" viewBox="0 0 1440 320" fill="currentColor">
+            <path d="M0,160L60,149.3C120,139,240,117,360,133.3C480,149,600,203,720,208C840,213,960,171,1080,144C1200,117,1320,107,1380,101.3L1440,96L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+          </svg>
+        </div>
       </section>
       
       {/* Pricing Section - ClickMax Style */}
@@ -521,7 +528,7 @@ export default function HomeClickMax() {
                   </ul>
                   
                   <Link href="/auth/register">
-                    <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-lg font-semibold">
+                    <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                       Começar Grátis
                     </Button>
                   </Link>
@@ -610,7 +617,7 @@ export default function HomeClickMax() {
                   </ul>
                   
                   <Link href="/contato">
-                    <Button variant="outline" className="w-full border-2 border-gray-300 hover:border-[#FFA94D] text-gray-900 hover:bg-[#FFA94D] hover:text-white py-3 rounded-lg font-semibold transition-all">
+                    <Button className="w-full bg-[#FFA94D] hover:bg-[#E8941F] text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                       Falar com Vendas
                     </Button>
                   </Link>
@@ -701,6 +708,13 @@ export default function HomeClickMax() {
               </p>
             </Card>
           </div>
+        </div>
+        
+        {/* Wave Separator */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg className="w-full h-20 text-[#3C5BFA]" viewBox="0 0 1440 320" fill="currentColor">
+            <path d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+          </svg>
         </div>
       </section>
       
