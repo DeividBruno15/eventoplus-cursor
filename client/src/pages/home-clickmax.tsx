@@ -11,84 +11,96 @@ export default function HomeClickMax() {
     <div className="min-h-screen bg-white">
       <HeaderClickMax />
       
-      {/* Hero Section - Exactly like ClickMax */}
+      {/* Hero Section - Enhanced with Dynamic Motion */}
       <section className="relative bg-gradient-to-b from-blue-50 to-white pt-20 pb-24 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-br from-[#3C5BFA]/10 to-transparent rounded-full blur-3xl animate-float-slow animate-morph"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-br from-[#FFA94D]/10 to-transparent rounded-full blur-3xl animate-float animate-delay-500"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-purple-100/20 to-transparent rounded-full blur-2xl animate-scale-pulse animate-delay-300"></div>
+          
+          {/* Floating Geometric Shapes */}
+          <div className="absolute top-32 right-1/4 w-16 h-16 bg-[#3C5BFA]/20 rounded-xl animate-float animate-rotate will-change-transform"></div>
+          <div className="absolute bottom-1/3 left-1/4 w-12 h-12 bg-[#FFA94D]/30 rounded-full animate-float-slow animate-delay-700"></div>
+          <div className="absolute top-2/3 right-1/3 w-8 h-8 bg-purple-400/25 rotate-45 animate-float animate-delay-1000"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            {/* Top Badge */}
-            <div className="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-8">
-              <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+            {/* Top Badge with Animation */}
+            <div className="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-8 animate-bounce-in animate-delay-200 hover-lift">
+              <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-scale-pulse"></span>
               Plataforma #1 em Eventos no Brasil
             </div>
             
-            {/* Main Headline */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-6">
+            {/* Main Headline with Staggered Animation */}
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-6 animate-fade-in-up animate-delay-300">
               Conectamos você ao
-              <span className="block text-[#3C5BFA]">evento perfeito</span>
+              <span className="block text-[#3C5BFA] animate-gradient will-change-transform">evento perfeito</span>
             </h1>
             
-            {/* Subtitle */}
-            <p className="text-xl md:text-2xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto">
+            {/* Subtitle with Delayed Animation */}
+            <p className="text-xl md:text-2xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto animate-fade-in-up animate-delay-500">
               Organizadores de eventos, prestadores de serviços e donos de espaços unidos em uma única plataforma. 
               Transforme sua ideia em realidade.
             </p>
             
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+            {/* CTA Buttons with Enhanced Interactions */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-fade-in-up animate-delay-700">
               <Link href="/auth/register">
-                <Button size="lg" className="bg-[#3C5BFA] hover:bg-[#2A4AE8] text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all">
+                <Button size="lg" className="bg-[#3C5BFA] hover:bg-[#2A4AE8] text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all btn-magnetic hover-lift">
                   Comece gratuitamente
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Button variant="outline" size="lg" className="px-8 py-4 text-lg font-semibold rounded-xl border-2 hover:bg-gray-50">
+              <Button variant="outline" size="lg" className="px-8 py-4 text-lg font-semibold rounded-xl border-2 hover:bg-gray-50 hover-lift hover-glow">
                 <Play className="mr-2 h-5 w-5" />
                 Assistir demo
               </Button>
             </div>
             
-            {/* Social Proof */}
-            <div className="flex flex-col md:flex-row items-center justify-center gap-8 text-gray-600">
-              <div className="flex items-center">
+            {/* Social Proof with Animations */}
+            <div className="flex flex-col md:flex-row items-center justify-center gap-8 text-gray-600 animate-fade-in-up animate-delay-1000">
+              <div className="flex items-center hover-lift">
                 <div className="flex -space-x-2 mr-3">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white"></div>
-                  <div className="w-8 h-8 bg-green-500 rounded-full border-2 border-white"></div>
-                  <div className="w-8 h-8 bg-yellow-500 rounded-full border-2 border-white"></div>
-                  <div className="w-8 h-8 bg-red-500 rounded-full border-2 border-white"></div>
+                  <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white animate-scale-pulse animate-delay-100"></div>
+                  <div className="w-8 h-8 bg-green-500 rounded-full border-2 border-white animate-scale-pulse animate-delay-200"></div>
+                  <div className="w-8 h-8 bg-yellow-500 rounded-full border-2 border-white animate-scale-pulse animate-delay-300"></div>
+                  <div className="w-8 h-8 bg-red-500 rounded-full border-2 border-white animate-scale-pulse animate-delay-500"></div>
                 </div>
                 <span className="text-sm">+50,000 eventos realizados</span>
               </div>
               
-              <div className="flex items-center">
+              <div className="flex items-center hover-lift">
                 <div className="flex mr-2">
-                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 animate-scale-pulse animate-delay-100" />
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 animate-scale-pulse animate-delay-200" />
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 animate-scale-pulse animate-delay-300" />
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 animate-scale-pulse animate-delay-500" />
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 animate-scale-pulse animate-delay-700" />
                 </div>
                 <span className="text-sm">4.9/5 (2,847 avaliações)</span>
               </div>
             </div>
           </div>
           
-          {/* Dashboard Mockup */}
-          <div className="max-w-4xl mx-auto mt-16">
-            <div className="relative">
+          {/* Dashboard Mockup with Motion */}
+          <div className="max-w-4xl mx-auto mt-16 animate-slide-in-bottom animate-delay-1000">
+            <div className="relative hover-lift">
               {/* Browser Frame */}
               <div className="bg-gray-200 rounded-t-2xl p-3">
                 <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-red-500 rounded-full animate-scale-pulse animate-delay-100"></div>
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full animate-scale-pulse animate-delay-200"></div>
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-scale-pulse animate-delay-300"></div>
                   <div className="flex-1 bg-white rounded-lg mx-4 py-1 px-3">
                     <span className="text-gray-500 text-sm">evento.com.br/dashboard</span>
                   </div>
                 </div>
               </div>
               
-              {/* Dashboard Content - Glassmorphism */}
-              <div className="bg-gradient-to-br from-gray-900/80 via-blue-900/60 to-purple-900/80 backdrop-blur-xl border border-white/10 rounded-b-2xl shadow-2xl overflow-hidden">
+              {/* Dashboard Content - Enhanced Glassmorphism */}
+              <div className="bg-gradient-to-br from-gray-900/80 via-blue-900/60 to-purple-900/80 backdrop-blur-xl border border-white/10 rounded-b-2xl shadow-2xl overflow-hidden animate-glow">
                 {/* Dashboard Header */}
                 <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-sm p-6 border-b border-white/10">
                   <div className="flex items-center justify-between text-white">
@@ -248,27 +260,27 @@ export default function HomeClickMax() {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden">
+            {/* Feature 1 - Enhanced with Motion */}
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-500 group relative overflow-hidden hover-lift animate-fade-in-up animate-delay-200 will-change-transform">
               <CardContent className="p-8">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-[#3C5BFA] transition-colors">
-                  <Calendar className="h-6 w-6 text-[#3C5BFA] group-hover:text-white" />
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-[#3C5BFA] transition-all duration-300 animate-scale-pulse">
+                  <Calendar className="h-6 w-6 text-[#3C5BFA] group-hover:text-white transition-colors" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Gestão Completa de Eventos</h3>
                 <p className="text-gray-600 mb-6">
                   Organize todos os aspectos do seu evento em um só lugar. Do planejamento à execução, controle total na palma da sua mão.
                 </p>
                 <ul className="space-y-2">
-                  <li className="flex items-center text-sm text-gray-600">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                  <li className="flex items-center text-sm text-gray-600 animate-fade-in-left animate-delay-300">
+                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 animate-scale-pulse animate-delay-100" />
                     Cronograma detalhado
                   </li>
-                  <li className="flex items-center text-sm text-gray-600">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                  <li className="flex items-center text-sm text-gray-600 animate-fade-in-left animate-delay-500">
+                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 animate-scale-pulse animate-delay-200" />
                     Controle orçamentário
                   </li>
-                  <li className="flex items-center text-sm text-gray-600">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                  <li className="flex items-center text-sm text-gray-600 animate-fade-in-left animate-delay-700">
+                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 animate-scale-pulse animate-delay-300" />
                     Lista de convidados
                   </li>
                 </ul>
