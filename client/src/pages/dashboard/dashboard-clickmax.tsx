@@ -30,7 +30,7 @@ export default function DashboardClickMax() {
         return {
           title: "Dashboard do Prestador",
           subtitle: "Gerencie seus serviços e oportunidades",
-          greeting: `Olá, ${user.firstName || user.username}!`,
+          greeting: `Olá, ${user.username}!`,
           stats: [
             { 
               label: "Candidaturas Ativas", 
@@ -71,7 +71,7 @@ export default function DashboardClickMax() {
         return {
           title: "Dashboard do Organizador",
           subtitle: "Organize e gerencie seus eventos",
-          greeting: `Bem-vindo, ${user.firstName || user.username}!`,
+          greeting: `Bem-vindo, ${user.username}!`,
           stats: [
             { 
               label: "Eventos Ativos", 
@@ -112,7 +112,7 @@ export default function DashboardClickMax() {
         return {
           title: "Dashboard do Anunciante",
           subtitle: "Gerencie seus espaços e reservas",
-          greeting: `Olá, ${user.firstName || user.username}!`,
+          greeting: `Olá, ${user.username}!`,
           stats: [
             { 
               label: "Espaços Cadastrados", 
