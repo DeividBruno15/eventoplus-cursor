@@ -691,7 +691,7 @@ export default function HomeClickMax() {
                       
                       <Link href="/auth/register">
                         <Button className="w-full bg-[#3C5BFA] hover:bg-[#2A4AE8] text-white py-3 rounded-lg font-semibold transition-all">
-                          Começar Teste Grátis
+                          Começar agora
                         </Button>
                       </Link>
                     </div>
@@ -732,7 +732,7 @@ export default function HomeClickMax() {
                       </ul>
                       
                       <Link href="/auth/register">
-                        <Button className="w-full bg-[#FFA94D] hover:bg-[#E8941F] text-white py-3 rounded-lg font-semibold transition-all">
+                        <Button className="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold transition-all">
                           Assinar Premium
                         </Button>
                       </Link>
@@ -815,7 +815,7 @@ export default function HomeClickMax() {
                       
                       <Link href="/auth/register">
                         <Button className="w-full bg-[#3C5BFA] hover:bg-[#2A4AE8] text-white py-3 rounded-lg font-semibold transition-all">
-                          Começar Teste Grátis
+                          Começar agora
                         </Button>
                       </Link>
                     </div>
@@ -852,7 +852,7 @@ export default function HomeClickMax() {
                       
                       <Link href="/contato">
                         <Button className="w-full bg-[#FFA94D] hover:bg-[#E8941F] text-white py-3 rounded-lg font-semibold transition-all">
-                          Falar com Vendas
+                          Começar agora
                         </Button>
                       </Link>
                     </div>
@@ -934,7 +934,7 @@ export default function HomeClickMax() {
                       
                       <Link href="/auth/register">
                         <Button className="w-full bg-[#3C5BFA] hover:bg-[#2A4AE8] text-white py-3 rounded-lg font-semibold transition-all">
-                          Começar Teste Grátis
+                          Começar agora
                         </Button>
                       </Link>
                     </div>
@@ -1097,16 +1097,13 @@ export default function HomeClickMax() {
             Junte-se a mais de 75.000 organizadores, prestadores e donos de espaços que já escolheram a Evento+ para realizar eventos inesquecíveis.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <div className="flex justify-center mb-12">
             <Link href="/auth/register">
               <Button size="lg" className="bg-white text-[#3C5BFA] hover:bg-gray-100 px-12 py-4 text-lg font-semibold rounded-xl shadow-lg">
                 Começar Gratuitamente
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white/10 px-8 py-4 text-lg rounded-xl">
-              Falar com Especialista
-            </Button>
           </div>
           
           <div className="flex flex-col md:flex-row items-center justify-center gap-8 text-blue-100">
