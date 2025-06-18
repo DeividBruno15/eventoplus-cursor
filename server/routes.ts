@@ -13,6 +13,7 @@ import speakeasy from "speakeasy";
 import qrcode from "qrcode";
 import crypto from "crypto";
 import { storage } from "./storage";
+import { pixService } from "./pix";
 import { 
   insertEventSchema, 
   insertEventApplicationSchema, 
@@ -1438,6 +1439,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         success: true,
         message: "API key removida com sucesso"
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // PIX payment routes
+  app.post("/api/payments/pix/create", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const { amount, description, payerCpf, externalReference } = req.body;
+      const user = req.user as any;
+
+      const pixPayment = await pixService.createPixPayment({
+        amount: parseFloat(amount),
+        description: description || "Pagamento Evento+",
+        payerEmail: user.email,
+        payerName: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username,
+        payerCpf,
+        externalReference
+      });
+
+      res.json(pixPayment);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/payments/pix/:paymentId/status", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const { paymentId } = req.params;
+      const status = await pixService.getPaymentStatus(paymentId);
+      res.json(status);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/webhooks/mercadopago", webhookLimiter, async (req, res) => {
+    try {
+      await pixService.processWebhook(req.body);
+      res.status(200).json({ received: true });
+    } catch (error: any) {
+      console.error("Webhook error:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Advanced search system
+  app.get("/api/search/advanced", async (req, res) => {
+    try {
+      const { 
+        q, 
+        type = 'all',
+        category,
+        location,
+        minPrice,
+        maxPrice,
+        rating,
+        verified,
+        radius = 50,
+        lat,
+        lng,
+        sortBy = 'relevance',
+        page = 1,
+        limit = 20
+      } = req.query;
+
+      const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
+      const results: any = { events: [], services: [], venues: [], total: 0 };
+
+      // Search events
+      if (type === 'all' || type === 'events') {
+        const events = await storage.getEvents();
+        const filteredEvents = events.filter(event => {
+          if (q && !event.title.toLowerCase().includes((q as string).toLowerCase()) && 
+                  !event.description.toLowerCase().includes((q as string).toLowerCase())) return false;
+          if (category && event.category !== category) return false;
+          if (location && !event.location.toLowerCase().includes((location as string).toLowerCase())) return false;
+          if (minPrice && parseFloat(event.budget) < parseFloat(minPrice as string)) return false;
+          if (maxPrice && parseFloat(event.budget) > parseFloat(maxPrice as string)) return false;
+          return true;
+        });
+        
+        results.events = filteredEvents.slice(offset, offset + parseInt(limit as string));
+        results.total += filteredEvents.length;
+      }
+
+      // Search services
+      if (type === 'all' || type === 'services') {
+        const services = await storage.getServices();
+        const filteredServices = services.filter(service => {
+          if (q && !service.title.toLowerCase().includes((q as string).toLowerCase()) && 
+                  !service.description.toLowerCase().includes((q as string).toLowerCase())) return false;
+          if (category && service.category !== category) return false;
+          if (location && service.location && !service.location.toLowerCase().includes((location as string).toLowerCase())) return false;
+          if (minPrice && service.basePrice && parseFloat(service.basePrice) < parseFloat(minPrice as string)) return false;
+          if (maxPrice && service.basePrice && parseFloat(service.basePrice) > parseFloat(maxPrice as string)) return false;
+          if (rating && service.rating && parseFloat(service.rating) < parseFloat(rating as string)) return false;
+          return true;
+        });
+        
+        results.services = filteredServices.slice(offset, offset + parseInt(limit as string));
+        results.total += filteredServices.length;
+      }
+
+      // Search venues
+      if (type === 'all' || type === 'venues') {
+        const venues = await storage.getVenues();
+        const filteredVenues = venues.filter(venue => {
+          if (q && !venue.name.toLowerCase().includes((q as string).toLowerCase()) && 
+                  !venue.description.toLowerCase().includes((q as string).toLowerCase())) return false;
+          if (category && venue.venueType !== category) return false;
+          if (location && !venue.address.toLowerCase().includes((location as string).toLowerCase())) return false;
+          if (minPrice && venue.basePrice && parseFloat(venue.basePrice) < parseFloat(minPrice as string)) return false;
+          if (maxPrice && venue.basePrice && parseFloat(venue.basePrice) > parseFloat(maxPrice as string)) return false;
+          if (rating && venue.rating && parseFloat(venue.rating) < parseFloat(rating as string)) return false;
+          return true;
+        });
+        
+        results.venues = filteredVenues.slice(offset, offset + parseInt(limit as string));
+        results.total += filteredVenues.length;
+      }
+
+      // Sort results
+      if (sortBy === 'price_asc') {
+        results.services.sort((a: any, b: any) => parseFloat(a.basePrice || 0) - parseFloat(b.basePrice || 0));
+        results.venues.sort((a: any, b: any) => parseFloat(a.basePrice || 0) - parseFloat(b.basePrice || 0));
+      } else if (sortBy === 'price_desc') {
+        results.services.sort((a: any, b: any) => parseFloat(b.basePrice || 0) - parseFloat(a.basePrice || 0));
+        results.venues.sort((a: any, b: any) => parseFloat(b.basePrice || 0) - parseFloat(a.basePrice || 0));
+      } else if (sortBy === 'rating') {
+        results.services.sort((a: any, b: any) => parseFloat(b.rating || 0) - parseFloat(a.rating || 0));
+        results.venues.sort((a: any, b: any) => parseFloat(b.rating || 0) - parseFloat(a.rating || 0));
+      }
+
+      res.json({
+        ...results,
+        pagination: {
+          page: parseInt(page as string),
+          limit: parseInt(limit as string),
+          total: results.total,
+          pages: Math.ceil(results.total / parseInt(limit as string))
+        },
+        filters: { q, type, category, location, minPrice, maxPrice, rating, sortBy }
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
