@@ -5,7 +5,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import Layout from "@/components/layout/layout";
 
 // Public Pages
-import Home from "@/pages/home-clean";
+import Home from "@/pages/home";
 import Login from "@/pages/auth/login";
 import RegisterStep1 from "@/pages/auth/register-step1";
 import RegisterStep2 from "@/pages/auth/register-step2";

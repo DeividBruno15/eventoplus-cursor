@@ -244,7 +244,7 @@ export default function PricingTabs() {
               ))}
             </ul>
 
-            <Link href={plan.price === "R$ 0" ? "/register" : "/subscribe"}>
+            <Link href={plan.price === "R$ 0" ? "/auth/register" : "/auth/login"}>
               <Button
                 className={`w-full py-3 font-medium transition-colors ${
                   plan.variant === "default"
