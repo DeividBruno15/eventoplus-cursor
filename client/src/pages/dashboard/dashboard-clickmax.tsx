@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { Calendar, Users, MapPin, TrendingUp, Plus, ArrowRight, Building, Star, Zap, Target } from "lucide-react";
+import { Calendar, Users, MapPin, TrendingUp, Plus, ArrowRight, Building, Star, Zap, Target, Eye, MessageSquare } from "lucide-react";
 import type { DashboardStats } from "@shared/types";
 
 export default function DashboardClickMax() {
@@ -18,7 +18,7 @@ export default function DashboardClickMax() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="animate-pulse text-gray-600">Carregando dashboard...</div>
       </div>
     );
@@ -28,74 +28,67 @@ export default function DashboardClickMax() {
     switch (user.userType) {
       case "prestador":
         return {
-          title: "Dashboard do Prestador",
+          title: "Dashboard",
           subtitle: "Gerencie seus serviços e oportunidades",
-          greeting: `Olá, ${user.username}!`,
+          greeting: `Olá, ${user.username}`,
           stats: [
             { 
-              label: "Candidaturas Ativas", 
+              label: "Candidaturas", 
               value: (stats as any)?.applicationsCount?.toString() || "0", 
               icon: Calendar,
-              color: "blue",
-              change: "+12% este mês"
+              trend: "+12% este mês"
             },
             { 
-              label: "Serviços Cadastrados", 
+              label: "Serviços", 
               value: (stats as any)?.servicesCount?.toString() || "0", 
-              icon: Users,
-              color: "green",
-              change: "+2 novos"
+              icon: Building,
+              trend: "+2 novos"
             },
             { 
-              label: "Avaliação Média", 
+              label: "Avaliação", 
               value: (stats as any)?.averageRating?.toString() || "5.0", 
               icon: Star,
-              color: "yellow",
-              change: "Excelente!"
+              trend: "Excelente"
             },
             { 
-              label: "Receita Mensal", 
-              value: "R$ 3.240", 
-              icon: TrendingUp,
-              color: "purple",
-              change: "+18% vs mês anterior"
+              label: "Visualizações", 
+              value: "1.2k", 
+              icon: Eye,
+              trend: "+8% semana"
             },
           ],
-          actions: [
-            { label: "Cadastrar Serviço", href: "/services/create", icon: Plus, primary: true },
-            { label: "Ver Oportunidades", href: "/events", icon: Calendar, primary: false },
-            { label: "Meus Serviços", href: "/services", icon: Building, primary: false },
+          quickActions: [
+            { label: "Cadastrar Serviço", href: "/services/create", icon: Plus },
+            { label: "Ver Eventos", href: "/events", icon: Calendar },
+            { label: "Mensagens", href: "/chat", icon: MessageSquare },
           ]
         };
       case "contratante":
         return {
-          title: "Dashboard do Organizador",
+          title: "Dashboard",
           subtitle: "Organize e gerencie seus eventos",
-          greeting: `Bem-vindo, ${user.username}!`,
+          greeting: `Bem-vindo, ${user.username}`,
           stats: [
             { 
-              label: "Eventos Ativos", 
+              label: "Eventos", 
               value: (stats as any)?.eventsCount?.toString() || "0", 
               icon: Calendar,
-              color: "blue",
-              change: "+3 este mês"
+              trend: "+3 este mês"
             },
             { 
-              label: "Prestadores Contratados", 
+              label: "Prestadores", 
               value: (stats as any)?.providersCount?.toString() || "0", 
               icon: Users,
-              color: "green",
-              change: "Em 12 eventos"
+              trend: "12 contratados"
             },
             { 
-              label: "Orçamento Total", 
+              label: "Orçamento", 
               value: `R$ ${(stats as any)?.totalBudget?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00'}`, 
               icon: TrendingUp,
-              color: "purple",
-              change: "Bem gerenciado"
+              trend: "Controlado"
             },
             { 
-              label: "Taxa de Sucesso", 
+              label: "Sucesso", 
               value: "98%", 
               icon: Target,
               color: "yellow",

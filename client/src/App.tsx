@@ -17,7 +17,7 @@ import QuemSomos from "@/pages/quem-somos";
 import Contato from "@/pages/contato";
 
 // Protected Pages
-import Dashboard from "@/pages/dashboard/dashboard-clickmax";
+import Dashboard from "@/pages/dashboard/dashboard-clean";
 import Events from "@/pages/events/events";
 import CreateEvent from "@/pages/events/create-event";
 import EventDetail from "@/pages/events/event-detail";
