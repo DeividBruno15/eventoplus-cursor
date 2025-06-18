@@ -320,7 +320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userType = (req.user as any).userType;
       const { type = 'events' } = req.query;
 
-      let recommendations = [];
+      let recommendations: any[] = [];
 
       if (userType === 'prestador' && type === 'events') {
         const events = await storage.getEvents();
