@@ -721,7 +721,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/search", async (req, res) => {
     try {
       const { query, type, category, location, page = 1, limit = 20 } = req.query;
-      const results = { events: [], services: [], venues: [] };
+      const results: { events: any[], services: any[], venues: any[] } = { events: [], services: [], venues: [] };
 
       if (!type || type === 'events') {
         let events = await storage.getEvents();
@@ -1016,7 +1016,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         subscriptionId: subscription.id,
-        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+        clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
         customerId: customer.id
       });
 
@@ -1060,11 +1060,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/reviews-enhanced/:userId", async (req, res) => {
     try {
       const { userId } = req.params;
-      const reviews = await db.select().from(reviews)
-        .where(eq(reviews.reviewedId, parseInt(userId)))
-        .orderBy(desc(reviews.createdAt));
+      const reviewsData = await storage.getReviews(parseInt(userId));
       
-      res.json(reviews);
+      res.json(reviewsData);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -1105,8 +1103,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { userId } = req.params;
       
       // Calculate reputation from reviews
-      const reviews = await db.select().from(reviews)
-        .where(eq(reviews.reviewedId, parseInt(userId)));
+      const reviewsData = await storage.getReviews(parseInt(userId));
 
       const reputation = {
         userId: parseInt(userId),
@@ -1237,7 +1234,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         );
         
         financialData.totalRevenue = userApplications.reduce((sum, app) => 
-          sum + parseFloat(app.proposedPrice || "0"), 0
+          sum + parseFloat(app.price || "0"), 0
         );
         financialData.completedTransactions = userApplications.length;
       } else if (userType === 'contratante') {
