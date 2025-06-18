@@ -97,8 +97,8 @@ export default function HomeClickMax() {
                   <div className="w-64 bg-gray-50 border-r border-gray-200 p-4">
                     {/* Company Header */}
                     <div className="flex items-center mb-6">
-                      <div className="w-8 h-8 bg-[#3C5BFA] rounded-lg flex items-center justify-center mr-3">
-                        <Calendar className="w-5 h-5 text-white" />
+                      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                        <Calendar className="w-5 h-5 text-gray-600" />
                       </div>
                       <div>
                         <h3 className="font-bold text-gray-900">Evento+</h3>
@@ -108,10 +108,6 @@ export default function HomeClickMax() {
                     
                     {/* Menu Items */}
                     <div className="space-y-2">
-                      <div className="bg-[#3C5BFA] text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center">
-                        <span className="w-2 h-2 bg-white rounded-full mr-3"></span>
-                        Dashboard
-                      </div>
                       <div className="text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-100 flex items-center">
                         <Users className="w-4 h-4 mr-3" />
                         Prestadores
@@ -136,7 +132,7 @@ export default function HomeClickMax() {
                         <p className="text-gray-600">Visão geral dos seus eventos</p>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <Button size="sm" className="bg-[#3C5BFA] text-white">
+                        <Button size="sm" variant="outline" className="border-gray-300 text-gray-700">
                           Novo Evento
                         </Button>
                       </div>
