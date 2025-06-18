@@ -113,15 +113,10 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 
 ## Changelog
 
-### June 17, 2025 - Correções Críticas e Implementação de Funcionalidades Avançadas
-- **Sistema de Autenticação Aprimorado**: Hook useAuth retorna {success, error} para feedback específico de login com tratamento de erros por tipo
-- **Validação de Duplicatas**: Implementada validação de email, CPF e CNPJ duplicados no registro com mensagens específicas por campo
-- **Formato Moeda Brasileira**: Sistema completo de formatação R$ 0,00 em criação de serviços com componente CurrencyInput reutilizável
-- **Upload de Mídia**: Funcionalidade completa de upload até 5 arquivos (fotos e vídeos) na criação de serviços com preview e remoção
-- **Correção Home Institucional**: Todos os botões "Escolher plano" agora direcionam corretamente para /auth/login
-- **Página Meus Espaços Simplificada**: Removidos filtros desnecessários da página anunciante, mantendo apenas funcionalidades essenciais
-- **Funcionalidades de Prestador**: Sistema completo de criação de serviços com categorias, tags, portfolio e sistema de mídia
-- **Interface Responsiva**: Todas as páginas otimizadas para dispositivos móveis com componentes consistentes
+### June 17, 2025 - Eliminação Completa de Erros 404 e Correção Total de Navegação
+- **Correção Sistemática de Links**: Corrigidos todos os links /login e /register para /auth/login e /auth/register em header.tsx, home.tsx, quem-somos.tsx, como-funciona.tsx, contato.tsx, home-clean.tsx e auth/register.tsx
+- **Botão Cadastrar Funcionando**: Problema principal do botão "Cadastrar" no header resolvido - agora direciona corretamente para /auth/register
+- **Navegação 100% Funcional**: Todos os testes confirmam rotas retornando 200 OK - eliminação completa dos erros 404
 - **Sistema PWA Completo**: Service worker implementado com cache inteligente, sync em background e notificações push para funcionalidade offline robusta
 - **IndexedDB Offline Storage**: Sistema completo de armazenamento offline com sincronização automática quando voltar online
 - **Rotas Corrigidas**: App.tsx atualizado com imports corretos e rota offline adicionada para melhor experiência do usuário

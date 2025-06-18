@@ -48,8 +48,6 @@ export interface IStorage {
   // Users
   getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
-  getUserByCpf(cpf: string): Promise<User | undefined>;
-  getUserByCnpj(cnpj: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateStripeCustomerId(userId: number, customerId: string): Promise<User>;
   updateUserStripeInfo(userId: number, customerId: string, subscriptionId: string): Promise<User>;
@@ -209,16 +207,6 @@ export class DatabaseStorage implements IStorage {
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    return result[0];
-  }
-
-  async getUserByCpf(cpf: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.cpf, cpf)).limit(1);
-    return result[0];
-  }
-
-  async getUserByCnpj(cnpj: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.cnpj, cnpj)).limit(1);
     return result[0];
   }
 
