@@ -144,7 +144,7 @@ export default function CreateEvent() {
 
   const createEventMutation = useMutation({
     mutationFn: async (data: CreateEventForm) => {
-      const totalBudget = services.reduce((total, service) => total + (service.budget || 0), 0);
+      const totalBudget = services.reduce((total, service) => total + (service.budget || 0), 0) / 100;
       const eventData = {
         ...data,
         totalBudget: totalBudget,
@@ -152,7 +152,11 @@ export default function CreateEvent() {
         addressData: JSON.stringify(addressData),
         imageCount: eventImages.length,
         fullAddress: `${addressData.street}, ${data.number}, ${addressData.neighborhood}, ${data.city}/${data.state}`,
-        publicLocation: `${data.city}, ${data.state}`
+        publicLocation: `${data.city}, ${data.state}`,
+        services: services.map(service => ({
+          ...service,
+          budget: service.budget / 100
+        }))
       };
       return apiRequest("POST", "/api/events", eventData);
     },
@@ -485,25 +489,16 @@ export default function CreateEvent() {
                                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
                                 <Input
                                   type="text"
-                                  placeholder="1.500,00"
+                                  placeholder="0,00"
                                   className="pl-10"
-                                  value={field.value ? 
-                                    new Intl.NumberFormat('pt-BR', { 
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2 
-                                    }).format(field.value) : ''
-                                  }
+                                  value={field.value ? (field.value / 100).toFixed(2).replace('.', ',') : ''}
                                   onChange={(e) => {
-                                    let value = e.target.value.replace(/[^\d,]/g, '');
-                                    if (value.includes(',')) {
-                                      const parts = value.split(',');
-                                      if (parts[1] && parts[1].length > 2) {
-                                        parts[1] = parts[1].substring(0, 2);
-                                      }
-                                      value = parts.join(',');
+                                    let value = e.target.value.replace(/[^\d]/g, '');
+                                    if (value === '') {
+                                      field.onChange(0);
+                                      return;
                                     }
-                                    value = value.replace(',', '.');
-                                    const numValue = parseFloat(value) || 0;
+                                    const numValue = parseFloat(value);
                                     field.onChange(numValue);
                                   }}
                                 />
@@ -540,10 +535,9 @@ export default function CreateEvent() {
                     type="text"
                     readOnly
                     className="pl-10 bg-white font-semibold text-lg"
-                    value={new Intl.NumberFormat('pt-BR', { 
-                      minimumFractionDigits: 2, 
-                      maximumFractionDigits: 2 
-                    }).format(services.reduce((total, service) => total + (service.budget || 0), 0))}
+                    value={services.reduce((total, service) => total + (service.budget || 0), 0) ? 
+                      (services.reduce((total, service) => total + (service.budget || 0), 0) / 100).toFixed(2).replace('.', ',') : '0,00'
+                    }
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
