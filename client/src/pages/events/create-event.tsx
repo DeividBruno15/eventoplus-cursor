@@ -291,7 +291,7 @@ export default function CreateEvent() {
                   Prestadores candidatos verão apenas a cidade e estado.
                 </p>
                 
-                <CEPInput onAddressFound={handleCEPFound} />
+                <CEPInput onAddressFound={handleCEPFound} placeholder="CEP" />
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField

@@ -16,9 +16,10 @@ interface CEPInputProps {
   }) => void;
   initialValue?: string;
   className?: string;
+  placeholder?: string;
 }
 
-export function CEPInput({ onAddressFound, initialValue = "", className = "" }: CEPInputProps) {
+export function CEPInput({ onAddressFound, initialValue = "", className = "", placeholder = "00000-000" }: CEPInputProps) {
   const [cep, setCep] = useState(initialValue);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -101,7 +102,7 @@ export function CEPInput({ onAddressFound, initialValue = "", className = "" }: 
     <div className={`flex gap-2 ${className}`}>
       <Input
         type="text"
-        placeholder="00000-000"
+        placeholder={placeholder}
         value={cep}
         onChange={handleCEPChange}
         onKeyPress={handleKeyPress}
