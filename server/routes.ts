@@ -923,7 +923,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const validatedData = insertEventSchema.parse(req.body);
+      // Convert date string to Date object and handle field mapping
+      const eventData = {
+        ...req.body,
+        date: new Date(req.body.date || req.body.eventDate),
+        budget: req.body.budget?.toString() || "0.00"
+      };
+      
+      // Remove eventDate if it exists since we use date
+      if (eventData.eventDate) {
+        delete eventData.eventDate;
+      }
+      
+      const validatedData = insertEventSchema.parse(eventData);
       const event = await storage.createEvent({
         ...validatedData,
         organizerId: (req.user as any).id,

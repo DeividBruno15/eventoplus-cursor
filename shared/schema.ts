@@ -442,6 +442,9 @@ export const insertEventSchema = createInsertSchema(events).omit({
   organizerId: true,
   status: true,
   createdAt: true,
+}).extend({
+  date: z.union([z.string(), z.date()]).transform((val) => new Date(val)),
+  budget: z.union([z.string(), z.number()]).transform((val) => val.toString()),
 });
 
 export const insertEventApplicationSchema = createInsertSchema(eventApplications).omit({
