@@ -102,6 +102,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     if (path === "/dashboard" && location === "/") return true;
     if (path === "/events" && location.startsWith("/events")) return true;
     if (path === "/services" && location.startsWith("/services")) return true;
+    if (path === "/pix-payment" && location === "/pix-payment") return true;
     if (path === "/venues" && location.startsWith("/venues")) return true;
     return location === path;
   };

@@ -36,7 +36,7 @@ export default function DashboardClean() {
           ],
           actions: [
             { label: "Cadastrar Serviço", href: "/services/create", icon: Plus },
-            { label: "Ver Eventos", href: "/events", icon: Calendar },
+            { label: "Pagamento PIX", href: "/pix-payment", icon: QrCode },
             { label: "Mensagens", href: "/chat", icon: MessageSquare },
           ]
         };
@@ -68,7 +68,7 @@ export default function DashboardClean() {
           ],
           actions: [
             { label: "Cadastrar Espaço", href: "/venues/create", icon: Plus },
-            { label: "Gerenciar Espaços", href: "/venues", icon: Building },
+            { label: "Pagamento PIX", href: "/pix-payment", icon: QrCode },
             { label: "Ver Reservas", href: "/bookings", icon: Calendar },
           ]
         };
