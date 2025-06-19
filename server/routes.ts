@@ -886,6 +886,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Events routes - Core CRUD operations
+  app.get("/api/events", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const userType = (req.user as any).userType;
+      
+      // Get user's events based on their role
+      const allEvents = await storage.getEvents();
+      let userEvents = [];
+      
+      if (userType === 'contratante') {
+        // Contratantes see only their own events
+        userEvents = allEvents.filter(event => event.organizerId === userId);
+      } else if (userType === 'prestador') {
+        // Prestadores see all active events
+        userEvents = allEvents.filter(event => event.status === 'active');
+      } else {
+        // Anunciantes see all events for venue matching
+        userEvents = allEvents;
+      }
+      
+      res.json(userEvents);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/events", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const validatedData = insertEventSchema.parse(req.body);
+      const event = await storage.createEvent({
+        ...validatedData,
+        organizerId: (req.user as any).id,
+      });
+      res.json(event);
+    } catch (error: any) {
+      console.error("Error creating event:", error);
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Event applications routes
+  app.post("/api/events/:eventId/apply", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const eventId = parseInt(req.params.eventId);
+      const validatedData = insertEventApplicationSchema.parse({
+        ...req.body,
+        eventId,
+        providerId: (req.user as any).id,
+      });
+      
+      const application = await storage.createEventApplication(validatedData);
+      res.json(application);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   // Search endpoints - simplified using storage functions
   app.get("/api/search/events", async (req, res) => {
     try {
