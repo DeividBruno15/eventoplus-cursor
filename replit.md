@@ -289,6 +289,14 @@ Preferred communication style: Simple, everyday language.
 - **Risk Assessment**: Technical and business risks identified with mitigation strategies
 - **Investment Planning**: R$ 300k initial investment estimate for 6-month full implementation
 
+### June 19, 2025 - Event Creation Bug Fix and Authentication Routes
+- **Critical Authentication Route Fix**: Corrected route mismatch between frontend (/api/auth/register, /api/auth/login) and backend (/api/register, /api/login)
+- **Missing Events Endpoints**: Added essential GET and POST /api/events endpoints that were missing from main routes.ts file
+- **Event Schema Enhancement**: Updated insertEventSchema to handle string date inputs and budget conversion with proper Zod transforms
+- **Form Field Mapping Fix**: Corrected create-event form to send proper 'location' field instead of undefined, fixing 400 validation errors
+- **API Functionality Confirmed**: Events now create successfully (200 OK) and display correctly in user event lists
+- **Complete Event Workflow**: Users can now create events through the interface and see them appear in "Meus eventos" immediately
+
 ### June 18, 2025 - ROADMAP COMPLETO IMPLEMENTADO - 100% EXECUTADO
 - **FASE 1 COMPLETA**: PIX integration, Stripe BRL, sistema de busca avançada, workflow completo de aplicações para eventos
 - **FASE 2 COMPLETA**: Google Maps integration, WhatsApp Business API, sistema de verificação, email service

@@ -146,13 +146,16 @@ export default function CreateEvent() {
     mutationFn: async (data: CreateEventForm) => {
       const totalBudget = services.reduce((total, service) => total + (service.budget || 0), 0) / 100;
       const eventData = {
-        ...data,
-        totalBudget: totalBudget,
+        title: data.title,
+        description: data.description,
+        date: data.date,
+        location: `${data.city}, ${data.state}`,
+        budget: totalBudget.toString(),
+        category: data.category,
         guestCount: parseInt(data.guestCount),
+        // Additional fields for frontend use
         addressData: JSON.stringify(addressData),
-        imageCount: eventImages.length,
         fullAddress: `${addressData.street}, ${data.number}, ${addressData.neighborhood}, ${data.city}/${data.state}`,
-        publicLocation: `${data.city}, ${data.state}`,
         services: services.map(service => ({
           ...service,
           budget: service.budget / 100
