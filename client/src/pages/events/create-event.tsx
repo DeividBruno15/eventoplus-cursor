@@ -33,7 +33,6 @@ const createEventSchema = z.object({
   street: z.string().optional(),
   neighborhood: z.string().optional(),
   number: z.string().min(1, "Número é obrigatório"),
-  totalBudget: z.number().min(0, "Orçamento total é obrigatório"),
   category: z.string().min(1, "Categoria é obrigatória"),
   guestCount: z.string().min(1, "Número de convidados é obrigatório"),
   services: z.array(serviceSchema).min(1, "Selecione pelo menos um serviço"),
@@ -121,7 +120,7 @@ export default function CreateEvent() {
       street: "",
       neighborhood: "",
       number: "",
-      totalBudget: "",
+
       category: "",
       guestCount: "",
       services: [{ type: "", quantity: 1, budget: 0 }],
@@ -146,14 +145,14 @@ export default function CreateEvent() {
 
   const createEventMutation = useMutation({
     mutationFn: async (data: CreateEventForm) => {
+      const totalBudget = services.reduce((total, service) => total + (service.budget || 0), 0);
       const eventData = {
         ...data,
-        totalBudget: parseFloat(data.totalBudget),
+        totalBudget: totalBudget,
         guestCount: parseInt(data.guestCount),
         addressData: JSON.stringify(addressData),
         imageCount: eventImages.length,
         fullAddress: `${addressData.street}, ${data.number}, ${addressData.neighborhood}, ${data.city}/${data.state}`,
-        // Only show city and state to prestadores, full address only after acceptance
         publicLocation: `${data.city}, ${data.state}`
       };
       return apiRequest("POST", "/api/events", eventData);
