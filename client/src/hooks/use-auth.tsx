@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
-      const response = await apiRequest("POST", "/api/login", { email, password });
+      const response = await apiRequest("POST", "/api/auth/login", { email, password });
       return response.json();
     },
     onSuccess: async () => {
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password: string; 
       userType: string; 
     }) => {
-      const response = await apiRequest("POST", "/api/register", { 
+      const response = await apiRequest("POST", "/api/auth/register", { 
         username, 
         email, 
         password, 
