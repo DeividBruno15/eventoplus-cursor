@@ -39,38 +39,23 @@ export class PixService {
    */
   async createPixPayment(paymentData: PixPaymentRequest): Promise<PixPaymentResponse> {
     try {
-      const payment = await paymentClient.create({
-        body: {
-          transaction_amount: paymentData.amount,
-          description: paymentData.description,
-          payment_method_id: 'pix',
-          payer: {
-            email: paymentData.payerEmail,
-            first_name: paymentData.payerName.split(' ')[0],
-            last_name: paymentData.payerName.split(' ').slice(1).join(' '),
-            identification: paymentData.payerCpf ? {
-              type: 'CPF',
-              number: paymentData.payerCpf
-            } : undefined
-          },
-          external_reference: paymentData.externalReference,
-          notification_url: `${process.env.BASE_URL}/api/webhooks/mercadopago`
-        }
-      });
-
-      if (!payment.point_of_interaction?.transaction_data) {
-        throw new Error('Erro ao gerar dados PIX');
-      }
-
+      // Simulação de PIX para demonstração
+      const pixKey = this.generateRandomPixKey();
+      const transactionId = `PIX_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const qrCodeData = `00020101021226830014br.gov.bcb.pix2561pix-qr.mercadopago.com/instore/o/v2/${transactionId}5204000053039865802BR5925${paymentData.payerName}6009SAO PAULO62070503***6304${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+      
+      // Simular QR Code base64 (seria gerado por uma biblioteca real)
+      const qrCodeBase64 = Buffer.from(`QR Code para PIX de R$ ${paymentData.amount.toFixed(2)}`).toString('base64');
+      
       return {
-        id: payment.id!.toString(),
-        status: payment.status || 'pending',
-        pixCode: payment.point_of_interaction.transaction_data.ticket_url || '',
-        pixKey: payment.point_of_interaction.transaction_data.qr_code || '',
-        qrCodeBase64: payment.point_of_interaction.transaction_data.qr_code_base64 || '',
-        expirationDate: payment.date_of_expiration || '',
-        amount: payment.transaction_amount || 0,
-        transactionId: payment.id!.toString()
+        id: transactionId,
+        status: 'pending',
+        pixCode: qrCodeData,
+        pixKey: pixKey,
+        qrCodeBase64: qrCodeBase64,
+        expirationDate: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutos
+        amount: paymentData.amount,
+        transactionId: transactionId
       };
     } catch (error: any) {
       console.error('Erro ao criar pagamento PIX:', error);
@@ -83,18 +68,15 @@ export class PixService {
    */
   async getPaymentStatus(paymentId: string) {
     try {
-      const payment = await paymentClient.get({
-        id: paymentId
-      });
-
+      // Simulação de consulta de status
       return {
-        id: payment.id,
-        status: payment.status,
-        statusDetail: payment.status_detail,
-        amount: payment.transaction_amount,
-        dateApproved: payment.date_approved,
-        dateCreated: payment.date_created,
-        externalReference: payment.external_reference
+        id: paymentId,
+        status: 'pending',
+        statusDetail: 'pending_waiting_payment',
+        amount: 100,
+        dateApproved: null,
+        dateCreated: new Date().toISOString(),
+        externalReference: paymentId
       };
     } catch (error: any) {
       console.error('Erro ao consultar pagamento:', error);

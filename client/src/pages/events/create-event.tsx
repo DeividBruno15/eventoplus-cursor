@@ -33,7 +33,7 @@ const createEventSchema = z.object({
   street: z.string().optional(),
   neighborhood: z.string().optional(),
   number: z.string().min(1, "Número é obrigatório"),
-  totalBudget: z.string().min(1, "Orçamento total é obrigatório"),
+  totalBudget: z.number().min(0, "Orçamento total é obrigatório"),
   category: z.string().min(1, "Categoria é obrigatória"),
   guestCount: z.string().min(1, "Número de convidados é obrigatório"),
   services: z.array(serviceSchema).min(1, "Selecione pelo menos um serviço"),
@@ -45,6 +45,18 @@ const serviceTypes = [
   // Entretenimento
   "DJ/Som",
   "Banda/Música ao vivo",
+  "Cantor - Sertanejo",
+  "Cantor - MPB",
+  "Cantor - Rock",
+  "Cantor - Pop",
+  "Cantor - Forró",
+  "Cantor - Samba/Pagode",
+  "Cantor - Jazz",
+  "Cantor - Clássico",
+  "Cantor - Gospel",
+  "Cantor - Rap/Hip-Hop",
+  "Cantor - Funk",
+  "Cantor - Eletrônica",
   "Animadores",
   "Fotógrafo",
   "Videomaker",
@@ -494,17 +506,14 @@ export default function CreateEvent() {
                                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
                                 <Input
                                   type="text"
-                                  placeholder="0,00"
+                                  placeholder="1500,00"
                                   className="pl-10"
-                                  value={field.value ? field.value.toString().replace('.', ',') : ''}
+                                  value={field.value ? field.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''}
                                   onChange={(e) => {
-                                    let value = e.target.value.replace(/[^\d]/g, '');
-                                    if (value === '') {
-                                      field.onChange(0);
-                                      return;
-                                    }
-                                    value = (parseFloat(value) / 100).toFixed(2);
-                                    field.onChange(parseFloat(value));
+                                    let value = e.target.value.replace(/[^\d,]/g, '');
+                                    value = value.replace(',', '.');
+                                    const numValue = parseFloat(value) || 0;
+                                    field.onChange(numValue);
                                   }}
                                 />
                               </div>
