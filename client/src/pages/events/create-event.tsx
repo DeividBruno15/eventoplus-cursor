@@ -120,7 +120,6 @@ export default function CreateEvent() {
       street: "",
       neighborhood: "",
       number: "",
-
       category: "",
       guestCount: "",
       services: [{ type: "", quantity: 1, budget: 0 }],
