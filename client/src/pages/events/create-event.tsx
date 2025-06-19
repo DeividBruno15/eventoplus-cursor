@@ -324,7 +324,7 @@ export default function CreateEvent() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="neighborhood"
@@ -336,25 +336,6 @@ export default function CreateEvent() {
                             placeholder="Nome do bairro" 
                             {...field} 
                             value={addressData.neighborhood || field.value}
-                            readOnly
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="cep"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>CEP</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="00000-000" 
-                            {...field} 
-                            value={addressData.cep || field.value}
                             readOnly
                           />
                         </FormControl>
@@ -504,11 +485,23 @@ export default function CreateEvent() {
                                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
                                 <Input
                                   type="text"
-                                  placeholder="1500,00"
+                                  placeholder="1.500,00"
                                   className="pl-10"
-                                  value={field.value ? field.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''}
+                                  value={field.value ? 
+                                    new Intl.NumberFormat('pt-BR', { 
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2 
+                                    }).format(field.value) : ''
+                                  }
                                   onChange={(e) => {
                                     let value = e.target.value.replace(/[^\d,]/g, '');
+                                    if (value.includes(',')) {
+                                      const parts = value.split(',');
+                                      if (parts[1] && parts[1].length > 2) {
+                                        parts[1] = parts[1].substring(0, 2);
+                                      }
+                                      value = parts.join(',');
+                                    }
                                     value = value.replace(',', '.');
                                     const numValue = parseFloat(value) || 0;
                                     field.onChange(numValue);
@@ -547,7 +540,10 @@ export default function CreateEvent() {
                     type="text"
                     readOnly
                     className="pl-10 bg-white font-semibold text-lg"
-                    value={services.reduce((total, service) => total + (service.budget || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    value={new Intl.NumberFormat('pt-BR', { 
+                      minimumFractionDigits: 2, 
+                      maximumFractionDigits: 2 
+                    }).format(services.reduce((total, service) => total + (service.budget || 0), 0))}
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
