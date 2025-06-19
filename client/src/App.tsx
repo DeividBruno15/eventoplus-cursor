@@ -257,6 +257,14 @@ function Router() {
         </Layout>
       </Route>
       
+      <Route path="/pix-payment">
+        <Layout>
+          <AuthGuard>
+            <PixPayment />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
       <Route path="/subscription">
         <Layout>
           <AuthGuard>

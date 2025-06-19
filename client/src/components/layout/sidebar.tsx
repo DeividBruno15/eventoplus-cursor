@@ -36,7 +36,8 @@ import {
   FileText,
   Shield,
   Bell,
-  CalendarDays
+  CalendarDays,
+  QrCode
 } from "lucide-react";
 
 interface SidebarProps {
@@ -58,6 +59,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: Plus, label: "Criar Evento", path: "/events/create" },
       { icon: Users, label: "Prestadores", path: "/services" },
       { icon: MapPin, label: "Espaços", path: "/venues" },
+      { icon: QrCode, label: "Pagamento PIX", path: "/pix-payment" },
       { icon: MessageSquare, label: "Chat", path: "/chat" },
       { icon: Bell, label: "Notificações", path: "/notifications" },
       { icon: ShoppingCart, label: "Carrinho", path: "/cart" },
@@ -69,6 +71,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: Search, label: "Buscar", path: "/search" },
       { icon: CalendarDays, label: "Eventos", path: "/events" },
       { icon: Star, label: "Gerenciar Serviços", path: "/services/manage" },
+      { icon: QrCode, label: "Pagamento PIX", path: "/pix-payment" },
       { icon: MessageSquare, label: "Chat", path: "/chat" },
       { icon: Bell, label: "Notificações", path: "/notifications" },
       { icon: FileText, label: "Contratos", path: "/contracts" },
@@ -79,6 +82,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: Search, label: "Buscar", path: "/search" },
       { icon: MapPin, label: "Gerenciar Espaços", path: "/venues/manage" },
       { icon: CalendarDays, label: "Eventos", path: "/events" },
+      { icon: QrCode, label: "Pagamento PIX", path: "/pix-payment" },
       { icon: MessageSquare, label: "Chat", path: "/chat" },
       { icon: Bell, label: "Notificações", path: "/notifications" },
       { icon: FileText, label: "Contratos", path: "/contracts" },

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { Calendar, Users, Building, Star, TrendingUp, Plus, MessageSquare, Eye, Target } from "lucide-react";
+import { Calendar, Users, Building, Star, TrendingUp, Plus, MessageSquare, Eye, Target, QrCode } from "lucide-react";
 
 export default function DashboardClean() {
   const { user } = useAuth();
@@ -52,7 +52,7 @@ export default function DashboardClean() {
           ],
           actions: [
             { label: "Criar Evento", href: "/events/create", icon: Plus },
-            { label: "Buscar Prestadores", href: "/services", icon: Users },
+            { label: "Pagamento PIX", href: "/pix-payment", icon: QrCode },
             { label: "Mensagens", href: "/chat", icon: MessageSquare },
           ]
         };
