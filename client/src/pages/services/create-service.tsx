@@ -8,12 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { insertServiceSchema } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
-import { ArrowLeft, Plus, X } from "lucide-react";
+import { ArrowLeft, MapPin } from "lucide-react";
 import { Link } from "wouter";
 import { z } from "zod";
 
@@ -21,7 +19,9 @@ const serviceSchema = z.object({
   title: z.string().min(1, "Nome do serviço é obrigatório"),
   description: z.string().min(1, "Descrição é obrigatória"),
   category: z.string().min(1, "Categoria é obrigatória"),
+  subcategory: z.string().optional(),
   price: z.string().min(1, "Preço é obrigatório"),
+  location: z.string().min(1, "Localização é obrigatória"),
   portfolio: z.string().optional(),
 });
 
@@ -36,7 +36,11 @@ const serviceCategories = [
 ];
 
 const entertainmentServices = [
-  "DJ", "Banda", "Cantor/Cantora", "Mágico", "Palhaço", "Animador", "Dançarinos"
+  "DJ", "Banda", "Cantor", "Mágico", "Palhaço", "Animador", "Dançarinos"
+];
+
+const singerGenres = [
+  "Sertanejo", "Pop", "Rock", "MPB", "Samba", "Pagode", "Funk", "Gospel", "Jazz", "Blues", "Bossa Nova", "Forró", "Axé", "Reggae"
 ];
 
 const foodServices = [
@@ -67,8 +71,8 @@ export default function CreateService() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState("");
+  const [locationSuggestions, setLocationSuggestions] = useState<string[]>([]);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
   const form = useForm<ServiceFormData>({
     resolver: zodResolver(serviceSchema),
@@ -76,12 +80,15 @@ export default function CreateService() {
       title: "",
       description: "",
       category: "",
+      subcategory: "",
       price: "",
+      location: "",
       portfolio: "",
     },
   });
 
   const selectedCategory = form.watch("category");
+  const selectedSubcategory = form.watch("subcategory");
 
   const createServiceMutation = useMutation({
     mutationFn: async (data: ServiceFormData) => {
@@ -91,7 +98,10 @@ export default function CreateService() {
         title: data.title,
         description: data.description,
         category: data.category,
-        basePrice: priceValue.toString()
+        subcategory: data.subcategory,
+        basePrice: priceValue.toString(),
+        location: data.location,
+        portfolio: data.portfolio ? [data.portfolio] : []
       };
 
       console.log("Sending service data:", JSON.stringify(serviceData, null, 2));
@@ -100,7 +110,6 @@ export default function CreateService() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: response.statusText }));
         console.error("Server error response:", errorData);
-        alert(`Erro ao criar serviço: ${JSON.stringify(errorData, null, 2)}`);
         throw new Error(errorData.message || `Erro ${response.status}: ${response.statusText}`);
       }
       return response.json();
@@ -126,24 +135,44 @@ export default function CreateService() {
     createServiceMutation.mutate(data);
   };
 
-  const addTag = () => {
-    if (newTag.trim() && !tags.includes(newTag.trim())) {
-      setTags([...tags, newTag.trim()]);
-      setNewTag("");
-    }
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
-  };
-
   const formatPrice = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    const price = (parseInt(numbers) || 0) / 100;
-    return price.toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
+    const numericValue = value.replace(/[^\d]/g, "");
+    const formattedValue = (parseInt(numericValue) / 100).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     });
+    return formattedValue;
+  };
+
+  const searchLocation = async (query: string) => {
+    if (query.length < 3) {
+      setLocationSuggestions([]);
+      return;
+    }
+
+    setIsLoadingLocation(true);
+    try {
+      // Using OpenStreetMap Nominatim API for location search
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&countrycodes=br&limit=5&q=${encodeURIComponent(query + ", Brasil")}`
+      );
+      const data = await response.json();
+      
+      const suggestions = data.map((item: any) => {
+        const parts = item.display_name.split(', ');
+        // Get city and state
+        const city = parts[0];
+        const state = parts.find((part: string) => part.length === 2 && part.toUpperCase() === part) || parts[parts.length - 3];
+        return `${city}, ${state}`;
+      }).filter((item: string, index: number, arr: string[]) => arr.indexOf(item) === index); // Remove duplicates
+      
+      setLocationSuggestions(suggestions);
+    } catch (error) {
+      console.error('Error searching location:', error);
+      setLocationSuggestions([]);
+    } finally {
+      setIsLoadingLocation(false);
+    }
   };
 
   return (
@@ -194,7 +223,10 @@ export default function CreateService() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Categoria</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={(value) => {
+                        field.onChange(value);
+                        form.setValue("subcategory", "");
+                      }} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione uma categoria" />
@@ -217,7 +249,7 @@ export default function CreateService() {
               {selectedCategory && (
                 <FormField
                   control={form.control}
-                  name="category"
+                  name="subcategory"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Tipo de Serviço</FormLabel>
@@ -231,6 +263,33 @@ export default function CreateService() {
                           {servicesByCategory[selectedCategory as keyof typeof servicesByCategory]?.map((service) => (
                             <SelectItem key={service} value={service}>
                               {service}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {selectedSubcategory === "Cantor" && (
+                <FormField
+                  control={form.control}
+                  name="subcategory"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gênero Musical</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o gênero musical" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {singerGenres.map((genre) => (
+                            <SelectItem key={genre} value={`Cantor - ${genre}`}>
+                              {genre}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -259,23 +318,71 @@ export default function CreateService() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Preço Base (por evento)</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="R$ 0,00"
-                        value={field.value ? formatPrice(field.value) : ""}
-                        onChange={(e) => field.onChange(e.target.value)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Preço Base (por evento)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="R$ 0,00"
+                          {...field}
+                          onChange={(e) => {
+                            const formatted = formatPrice(e.target.value);
+                            field.onChange(formatted);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        Localização
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            placeholder="Digite sua cidade/estado"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e.target.value);
+                              searchLocation(e.target.value);
+                            }}
+                          />
+                          {locationSuggestions.length > 0 && (
+                            <div className="absolute top-full left-0 right-0 z-10 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto">
+                              {locationSuggestions.map((suggestion, index) => (
+                                <button
+                                  key={index}
+                                  type="button"
+                                  className="w-full text-left px-3 py-2 hover:bg-gray-100"
+                                  onClick={() => {
+                                    field.onChange(suggestion);
+                                    setLocationSuggestions([]);
+                                  }}
+                                >
+                                  {suggestion}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
@@ -293,39 +400,6 @@ export default function CreateService() {
                   </FormItem>
                 )}
               />
-
-              {/* Tags */}
-              <div className="space-y-3">
-                <FormLabel>Tags/Palavras-chave</FormLabel>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Adicionar tag..."
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                  />
-                  <Button type="button" variant="outline" onClick={addTag}>
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                {tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-                        {tag}
-                        <button
-                          type="button"
-                          onClick={() => removeTag(tag)}
-                          className="ml-1 hover:text-destructive"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
 
               <div className="flex gap-4 pt-6">
                 <Button
