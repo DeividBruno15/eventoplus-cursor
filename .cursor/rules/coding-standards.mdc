@@ -1,0 +1,72 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Padrões de Codificação EventoPlus
+
+## Regras Gerais
+- **Idioma**: Sempre responder em português
+- **Consistência**: Manter padrões estabelecidos no projeto
+
+## ⚠️ REGRA CRÍTICA - DESIGN
+**NUNCA ALTERE O DESIGN EM HIPÓTESE ALGUMA**
+- Não modificar cores, fontes, espaçamentos ou layouts existentes
+- Não alterar ícones, imagens ou elementos visuais
+- Não mudar componentes de UI já implementados
+- Não modificar estilos CSS ou classes Tailwind existentes
+- Não alterar a estrutura visual de páginas ou componentes
+- Qualquer mudança visual deve ser explicitamente solicitada pelo usuário
+- Em caso de dúvida sobre design, sempre manter o existente
+
+## Frontend (React/TypeScript)
+
+### Componentes
+- Use componentes funcionais com hooks
+- Prefira TypeScript interfaces para props
+- Use shadcn/ui components quando disponível
+- Mantenha componentes pequenos e reutilizáveis
+
+### Roteamento
+- Use Wouter para roteamento (não React Router)
+- Estruture rotas em [App.tsx](mdc:client/src/App.tsx)
+- Use AuthGuard para rotas protegidas
+
+### Estado
+- Use TanStack Query para estado do servidor
+- Use useState/useReducer para estado local
+- Context API apenas para autenticação
+
+### Estilização
+- Use Tailwind CSS para estilização
+- Mantenha classes organizadas e legíveis
+- Use variáveis CSS para temas
+
+## Backend (Express/TypeScript)
+
+### Estrutura
+- Organize rotas em [routes.ts](mdc:server/routes.ts)
+- Use middleware para validação e autenticação
+- Mantenha controladores separados das rotas
+
+### Validação
+- Use Zod para validação de dados
+- Valide entrada e saída de APIs
+- Retorne erros consistentes
+
+### Banco de Dados
+- Use Drizzle ORM para queries
+- Defina schemas em [shared/schema.ts](mdc:shared/schema.ts)
+- Use transações para operações críticas
+
+## Segurança
+- Sempre validar entrada do usuário
+- Use rate limiting para APIs
+- Implementar autenticação adequada
+- Não expor informações sensíveis
+
+## Tratamento de Erros
+- Use try/catch consistentemente
+- Retorne mensagens de erro claras
+- Log erros para monitoramento
+- Implemente fallbacks quando necessário

@@ -1,0 +1,108 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Fluxo de Desenvolvimento
+
+## Scripts Disponíveis
+
+### Desenvolvimento
+```bash
+npm run dev          # Inicia servidor de desenvolvimento
+npm run build        # Build para produção
+npm run start        # Inicia servidor de produção
+npm run check        # Verificação de tipos TypeScript
+```
+
+### Banco de Dados
+```bash
+npm run db:push      # Aplica mudanças no schema para o banco
+```
+
+### Testes
+```bash
+npm test            # Executa testes Playwright
+```
+
+## Configuração do Ambiente
+
+### Variáveis de Ambiente
+- Configure `.env` com as chaves necessárias
+- Google OAuth: CLIENT_ID e CLIENT_SECRET
+- Banco de dados: DATABASE_URL
+- Chaves de pagamento: STRIPE_SECRET_KEY, PIX_KEY
+
+### Desenvolvimento Local
+1. Clone o repositório
+2. Execute `npm install`
+3. Configure `.env`
+4. Execute `npm run db:push`
+5. Execute `npm run dev`
+
+## Estrutura de Branches
+- **main**: Produção estável
+- **develop**: Desenvolvimento ativo
+- **feature/***: Novas funcionalidades
+- **fix/***: Correções de bugs
+
+## Mobile Development
+
+### Setup Local
+```bash
+# Linux/Mac
+./setup-mobile-local.sh
+
+# Windows
+setup-mobile-windows.bat
+
+# Iniciar desenvolvimento mobile
+./start-mobile.sh
+```
+
+### Estrutura Mobile
+- **App principal**: [mobile/App.tsx](mdc:mobile/App.tsx)
+- **Screens**: [mobile/src/screens/](mdc:mobile/src/screens/)
+- **Context**: [mobile/src/context/](mdc:mobile/src/context/)
+- **Utils**: [mobile/src/utils/](mdc:mobile/src/utils/)
+
+## Debugging
+
+### Frontend
+- Use React DevTools
+- Console.log para debugging simples
+- Network tab para APIs
+- TanStack Query DevTools
+
+### Backend
+- Logs estruturados no console
+- Monitoring em [monitoring.ts](mdc:server/monitoring.ts)
+- Error tracking implementado
+
+## Performance
+
+### Frontend
+- Use React.memo para componentes pesados
+- Lazy loading para rotas
+- Otimize imagens e assets
+- Cache com TanStack Query
+
+### Backend
+- Rate limiting implementado
+- Monitoring de performance
+- Otimização de queries do banco
+- Caching strategies
+
+## Deployment
+
+### Produção
+- Build automático via CI/CD
+- Variáveis de ambiente configuradas
+- Monitoramento ativo
+- Backup automático do banco
+
+### Replit Specific
+- Arquivo [.replit](mdc:.replit) configurado
+- Port 5000 sempre usado
+- Vite setup para desenvolvimento
+

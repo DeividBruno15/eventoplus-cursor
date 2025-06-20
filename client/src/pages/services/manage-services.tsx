@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus, Edit, Trash2, DollarSign, Clock, MapPin, Eye, Star } from "lucide-react";
+import { Plus, Edit, Trash2, DollarSign, Clock, MapPin, Eye, Star, Check, ChevronsUpDown, X, Upload } from "lucide-react";
 
 interface Service {
   id: number;
@@ -21,16 +24,15 @@ interface Service {
   description: string;
   category: string;
   subcategory?: string;
+  musicalGenre?: string;
+  hasEquipment?: string;
+  equipment?: string[];
+  mediaFiles?: string[];
   basePrice: number;
   priceType: string;
   duration?: number;
   location?: string;
-  serviceArea: string[];
   portfolio: string[];
-  requirements?: string;
-  includes: string[];
-  excludes: string[];
-  tags: string[];
   rating: number;
   reviewCount: number;
   bookingCount: number;
@@ -41,7 +43,7 @@ interface Service {
 
 const SERVICE_CATEGORIES = {
   "entretenimento": [
-    "DJ", "Banda", "MC", "Animação", "Karaokê", "Show", "Dança"
+    "DJ", "Banda", "Cantor", "Animação", "Karaokê", "Show", "Dança"
   ],
   "alimentacao": [
     "Buffet", "Chef", "Bartender", "Confeitaria", "Catering", "Food Truck"
@@ -56,6 +58,31 @@ const SERVICE_CATEGORIES = {
     "Limpeza pré-evento", "Limpeza pós-evento", "Organização", "Manutenção"
   ]
 };
+
+const MUSICAL_GENRES = [
+  "Sertanejo", "Funk", "Rock", "Pop", "MPB", "Forró", "Pagode", "Samba", 
+  "Axé", "Reggae", "Eletrônica", "Hip Hop", "Jazz", "Blues", "Gospel", 
+  "Clássica", "Bossa Nova", "Indie", "Country", "Reggaeton"
+];
+
+const EQUIPMENT_OPTIONS = [
+  "Microfone", "Instrumentos musicais", "Caixa de som", "Mesa de som", 
+  "Amplificador", "Pedestal para microfone", "Cabo de áudio", "Monitor de retorno",
+  "Mixer", "Equalizador", "Processador de efeitos", "Iluminação básica"
+];
+
+const BRAZILIAN_CITIES = [
+  "São Paulo, SP", "Rio de Janeiro, RJ", "Brasília, DF", "Salvador, BA", "Fortaleza, CE",
+  "Belo Horizonte, MG", "Manaus, AM", "Curitiba, PR", "Recife, PE", "Goiânia, GO",
+  "Belém, PA", "Porto Alegre, RS", "Guarulhos, SP", "Campinas, SP", "São Luís, MA",
+  "São Gonçalo, RJ", "Maceió, AL", "Duque de Caxias, RJ", "Campo Grande, MS", "Natal, RN",
+  "Teresina, PI", "São Bernardo do Campo, SP", "Nova Iguaçu, RJ", "João Pessoa, PB", "Santo André, SP",
+  "Osasco, SP", "São José dos Campos, SP", "Jaboatão dos Guararapes, PE", "Ribeirão Preto, SP",
+  "Uberlândia, MG", "Contagem, MG", "Sorocaba, SP", "Aracaju, SE", "Feira de Santana, BA",
+  "Cuiabá, MT", "Joinville, SC", "Aparecida de Goiânia, GO", "Londrina, PR", "Juiz de Fora, MG",
+  "Ananindeua, PA", "Porto Velho, RO", "Serra, ES", "Niterói, RJ", "Caxias do Sul, RS",
+  "Campos dos Goytacazes, RJ", "Vila Velha, ES", "Florianópolis, SC", "Macapá, AP", "Diadema, SP"
+];
 
 const PRICE_TYPES = [
   { value: "fixed", label: "Preço fixo" },
@@ -72,22 +99,133 @@ export default function ManageServices() {
   
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
+  const [openLocationCombobox, setOpenLocationCombobox] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     category: "",
     subcategory: "",
+    musicalGenre: "",
+    hasEquipment: "",
+    equipment: [] as string[],
+    mediaFiles: [] as string[],
     basePrice: "",
     priceType: "fixed",
     duration: "",
     location: "",
-    serviceArea: "",
-    requirements: "",
-    includes: "",
-    excludes: "",
-    tags: "",
     active: true
   });
+
+  // Função para formatar preço em moeda brasileira
+  const formatCurrency = (value: string) => {
+    // Remove tudo que não é dígito
+    const numericValue = value.replace(/\D/g, '');
+    
+    if (!numericValue || numericValue === '0') {
+      return '';
+    }
+    
+    // Converte para número dividindo por 100 (centavos)
+    const numberValue = parseInt(numericValue) / 100;
+    
+    // Formata como moeda brasileira
+    return numberValue.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+  };
+
+  // Função para lidar com mudança de preço
+  const handlePriceChange = (value: string) => {
+    if (value === '') {
+      setFormData({ ...formData, basePrice: '' });
+      return;
+    }
+    
+    // Se o usuário digitou apenas números, formata
+    if (/^\d+$/.test(value)) {
+      const formatted = formatCurrency(value);
+      setFormData({ ...formData, basePrice: formatted });
+    } else {
+      // Se já está formatado, pega apenas os números e reformata
+      const numericValue = value.replace(/\D/g, '');
+      const formatted = formatCurrency(numericValue);
+      setFormData({ ...formData, basePrice: formatted });
+    }
+  };
+
+  // Função para lidar com mudança de equipamento
+  const handleEquipmentChange = (equipment: string, checked: boolean) => {
+    if (checked) {
+      setFormData(prev => ({
+        ...prev,
+        equipment: [...prev.equipment, equipment]
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        equipment: prev.equipment.filter(item => item !== equipment)
+      }));
+    }
+  };
+
+  // Função para lidar com upload de mídia
+  const handleMediaUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    // Limitar a 5 arquivos
+    const maxFiles = 5;
+    const currentFileCount = formData.mediaFiles.length;
+    const remainingSlots = maxFiles - currentFileCount;
+    
+    if (remainingSlots <= 0) {
+      toast({
+        title: "Limite excedido",
+        description: "Você pode adicionar no máximo 5 arquivos de mídia.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const filesToProcess = Array.from(files).slice(0, remainingSlots);
+    
+    // Converter arquivos para Base64 para persistência (simulação)
+    const newMediaFiles: string[] = [];
+    let processed = 0;
+    
+    filesToProcess.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          newMediaFiles.push(e.target.result as string);
+          processed++;
+          
+          // Quando todos os arquivos foram processados
+          if (processed === filesToProcess.length) {
+            setFormData(prev => ({
+              ...prev,
+              mediaFiles: [...prev.mediaFiles, ...newMediaFiles]
+            }));
+            
+            toast({
+              title: "Mídia adicionada",
+              description: `${newMediaFiles.length} arquivo(s) adicionado(s) com sucesso.`,
+            });
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Função para remover mídia
+  const handleRemoveMedia = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      mediaFiles: prev.mediaFiles.filter((_, i) => i !== index)
+    }));
+  };
 
   const { data: services, isLoading } = useQuery({
     queryKey: ['/api/services', user?.id],
@@ -136,7 +274,11 @@ export default function ManageServices() {
 
   const deleteServiceMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/services/${id}`);
+      const response = await apiRequest("DELETE", `/api/services/${id}`);
+      if (!response.ok) {
+        throw new Error('Erro ao excluir serviço');
+      }
+      return response;
     },
     onSuccess: () => {
       toast({
@@ -144,6 +286,14 @@ export default function ManageServices() {
         description: "O serviço foi removido do seu catálogo.",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/services', user?.id] });
+      queryClient.refetchQueries({ queryKey: ['/api/services', user?.id] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao excluir",
+        description: error.message || "Não foi possível excluir o serviço",
+        variant: "destructive",
+      });
     },
   });
 
@@ -153,15 +303,14 @@ export default function ManageServices() {
       description: "",
       category: "",
       subcategory: "",
+      musicalGenre: "",
+      hasEquipment: "",
+      equipment: [],
+      mediaFiles: [],
       basePrice: "",
       priceType: "fixed",
       duration: "",
       location: "",
-      serviceArea: "",
-      requirements: "",
-      includes: "",
-      excludes: "",
-      tags: "",
       active: true
     });
   };
@@ -176,15 +325,33 @@ export default function ManageServices() {
       return;
     }
 
+    // Converter preço formatado para número
+    let priceNumber = 0;
+    if (formData.basePrice) {
+      // Remove "R$" e espaços, depois converte vírgula para ponto
+      let priceString = formData.basePrice.toString();
+      
+      // Se tem formato R$ 1.500,00
+      if (priceString.includes('R$')) {
+        priceString = priceString
+          .replace(/R\$\s?/g, '')  // Remove R$
+          .replace(/\./g, '')      // Remove pontos (separadores de milhares)
+          .replace(',', '.');      // Converte vírgula para ponto decimal
+      }
+      
+      priceNumber = parseFloat(priceString) || 0;
+    }
+
+    console.log('Preço original:', formData.basePrice);
+    console.log('Preço convertido:', priceNumber);
+
     const serviceData = {
       ...formData,
-      basePrice: parseFloat(formData.basePrice),
+      basePrice: priceNumber,
       duration: formData.duration ? parseInt(formData.duration) : null,
-      serviceArea: formData.serviceArea.split(',').map(s => s.trim()).filter(s => s),
-      includes: formData.includes.split(',').map(s => s.trim()).filter(s => s),
-      excludes: formData.excludes.split(',').map(s => s.trim()).filter(s => s),
-      tags: formData.tags.split(',').map(s => s.trim()).filter(s => s),
     };
+
+    console.log('Dados do serviço sendo enviados:', serviceData);
 
     if (editingService) {
       updateServiceMutation.mutate({ id: editingService.id, data: serviceData });
@@ -200,15 +367,14 @@ export default function ManageServices() {
       description: service.description,
       category: service.category,
       subcategory: service.subcategory || "",
-      basePrice: service.basePrice.toString(),
+      musicalGenre: service.musicalGenre || "",
+      hasEquipment: service.hasEquipment || "",
+      equipment: service.equipment || [],
+      mediaFiles: service.mediaFiles || [],
+      basePrice: `R$ ${service.basePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
       priceType: service.priceType,
       duration: service.duration?.toString() || "",
       location: service.location || "",
-      serviceArea: service.serviceArea.join(', '),
-      requirements: service.requirements || "",
-      includes: service.includes.join(', '),
-      excludes: service.excludes.join(', '),
-      tags: service.tags.join(', '),
       active: service.active
     });
     setIsCreateDialogOpen(true);
@@ -283,7 +449,7 @@ export default function ManageServices() {
               {formData.category && (
                 <div>
                   <Label htmlFor="subcategory">Subcategoria</Label>
-                  <Select value={formData.subcategory} onValueChange={(value) => setFormData({ ...formData, subcategory: value })}>
+                  <Select value={formData.subcategory} onValueChange={(value) => setFormData({ ...formData, subcategory: value, musicalGenre: "" })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione uma subcategoria" />
                     </SelectTrigger>
@@ -295,6 +461,116 @@ export default function ManageServices() {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+              )}
+
+              {formData.category === 'entretenimento' && formData.subcategory === 'Cantor' && (
+                <div>
+                  <Label htmlFor="musicalGenre">Gênero Musical</Label>
+                  <Select value={formData.musicalGenre} onValueChange={(value) => setFormData({ ...formData, musicalGenre: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um gênero musical" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MUSICAL_GENRES.map((genre) => (
+                        <SelectItem key={genre} value={genre}>
+                          {genre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {formData.category === 'entretenimento' && formData.subcategory && 
+               ['Banda', 'DJ', 'Cantor'].includes(formData.subcategory) && (
+                <>
+                  <div>
+                    <Label htmlFor="hasEquipment">Possui equipamentos?</Label>
+                    <Select value={formData.hasEquipment} onValueChange={(value) => setFormData({ ...formData, hasEquipment: value, equipment: [] })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma opção" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Possuo">Possuo</SelectItem>
+                        <SelectItem value="Não Possuo">Não Possuo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {formData.hasEquipment === 'Possuo' && (
+                    <div>
+                      <Label>Equipamentos disponíveis</Label>
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        {EQUIPMENT_OPTIONS.map((equipment) => (
+                          <div key={equipment} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={equipment}
+                              checked={formData.equipment.includes(equipment)}
+                              onCheckedChange={(checked) => handleEquipmentChange(equipment, checked as boolean)}
+                            />
+                            <Label htmlFor={equipment} className="text-sm">{equipment}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {formData.subcategory === 'Cantor' && (
+                <div>
+                  <Label>Mídia (Imagens/Vídeos) - Máximo 5 arquivos</Label>
+                  <div className="mt-2">
+                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <Upload className="w-8 h-8 mb-2 text-gray-500" />
+                        <p className="mb-2 text-sm text-gray-500">
+                          <span className="font-semibold">Clique para upload</span> ou arraste arquivos
+                        </p>
+                        <p className="text-xs text-gray-500">PNG, JPG, MP4 até 10MB</p>
+                      </div>
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*,video/*"
+                        onChange={handleMediaUpload}
+                        className="hidden"
+                        disabled={formData.mediaFiles.length >= 5}
+                      />
+                    </label>
+                  </div>
+                  
+                  {formData.mediaFiles.length > 0 && (
+                    <div className="mt-4 grid grid-cols-3 gap-2">
+                      {formData.mediaFiles.map((file, index) => (
+                        <div key={index} className="relative">
+                          <div className="w-full h-20 bg-gray-200 rounded-lg flex items-center justify-center relative overflow-hidden">
+                            <img 
+                              src={file} 
+                              alt={`Mídia ${index + 1}`}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                // Se não for imagem, mostrar ícone de vídeo
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                            <div className="hidden w-full h-full flex items-center justify-center bg-gray-300">
+                              <span className="text-xs text-gray-600">Vídeo</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveMedia(index)}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center hover:bg-red-600"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -314,10 +590,9 @@ export default function ManageServices() {
                   <Label htmlFor="basePrice">Preço (R$) *</Label>
                   <Input
                     id="basePrice"
-                    type="number"
                     value={formData.basePrice}
-                    onChange={(e) => setFormData({ ...formData, basePrice: e.target.value })}
-                    placeholder="0.00"
+                    onChange={(e) => handlePriceChange(e.target.value)}
+                    placeholder="R$ 0,00"
                   />
                 </div>
                 <div>
@@ -347,70 +622,49 @@ export default function ManageServices() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="location">Localização</Label>
-                  <Input
-                    id="location"
-                    value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    placeholder="Ex: São Paulo, SP"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="serviceArea">Áreas de atendimento</Label>
-                  <Input
-                    id="serviceArea"
-                    value={formData.serviceArea}
-                    onChange={(e) => setFormData({ ...formData, serviceArea: e.target.value })}
-                    placeholder="Separado por vírgula"
-                  />
-                </div>
-              </div>
-
               <div>
-                <Label htmlFor="requirements">Requisitos</Label>
-                <Textarea
-                  id="requirements"
-                  value={formData.requirements}
-                  onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
-                  placeholder="Requisitos específicos para este serviço..."
-                  rows={2}
-                />
+                <Label htmlFor="location">Localização</Label>
+                <Popover open={openLocationCombobox} onOpenChange={setOpenLocationCombobox}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openLocationCombobox}
+                      className="w-full justify-between"
+                    >
+                      {formData.location || "Selecione uma cidade..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput placeholder="Buscar cidade..." />
+                      <CommandEmpty>Nenhuma cidade encontrada.</CommandEmpty>
+                      <CommandGroup className="max-h-48 overflow-y-auto">
+                        {BRAZILIAN_CITIES.map((city) => (
+                          <CommandItem
+                            key={city}
+                            value={city}
+                            onSelect={(currentValue) => {
+                              setFormData({ ...formData, location: currentValue === formData.location ? "" : currentValue });
+                              setOpenLocationCombobox(false);
+                            }}
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formData.location === city ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {city}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="includes">O que está incluso</Label>
-                  <Textarea
-                    id="includes"
-                    value={formData.includes}
-                    onChange={(e) => setFormData({ ...formData, includes: e.target.value })}
-                    placeholder="Separado por vírgula"
-                    rows={2}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="excludes">O que não está incluso</Label>
-                  <Textarea
-                    id="excludes"
-                    value={formData.excludes}
-                    onChange={(e) => setFormData({ ...formData, excludes: e.target.value })}
-                    placeholder="Separado por vírgula"
-                    rows={2}
-                  />
-                </div>
-              </div>
 
-              <div>
-                <Label htmlFor="tags">Tags</Label>
-                <Input
-                  id="tags"
-                  value={formData.tags}
-                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                  placeholder="Separado por vírgula: festa, casamento, aniversário"
-                />
-              </div>
 
               <div className="flex items-center space-x-2">
                 <Switch
@@ -466,14 +720,28 @@ export default function ManageServices() {
         </Card>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service: Service) => (
+          {services.map((service: Service) => {
+            console.log('Serviço renderizado:', service);
+            return (
             <Card key={service.id} className="relative">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-lg">{service.title}</CardTitle>
-                    <div className="flex items-center space-x-2 mt-1">
+                    <div className="flex items-center space-x-2 mt-1 flex-wrap gap-1">
                       <Badge variant="secondary">{service.category}</Badge>
+                      {service.subcategory && (
+                        <Badge variant="outline">{service.subcategory}</Badge>
+                      )}
+                      {service.musicalGenre && (
+                        <Badge variant="outline" className="bg-purple-100 text-purple-800">{service.musicalGenre}</Badge>
+                      )}
+                      {service.hasEquipment === 'Possuo' && (
+                        <Badge className="bg-green-500">Com Equipamentos</Badge>
+                      )}
+                      {service.mediaFiles && service.mediaFiles.length > 0 && (
+                        <Badge className="bg-blue-500">{service.mediaFiles.length} Mídia(s)</Badge>
+                      )}
                       {!service.active && <Badge variant="destructive">Inativo</Badge>}
                       {service.featured && <Badge className="bg-yellow-500">Destaque</Badge>}
                     </div>
@@ -505,7 +773,7 @@ export default function ManageServices() {
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center text-gray-600">
                     <DollarSign className="w-4 h-4 mr-2" />
-                    <span>R$ {service.basePrice.toLocaleString()} ({service.priceType})</span>
+                    <span>R$ {typeof service.basePrice === 'number' ? service.basePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'} ({service.priceType || 'por evento'})</span>
                   </div>
                   
                   {service.duration && (
@@ -524,34 +792,47 @@ export default function ManageServices() {
                   
                   <div className="flex items-center text-gray-600">
                     <Star className="w-4 h-4 mr-2" />
-                    <span>{service.rating.toFixed(1)} ({service.reviewCount} avaliações)</span>
+                    <span>{typeof service.rating === 'number' ? service.rating.toFixed(1) : '0.0'} ({service.reviewCount || 0} avaliações)</span>
                   </div>
                   
                   <div className="flex items-center text-gray-600">
                     <Eye className="w-4 h-4 mr-2" />
-                    <span>{service.bookingCount} contratações</span>
+                    <span>{service.bookingCount || 0} contratações</span>
                   </div>
                 </div>
 
-                {service.tags.length > 0 && (
+                {service.mediaFiles && service.mediaFiles.length > 0 && (
                   <div className="mt-3">
-                    <div className="flex flex-wrap gap-1">
-                      {service.tags.slice(0, 3).map((tag, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {tag}
-                        </Badge>
+                    <p className="text-xs text-gray-500 mb-2">Mídia disponível:</p>
+                    <div className="flex gap-1 overflow-x-auto">
+                      {service.mediaFiles.slice(0, 3).map((media, index) => (
+                        <div key={index} className="w-12 h-12 bg-gray-200 rounded flex-shrink-0 overflow-hidden">
+                          <img 
+                            src={media} 
+                            alt={`Mídia ${index + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                            }}
+                          />
+                          <div className="hidden w-full h-full flex items-center justify-center bg-gray-300">
+                            <span className="text-xs text-gray-600">📹</span>
+                          </div>
+                        </div>
                       ))}
-                      {service.tags.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{service.tags.length - 3}
-                        </Badge>
+                      {service.mediaFiles.length > 3 && (
+                        <div className="w-12 h-12 bg-gray-300 rounded flex-shrink-0 flex items-center justify-center">
+                          <span className="text-xs text-gray-600">+{service.mediaFiles.length - 3}</span>
+                        </div>
                       )}
                     </div>
                   </div>
                 )}
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

@@ -229,7 +229,7 @@ export default function Services() {
                               {service.rating && (
                                 <div className="flex items-center gap-1">
                                   <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                                  <span className="text-sm font-medium">{service.rating.toFixed(1)}</span>
+                                  <span className="text-sm font-medium">{typeof service.rating === 'number' ? service.rating.toFixed(1) : '0.0'}</span>
                                   <span className="text-sm text-gray-500">
                                     ({service.reviewCount || 0})
                                   </span>

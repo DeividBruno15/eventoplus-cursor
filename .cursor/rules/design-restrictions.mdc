@@ -1,0 +1,85 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# 🚫 RESTRIÇÕES DE DESIGN - REGRA ABSOLUTA
+
+## ⚠️ AVISO CRÍTICO
+**ESTA É UMA REGRA ABSOLUTA E INVIOLÁVEL**
+
+**NUNCA, EM HIPÓTESE ALGUMA, ALTERE QUALQUER ASPECTO DO DESIGN**
+
+## 🔒 O QUE ESTÁ PROIBIDO
+
+### Elementos Visuais
+- ❌ **Cores**: Não alterar paleta de cores, backgrounds, bordas
+- ❌ **Tipografia**: Não mudar fontes, tamanhos, pesos ou estilos de texto
+- ❌ **Ícones**: Não substituir, remover ou adicionar ícones
+- ❌ **Imagens**: Não alterar imagens, logos ou elementos gráficos
+- ❌ **Espaçamentos**: Não modificar margins, paddings ou gaps
+
+### Layout e Estrutura
+- ❌ **Layouts**: Não alterar grid, flexbox ou estruturas de layout
+- ❌ **Componentes**: Não modificar aparência de botões, cards, forms
+- ❌ **Navegação**: Não alterar header, sidebar, footer ou menus
+- ❌ **Responsividade**: Não modificar breakpoints ou comportamento mobile
+
+### Estilos e CSS
+- ❌ **Classes Tailwind**: Não alterar classes CSS existentes
+- ❌ **Estilos customizados**: Não modificar CSS personalizado
+- ❌ **Animações**: Não alterar ou adicionar animações
+- ❌ **Temas**: Não modificar sistema de temas ou variáveis CSS
+
+## ✅ O QUE É PERMITIDO
+
+### Funcionalidade Apenas
+- ✅ Adicionar nova lógica de negócio
+- ✅ Corrigir bugs funcionais (não visuais)
+- ✅ Melhorar performance sem impacto visual
+- ✅ Adicionar validações e tratamento de erros
+- ✅ Implementar novas funcionalidades com design IDÊNTICO ao existente
+
+### Quando Adicionar Novos Elementos
+- ✅ Use EXATAMENTE os mesmos padrões visuais existentes
+- ✅ Copie estilos de componentes similares já implementados
+- ✅ Mantenha consistência absoluta com o design atual
+- ✅ Não inove visualmente - apenas replique o existente
+
+## 🎯 DIRETRIZES ESPECÍFICAS
+
+### Para Novos Componentes
+1. Identifique um componente similar existente
+2. Copie EXATAMENTE os estilos visuais
+3. Mantenha todas as classes CSS iguais
+4. Use os mesmos ícones e padrões visuais
+5. Não adicione nenhum toque pessoal ou "melhoria" visual
+
+### Para Correções
+1. Corrija APENAS a funcionalidade
+2. Mantenha TODOS os estilos existentes
+3. Se algo visual estiver "quebrado", mantenha como está
+4. Não "aproveite" para "melhorar" o visual
+
+### Para Refatorações
+1. Mantenha resultado visual IDÊNTICO
+2. Não altere nem uma classe CSS
+3. Preserve todas as propriedades visuais
+4. Teste que o visual permanece exatamente igual
+
+## 🚨 CONSEQUÊNCIAS
+
+**Qualquer alteração visual, por menor que seja, é considerada uma violação desta regra.**
+
+**Em caso de dúvida: NÃO ALTERE. Sempre mantenha o existente.**
+
+## 📋 CHECKLIST ANTES DE QUALQUER MUDANÇA
+
+- [ ] Esta mudança afeta apenas a lógica/funcionalidade?
+- [ ] Nenhum estilo visual será alterado?
+- [ ] Nenhuma classe CSS será modificada?
+- [ ] Nenhum ícone ou imagem será alterado?
+- [ ] O resultado visual será IDÊNTICO ao atual?
+
+**Se qualquer resposta for "não" ou "talvez", NÃO FAÇA A MUDANÇA.**
+

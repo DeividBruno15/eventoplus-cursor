@@ -1,0 +1,81 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Padrões de Componentes UI
+
+## 🚫 AVISO CRÍTICO: NÃO ALTERE DESIGN
+**Antes de qualquer modificação, lembre-se: NUNCA altere aspectos visuais, ícones, cores ou layouts existentes. Apenas funcionalidade pode ser modificada.**
+
+## Estrutura de Componentes
+
+### Organização
+- **UI Base**: [client/src/components/ui/](mdc:client/src/components/ui/) - componentes shadcn/ui
+- **Layout**: [client/src/components/layout/](mdc:client/src/components/layout/) - header, footer, sidebar
+- **Auth**: [client/src/components/auth/](mdc:client/src/components/auth/) - autenticação e guards
+- **Features**: Componentes específicos por funcionalidade
+
+### Componentes UI Disponíveis
+- **Formulários**: Button, Input, Select, Textarea, Checkbox, Switch
+- **Layout**: Card, Dialog, Sheet, Tabs, Accordion
+- **Feedback**: Alert, Toast, Progress, Skeleton
+- **Navegação**: Breadcrumb, Pagination, Command
+- **Data**: Table, Calendar, Chart
+
+## Padrões de Uso
+
+### Formulários
+```tsx
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+```
+
+### Dialogs e Modais
+```tsx
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+```
+
+### Cards e Layout
+```tsx
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+```
+
+### Estados de Loading
+- Use `Skeleton` para carregamento de conteúdo
+- Use `Spinner` customizado para ações
+- Implemente estados de loading em botões
+
+### Tratamento de Erros
+- Use `Alert` para mensagens de erro
+- Use `Toast` para feedback de ações
+- Implemente `ErrorBoundary` para erros críticos
+
+## Layout System
+
+### Header/Navigation
+- Use [header-clickmax.tsx](mdc:client/src/components/layout/header-clickmax.tsx) como padrão
+- Mantenha navegação consistente entre páginas
+- Implemente indicadores de usuário logado
+
+### Sidebar
+- Use [sidebar-new.tsx](mdc:client/src/components/layout/sidebar-new.tsx)
+- Adapte menu baseado no tipo de usuário
+- Mantenha estado de collapse/expand
+
+### Footer
+- Use [footer-clickmax.tsx](mdc:client/src/components/layout/footer-clickmax.tsx)
+- Mantenha links e informações atualizadas
+
+## Responsividade
+- Use classes Tailwind para breakpoints
+- Teste em mobile, tablet e desktop
+- Use `use-mobile.tsx` hook quando necessário
+
+## Acessibilidade
+- Use componentes Radix UI que já incluem ARIA
+- Mantenha labels descritivos
+- Implemente navegação por teclado

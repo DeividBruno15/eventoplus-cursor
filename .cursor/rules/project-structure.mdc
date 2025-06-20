@@ -1,0 +1,51 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Estrutura do Projeto EventoPlus
+
+## Visão Geral
+EventoPlus é uma plataforma SaaS completa para conectar organizadores de eventos, prestadores de serviços e anunciantes de espaços. O projeto usa uma arquitetura full-stack com React + TypeScript no frontend e Express + Node.js no backend.
+
+## Estrutura Principal
+
+### Frontend (client/)
+- **Framework**: React 18 + TypeScript + Vite
+- **Roteamento**: Wouter (não React Router)
+- **Estado**: TanStack Query (React Query) para gerenciamento de estado do servidor
+- **UI**: Radix UI + Tailwind CSS + shadcn/ui
+- **Autenticação**: Context API personalizado em [use-auth.tsx](mdc:client/src/hooks/use-auth.tsx)
+
+### Backend (server/)
+- **Framework**: Express.js + TypeScript
+- **Banco de Dados**: PostgreSQL com Drizzle ORM
+- **Autenticação**: Passport.js (Google OAuth + Local)
+- **Validação**: Zod
+- **Entrada principal**: [index.ts](mdc:server/index.ts)
+
+### Compartilhado (shared/)
+- **Tipos**: [types.ts](mdc:shared/types.ts) - tipos compartilhados entre frontend e backend
+- **Schema**: [schema.ts](mdc:shared/schema.ts) - esquemas do banco de dados
+
+### Mobile (mobile/)
+- **Framework**: React Native com Expo
+- **Estrutura**: Similar ao cliente web mas adaptada para mobile
+
+## Aliases de Importação
+- `@/` → `client/src/`
+- `@shared/` → `shared/`
+- `@assets/` → `attached_assets/`
+
+## Tipos de Usuário
+1. **Contratante**: Organiza eventos e contrata serviços
+2. **Prestador**: Oferece serviços para eventos
+3. **Anunciante**: Disponibiliza espaços/venues para eventos
+
+## Páginas Principais
+- Dashboard específico por tipo de usuário
+- Gerenciamento de eventos, serviços e venues
+- Sistema de chat e notificações
+- Analytics e relatórios
+- Sistema de pagamentos (PIX + Stripe)
+

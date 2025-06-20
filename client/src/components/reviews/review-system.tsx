@@ -227,7 +227,7 @@ export default function ReviewSystem({ reviewedId, reviewedName, canReview = fal
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="text-center">
                 <div className="text-4xl font-bold text-yellow-600 mb-2">
-                  {average.toFixed(1)}
+                  {typeof average === 'number' ? average.toFixed(1) : '0.0'}
                 </div>
                 {renderStars(Math.round(average))}
                 <p className="text-sm text-gray-600 mt-2">

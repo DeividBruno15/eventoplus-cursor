@@ -1,0 +1,106 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Padrões de API e Backend
+
+## Estrutura de APIs
+
+### Rotas Backend
+- **Arquivo principal**: [server/routes.ts](mdc:server/routes.ts)
+- **Prefixo**: Todas as APIs usam `/api/` como prefixo
+- **Autenticação**: Middleware de autenticação para rotas protegidas
+
+### Frontend Integration
+
+### TanStack Query (React Query)
+- Use para todas as chamadas de API
+- Implemente cache e invalidação adequados
+- Use mutations para operações de escrita
+
+```tsx
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+// Query example
+const { data, isLoading, error } = useQuery({
+  queryKey: ['services', userId],
+  queryFn: () => fetchServices(userId)
+});
+
+// Mutation example
+const mutation = useMutation({
+  mutationFn: createService,
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['services'] });
+  }
+});
+```
+
+## Padrões de Resposta
+
+### Estrutura Padrão
+```typescript
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  message?: string;
+  error?: string;
+}
+```
+
+### Códigos de Status
+- **200**: Sucesso
+- **201**: Criado com sucesso
+- **400**: Erro de validação
+- **401**: Não autenticado
+- **403**: Não autorizado
+- **404**: Não encontrado
+- **500**: Erro interno
+
+## Autenticação
+
+### Sistema de Auth
+- **Implementação**: [use-auth.tsx](mdc:client/src/hooks/use-auth.tsx)
+- **Backend**: Passport.js com Google OAuth e Local Strategy
+- **Proteção**: AuthGuard component para rotas protegidas
+
+### Tipos de Usuário
+- Contratante, Prestador, Anunciante
+- Permissões específicas por tipo
+- Dashboard adaptado por usuário
+
+## Validação
+
+### Frontend
+- Use Zod para validação de formulários
+- Valide antes de enviar para API
+- Mostre erros de forma clara
+
+### Backend
+- Valide todos os inputs com Zod
+- Sanitize dados antes de salvar
+- Retorne erros estruturados
+
+## Rate Limiting
+- Implementado em [rateLimiter.ts](mdc:server/rateLimiter.ts)
+- Limite por IP e por usuário
+- Diferentes limites por tipo de operação
+
+## Monitoramento
+- Logs estruturados em [monitoring.ts](mdc:server/monitoring.ts)
+- Métricas de performance
+- Alertas para erros críticos
+
+## Integração com Terceiros
+
+### Pagamentos
+- **PIX**: Implementação em [pix.ts](mdc:server/pix.ts)
+- **Stripe**: Para cartões de crédito
+- **MercadoPago**: Alternativa de pagamento
+
+### AI/ML
+- **Matching**: Sistema de recomendação em [ai-matching.ts](mdc:server/ai-matching.ts)
+- **OpenAI**: Para funcionalidades de IA
+- **Anthropic**: Claude para assistência
+
