@@ -458,6 +458,26 @@ export const insertServiceSchema = createInsertSchema(services).omit({
   providerId: true,
   active: true,
   createdAt: true,
+  updatedAt: true,
+  rating: true,
+  reviewCount: true,
+  bookingCount: true,
+  featured: true,
+}).extend({
+  // Make optional fields actually optional
+  subcategory: z.string().optional(),
+  basePrice: z.union([z.string(), z.number()]).optional().nullable(),
+  priceType: z.string().optional(),
+  minPrice: z.union([z.string(), z.number()]).optional().nullable(),
+  maxPrice: z.union([z.string(), z.number()]).optional().nullable(),
+  duration: z.number().optional().nullable(),
+  location: z.string().optional().nullable(),
+  serviceArea: z.array(z.string()).optional().nullable(),
+  portfolio: z.array(z.string()).optional().nullable(),
+  requirements: z.string().optional().nullable(),
+  includes: z.array(z.string()).optional().nullable(),
+  excludes: z.array(z.string()).optional().nullable(),
+  tags: z.array(z.string()).optional().nullable(),
 });
 
 export const insertVenueSchema = createInsertSchema(venues).omit({

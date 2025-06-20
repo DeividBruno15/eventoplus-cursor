@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Star, MapPin, Clock, Users } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Search, Star, MapPin, Clock, Users, DollarSign, FileText, Tag } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 interface Service {
@@ -29,6 +30,8 @@ export default function ServicesPage() {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
 
   const { data: services = [], isLoading } = useQuery({
     queryKey: ["/api/services", searchTerm, selectedCategory],
@@ -58,6 +61,11 @@ export default function ServicesPage() {
       style: 'currency',
       currency: 'BRL'
     }).format(numPrice);
+  };
+
+  const handleViewDetails = (service: Service) => {
+    setSelectedService(service);
+    setIsDetailsDialogOpen(true);
   };
 
   if (isLoading) {
@@ -189,7 +197,7 @@ export default function ServicesPage() {
                   <div className="text-lg font-bold" style={{ color: '#3C5BFA' }}>
                     {formatPrice(service.price || "0")}
                   </div>
-                  <Button size="sm" style={{ backgroundColor: '#3C5BFA' }}>
+                  <Button size="sm" style={{ backgroundColor: '#3C5BFA' }} onClick={() => handleViewDetails(service)}>
                     Ver Detalhes
                   </Button>
                 </div>
@@ -214,6 +222,119 @@ export default function ServicesPage() {
           </p>
         </div>
       )}
+
+      {/* Service Details Modal */}
+      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">
+              {selectedService?.title}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedService && (
+            <div className="space-y-6">
+              {/* Service Image */}
+              {selectedService.images?.[0] && (
+                <div className="relative h-64 rounded-lg overflow-hidden">
+                  <img
+                    src={selectedService.images[0]}
+                    alt={selectedService.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <Badge className="absolute top-4 left-4" variant="secondary">
+                    {selectedService.category}
+                  </Badge>
+                </div>
+              )}
+
+              {/* Provider Info */}
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                  <Users className="h-6 w-6 text-gray-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">
+                    {selectedService.provider?.name || "Prestador"}
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <span className="text-sm">
+                      {selectedService.rating || 5.0} ({selectedService.reviewCount || 0} avaliações)
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Descrição
+                </h4>
+                <p className="text-gray-600 leading-relaxed">
+                  {selectedService.description}
+                </p>
+              </div>
+
+              {/* Details Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-green-600" />
+                    <span className="font-medium">Preço:</span>
+                    <span className="text-lg font-bold" style={{ color: '#3C5BFA' }}>
+                      {formatPrice(selectedService.price || "0")}
+                    </span>
+                  </div>
+                  
+                  {selectedService.duration && (
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-blue-600" />
+                      <span className="font-medium">Duração:</span>
+                      <span>{selectedService.duration} horas</span>
+                    </div>
+                  )}
+                  
+                  {selectedService.location && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-red-600" />
+                      <span className="font-medium">Localização:</span>
+                      <span>{selectedService.location}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Tag className="h-4 w-4 text-purple-600" />
+                    <span className="font-medium">Categoria:</span>
+                    <Badge variant="outline">{selectedService.category}</Badge>
+                  </div>
+                  
+                  {selectedService.subcategory && (
+                    <div className="flex items-center gap-2">
+                      <Tag className="h-4 w-4 text-purple-600" />
+                      <span className="font-medium">Subcategoria:</span>
+                      <Badge variant="outline">{selectedService.subcategory}</Badge>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>
+                  Fechar
+                </Button>
+                <Button style={{ backgroundColor: '#3C5BFA' }}>
+                  Contratar Serviço
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

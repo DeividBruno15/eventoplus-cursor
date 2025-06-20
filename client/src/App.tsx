@@ -63,6 +63,17 @@ function AnalyticsWrapper() {
   return <Analytics />;
 }
 
+// Services Wrapper Component
+function ServicesWrapper() {
+  const { user } = useAuth();
+  
+  if (user?.userType === 'prestador') {
+    return <ManageServices />;
+  }
+  
+  return <Services />;
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -212,7 +223,7 @@ function Router() {
       <Route path="/services">
         <Layout>
           <AuthGuard>
-            <Services />
+            <ServicesWrapper />
           </AuthGuard>
         </Layout>
       </Route>

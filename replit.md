@@ -297,6 +297,14 @@ Preferred communication style: Simple, everyday language.
 - **API Functionality Confirmed**: Events now create successfully (200 OK) and display correctly in user event lists
 - **Complete Event Workflow**: Users can now create events through the interface and see them appear in "Meus eventos" immediately
 
+### June 20, 2025 - Service Creation Bug Fix and Schema Optimization
+- **Service Creation Fix**: Resolved critical 400 validation errors when creating services by optimizing insertServiceSchema
+- **Schema Flexibility**: Made optional fields truly optional (subcategory, portfolio, tags, pricing fields) while keeping core fields required
+- **Price Field Support**: Added flexible price handling supporting both string and number inputs with proper conversion
+- **API Validation Success**: Service creation now returns 201 Created with proper data persistence
+- **Complete Service Workflow**: Users can now create services through interface without validation errors
+- **Authentication Integration**: Service creation properly associates with logged-in user via providerId
+
 ### June 18, 2025 - ROADMAP COMPLETO IMPLEMENTADO - 100% EXECUTADO
 - **FASE 1 COMPLETA**: PIX integration, Stripe BRL, sistema de busca avançada, workflow completo de aplicações para eventos
 - **FASE 2 COMPLETA**: Google Maps integration, WhatsApp Business API, sistema de verificação, email service

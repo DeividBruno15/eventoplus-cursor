@@ -88,14 +88,20 @@ export default function CreateService() {
       const priceValue = parseFloat(data.price.replace(/[^\d,]/g, '').replace(',', '.'));
       
       const serviceData = {
-        ...data,
-        price: priceValue,
-        tags: tags.join(','),
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        basePrice: priceValue.toString()
       };
+
+      console.log("Sending service data:", JSON.stringify(serviceData, null, 2));
 
       const response = await apiRequest("POST", "/api/services", serviceData);
       if (!response.ok) {
-        throw new Error(`Erro ${response.status}: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({ message: response.statusText }));
+        console.error("Server error response:", errorData);
+        alert(`Erro ao criar serviço: ${JSON.stringify(errorData, null, 2)}`);
+        throw new Error(errorData.message || `Erro ${response.status}: ${response.statusText}`);
       }
       return response.json();
     },

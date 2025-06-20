@@ -632,6 +632,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
+      console.log("Request body:", JSON.stringify(req.body, null, 2));
+      
       const validatedData = insertServiceSchema.parse(req.body);
       const userId = (req.user as any).id;
       
@@ -642,7 +644,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.status(201).json(service);
     } catch (error: any) {
-      res.status(400).json({ message: error.message });
+      console.error("Validation error:", error);
+      if (error.issues) {
+        console.error("Zod validation issues:", JSON.stringify(error.issues, null, 2));
+      }
+      res.status(400).json({ 
+        message: error.message,
+        issues: error.issues || []
+      });
     }
   });
 
