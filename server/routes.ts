@@ -995,8 +995,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Contratantes see only their own events
         userEvents = allEvents.filter(event => event.organizerId === userId);
       } else if (userType === 'prestador') {
-        // Prestadores see all active events
-        userEvents = allEvents.filter(event => event.status === 'active');
+        // Prestadores see events matching their services and location
+        const userServices = await storage.getServices(userId);
+        const userLocation = (req.user as any).location || '';
+        
+        // Get provider's service categories
+        const providerCategories = userServices.map(service => service.category);
+        
+        // Filter events that match provider's categories and are active
+        userEvents = allEvents.filter(event => {
+          if (event.status !== 'active') return false;
+          
+          // Check if event category matches any of the provider's service categories
+          const hasMatchingService = providerCategories.includes(event.category);
+          
+          // For now, return events with matching categories
+          // Location filtering will be handled on the frontend with modal warning
+          return hasMatchingService;
+        });
       } else {
         // Anunciantes see all events for venue matching
         userEvents = allEvents;
@@ -1035,6 +1051,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error creating event:", error);
       res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Get specific event by ID
+  app.get("/api/events/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const eventId = parseInt(req.params.id);
+      if (!eventId || isNaN(eventId)) {
+        return res.status(400).json({ message: "ID do evento inválido" });
+      }
+
+      const event = await storage.getEvent(eventId);
+      if (!event) {
+        return res.status(404).json({ message: "Evento não encontrado" });
+      }
+
+      // Get applications for this event
+      const applications = await storage.getEventApplications(eventId);
+      
+      res.json({
+        ...event,
+        applications: applications || []
+      });
+    } catch (error: any) {
+      console.error("Error fetching event:", error);
+      res.status(500).json({ message: error.message });
     }
   });
 
