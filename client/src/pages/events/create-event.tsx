@@ -198,34 +198,38 @@ export default function CreateEvent() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-black mb-2">
+    <div className="max-w-3xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-black mb-2">
           Criar Novo Evento
         </h1>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           Preencha os detalhes do seu evento para começar a receber propostas de prestadores qualificados.
         </p>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Informações do Evento</CardTitle>
-          <CardDescription>
+        <CardHeader className="px-4 sm:px-6">
+          <CardTitle className="text-lg sm:text-xl">Informações do Evento</CardTitle>
+          <CardDescription className="text-sm">
             Forneça detalhes completos para atrair os melhores prestadores
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
               <FormField
                 control={form.control}
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Título do Evento</FormLabel>
+                    <FormLabel className="text-sm sm:text-base">Título do Evento</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: Casamento dos Sonhos - Marina & João" {...field} />
+                      <Input 
+                        placeholder="Ex: Casamento dos Sonhos - Marina & João" 
+                        className="text-sm sm:text-base"
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -237,11 +241,12 @@ export default function CreateEvent() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Descrição</FormLabel>
+                    <FormLabel className="text-sm sm:text-base">Descrição</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Descreva detalhadamente seu evento, estilo, preferências e expectativas..."
-                        rows={4}
+                        rows={3}
+                        className="text-sm sm:text-base resize-none"
                         {...field}
                       />
                     </FormControl>
@@ -250,16 +255,17 @@ export default function CreateEvent() {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <FormField
                   control={form.control}
                   name="date"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Data do Evento</FormLabel>
+                      <FormLabel className="text-sm sm:text-base">Data do Evento</FormLabel>
                       <FormControl>
                         <Input
                           type="date"
+                          className="text-sm sm:text-base"
                           {...field}
                         />
                       </FormControl>
@@ -273,11 +279,12 @@ export default function CreateEvent() {
                   name="guestCount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Número de Convidados</FormLabel>
+                      <FormLabel className="text-sm sm:text-base">Número de Convidados</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           placeholder="150"
+                          className="text-sm sm:text-base"
                           {...field}
                         />
                       </FormControl>
@@ -287,25 +294,26 @@ export default function CreateEvent() {
                 />
               </div>
 
-              <div className="space-y-4">
-                <FormLabel>Localização do Evento</FormLabel>
-                <p className="text-sm text-gray-600">
+              <div className="space-y-3 sm:space-y-4">
+                <FormLabel className="text-sm sm:text-base">Localização do Evento</FormLabel>
+                <p className="text-xs sm:text-sm text-gray-600">
                   O endereço completo será mostrado apenas para prestadores aceitos. 
                   Prestadores candidatos verão apenas a cidade e estado.
                 </p>
                 
                 <CEPInput onAddressFound={handleCEPFound} placeholder="CEP" />
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <FormField
                     control={form.control}
                     name="street"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Rua</FormLabel>
+                        <FormLabel className="text-sm">Rua</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="Nome da rua" 
+                            className="text-sm"
                             {...field} 
                             value={addressData.street || field.value}
                             readOnly
@@ -321,9 +329,13 @@ export default function CreateEvent() {
                     name="number"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Número</FormLabel>
+                        <FormLabel className="text-sm">Número</FormLabel>
                         <FormControl>
-                          <Input placeholder="123" {...field} />
+                          <Input 
+                            placeholder="123" 
+                            className="text-sm"
+                            {...field} 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -331,16 +343,17 @@ export default function CreateEvent() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <FormField
                     control={form.control}
                     name="neighborhood"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Bairro</FormLabel>
+                        <FormLabel className="text-sm">Bairro</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="Nome do bairro" 
+                            className="text-sm"
                             {...field} 
                             value={addressData.neighborhood || field.value}
                             readOnly
@@ -356,10 +369,10 @@ export default function CreateEvent() {
                     name="category"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Categoria do Evento</FormLabel>
+                        <FormLabel className="text-sm">Categoria do Evento</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="text-sm">
                               <SelectValue placeholder="Selecione" />
                             </SelectTrigger>
                           </FormControl>
@@ -378,19 +391,19 @@ export default function CreateEvent() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <FormField
                     control={form.control}
                     name="city"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Cidade</FormLabel>
+                        <FormLabel className="text-sm">Cidade</FormLabel>
                         <FormControl>
                           <Input 
+                            className="text-sm bg-gray-50"
                             {...field} 
                             value={addressData.city || field.value}
                             readOnly
-                            className="bg-gray-50"
                           />
                         </FormControl>
                         <FormMessage />
@@ -403,13 +416,13 @@ export default function CreateEvent() {
                     name="state"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Estado</FormLabel>
+                        <FormLabel className="text-sm">Estado</FormLabel>
                         <FormControl>
                           <Input 
+                            className="text-sm bg-gray-50"
                             {...field} 
                             value={addressData.state || field.value}
                             readOnly
-                            className="bg-gray-50"
                           />
                         </FormControl>
                         <FormMessage />
@@ -419,39 +432,40 @@ export default function CreateEvent() {
                 </div>
               </div>
 
-              {/* Services Selection */}
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <FormLabel>Serviços Necessários</FormLabel>
+              {/* Services Selection - Mobile Optimized */}
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                  <FormLabel className="text-sm sm:text-base">Serviços Necessários</FormLabel>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={addService}
+                    className="w-full sm:w-auto text-xs sm:text-sm"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                     Adicionar Serviço
                   </Button>
                 </div>
                 
                 {services.map((service, index) => (
-                  <Card key={index} className="p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                  <Card key={index} className="p-3 sm:p-4">
+                    <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-4 sm:gap-4 sm:items-end">
                       <FormField
                         control={form.control}
                         name={`services.${index}.type`}
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Tipo de Serviço</FormLabel>
+                          <FormItem className="sm:col-span-2 lg:col-span-1">
+                            <FormLabel className="text-xs sm:text-sm">Tipo de Serviço</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
-                                <SelectTrigger>
+                                <SelectTrigger className="text-xs sm:text-sm">
                                   <SelectValue placeholder="Selecione" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
                                 {serviceTypes.map((type) => (
-                                  <SelectItem key={type} value={type}>
+                                  <SelectItem key={type} value={type} className="text-xs sm:text-sm">
                                     {type}
                                   </SelectItem>
                                 ))}
@@ -462,65 +476,69 @@ export default function CreateEvent() {
                         )}
                       />
 
-                      <FormField
-                        control={form.control}
-                        name={`services.${index}.quantity`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Quantidade</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                min="1"
-                                {...field}
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name={`services.${index}.budget`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Orçamento</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                      <div className="grid grid-cols-2 gap-2 sm:gap-0 sm:contents">
+                        <FormField
+                          control={form.control}
+                          name={`services.${index}.quantity`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs sm:text-sm">Quantidade</FormLabel>
+                              <FormControl>
                                 <Input
-                                  type="text"
-                                  placeholder="0,00"
-                                  className="pl-10"
-                                  value={field.value ? (field.value / 100).toFixed(2).replace('.', ',') : ''}
-                                  onChange={(e) => {
-                                    let value = e.target.value.replace(/[^\d]/g, '');
-                                    if (value === '') {
-                                      field.onChange(0);
-                                      return;
-                                    }
-                                    const numValue = parseFloat(value);
-                                    field.onChange(numValue);
-                                  }}
+                                  type="number"
+                                  min="1"
+                                  className="text-xs sm:text-sm"
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
                                 />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                      <div>
+                        <FormField
+                          control={form.control}
+                          name={`services.${index}.budget`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs sm:text-sm">Orçamento</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <span className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs sm:text-sm">R$</span>
+                                  <Input
+                                    type="text"
+                                    placeholder="0,00"
+                                    className="pl-8 sm:pl-10 text-xs sm:text-sm"
+                                    value={field.value ? (field.value / 100).toFixed(2).replace('.', ',') : ''}
+                                    onChange={(e) => {
+                                      let value = e.target.value.replace(/[^\d]/g, '');
+                                      if (value === '') {
+                                        field.onChange(0);
+                                        return;
+                                      }
+                                      const numValue = parseFloat(value);
+                                      field.onChange(numValue);
+                                    }}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="flex justify-end sm:justify-start">
                         {services.length > 1 && (
                           <Button
                             type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => removeService(index)}
+                            className="text-xs sm:text-sm"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                           </Button>
                         )}
                       </div>
@@ -529,15 +547,15 @@ export default function CreateEvent() {
                 ))}
               </div>
 
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <FormLabel className="text-lg font-semibold">Orçamento Total do Evento</FormLabel>
-                <p className="text-sm text-gray-600 mb-2">Calculado automaticamente baseado nos serviços</p>
+              <div className="p-3 sm:p-4 bg-gray-50 rounded-lg">
+                <FormLabel className="text-base sm:text-lg font-semibold">Orçamento Total do Evento</FormLabel>
+                <p className="text-xs sm:text-sm text-gray-600 mb-2">Calculado automaticamente baseado nos serviços</p>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                  <span className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm sm:text-base">R$</span>
                   <Input
                     type="text"
                     readOnly
-                    className="pl-10 bg-white font-semibold text-lg"
+                    className="pl-8 sm:pl-10 bg-white font-semibold text-sm sm:text-lg"
                     value={services.reduce((total, service) => total + (service.budget || 0), 0) ? 
                       (services.reduce((total, service) => total + (service.budget || 0), 0) / 100).toFixed(2).replace('.', ',') : '0,00'
                     }
@@ -548,9 +566,9 @@ export default function CreateEvent() {
                 </p>
               </div>
 
-              <div className="space-y-4">
-                <FormLabel>Imagens do Evento</FormLabel>
-                <p className="text-sm text-gray-600">
+              <div className="space-y-3 sm:space-y-4">
+                <FormLabel className="text-sm sm:text-base">Imagens do Evento</FormLabel>
+                <p className="text-xs sm:text-sm text-gray-600">
                   Adicione até 5 imagens para ilustrar seu evento e atrair mais prestadores.
                 </p>
                 <MediaUpload
@@ -560,17 +578,18 @@ export default function CreateEvent() {
                 />
               </div>
 
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={() => setLocation("/events")}
+                  className="order-2 sm:order-1 text-sm sm:text-base"
                 >
                   Cancelar
                 </Button>
                 <Button 
                   type="submit" 
-                  className="bg-primary hover:bg-blue-700"
+                  className="order-1 sm:order-2 bg-primary hover:bg-blue-700 text-sm sm:text-base"
                   disabled={createEventMutation.isPending}
                 >
                   {createEventMutation.isPending ? "Criando..." : "Publicar Evento"}

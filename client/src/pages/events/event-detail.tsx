@@ -29,12 +29,28 @@ export default function EventDetail() {
   // Buscar dados do evento
   const { data: event, isLoading } = useQuery<any>({
     queryKey: ["/api/events", eventId],
+    queryFn: async () => {
+      if (!eventId) return null;
+      const response = await apiRequest("GET", `/api/events/${eventId}`);
+      if (!response.ok) {
+        throw new Error('Evento não encontrado');
+      }
+      return await response.json();
+    },
     enabled: !!eventId,
   });
 
   // Buscar candidaturas do evento
   const { data: applications = [] } = useQuery<any[]>({
     queryKey: ["/api/events", eventId, "applications"],
+    queryFn: async () => {
+      if (!eventId) return [];
+      const response = await apiRequest("GET", `/api/events/${eventId}/applications`);
+      if (!response.ok) {
+        return [];
+      }
+      return await response.json();
+    },
     enabled: !!eventId,
   });
 
@@ -169,9 +185,9 @@ export default function EventDetail() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {/* Informações Principais */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 md:space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Descrição do Evento</CardTitle>
@@ -186,7 +202,7 @@ export default function EventDetail() {
                 <CardTitle>Detalhes</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium text-gray-500">Categoria</Label>
                     <p className="text-gray-900">{event.category}</p>

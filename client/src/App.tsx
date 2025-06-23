@@ -164,14 +164,6 @@ function Router() {
         </Layout>
       </Route>
       
-      <Route path="/event/:id">
-        <Layout>
-          <AuthGuard>
-            <EventDetails />
-          </AuthGuard>
-        </Layout>
-      </Route>
-      
       <Route path="/services/manage">
         <Layout>
           <AuthGuard>
@@ -256,14 +248,6 @@ function Router() {
         <Layout>
           <AuthGuard>
             <Subscribe />
-          </AuthGuard>
-        </Layout>
-      </Route>
-      
-      <Route path="/pix-payment">
-        <Layout>
-          <AuthGuard>
-            <PixPayment />
           </AuthGuard>
         </Layout>
       </Route>

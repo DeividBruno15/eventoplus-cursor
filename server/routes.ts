@@ -111,6 +111,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(passport.session());
 
 
+  // Health check endpoint
+  app.get("/api/health", (req, res) => {
+    res.json({ 
+      status: "ok", 
+      timestamp: new Date().toISOString(),
+      version: "1.0.0",
+      environment: process.env.NODE_ENV || "development"
+    });
+  });
+
+  // Upload endpoint para imagens e vídeos
+  app.post("/api/upload", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      // Por agora, simular upload bem-sucedido
+      // Em produção, implementar com storage real (AWS S3, Cloudinary, etc.)
+      const { mediaData, fileName, fileType } = req.body;
+      
+      if (!mediaData || !fileName) {
+        return res.status(400).json({ message: "Dados de mídia incompletos" });
+      }
+
+      // Validar tipo de arquivo
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'];
+      if (!allowedTypes.includes(fileType)) {
+        return res.status(400).json({ message: "Tipo de arquivo não suportado" });
+      }
+
+      // Simular processamento e retornar URL válida
+      const fileId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const fileExtension = fileType.split('/')[1];
+      const publicUrl = `/uploads/${fileId}.${fileExtension}`;
+
+      // Em produção, aqui salvaria o arquivo e retornaria a URL real
+      res.json({
+        success: true,
+        url: publicUrl,
+        fileName,
+        fileType,
+        uploadedAt: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      res.status(500).json({ message: "Erro interno do servidor durante upload" });
+    }
+  });
+
   // Apply rate limiting to all API routes
   app.use('/api', apiLimiter);
   
@@ -213,6 +264,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/user/type", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const { userType } = req.body;
+
+      if (!userType || !['prestador', 'contratante', 'anunciante'].includes(userType)) {
+        return res.status(400).json({ message: "Tipo de usuário inválido" });
+      }
+
+      const updatedUser = await storage.updateUserType(userId, userType);
+      
+      // Update session data
+      (req.user as any).userType = userType;
+      
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      console.error("Error updating user type:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
 
   app.post("/api/logout", (req, res) => {
     req.logout((err) => {
@@ -1054,7 +1130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get specific event by ID
+  // Get specific event by ID (COM TIMEOUT OTIMIZADO)
   app.get("/api/events/:id", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Não autenticado" });
@@ -1066,25 +1142,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "ID do evento inválido" });
       }
 
-      const event = await storage.getEvent(eventId);
+      console.log(`🔍 Buscando evento ID: ${eventId}`);
+      
+      // Timeout de 5 segundos para evitar hang
+      const eventPromise = storage.getEvent(eventId);
+      const applicationsPromise = storage.getEventApplications(eventId);
+      
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Timeout na busca do evento")), 5000);
+      });
+
+      const [event, applications] = await Promise.race([
+        Promise.all([eventPromise, applicationsPromise]),
+        timeoutPromise
+      ]) as [any, any];
+
       if (!event) {
+        console.log(`❌ Evento ${eventId} não encontrado`);
         return res.status(404).json({ message: "Evento não encontrado" });
       }
 
-      // Get applications for this event
-      const applications = await storage.getEventApplications(eventId);
+      console.log(`✅ Evento ${eventId} encontrado: ${event.title}`);
       
       res.json({
         ...event,
         applications: applications || []
       });
     } catch (error: any) {
-      console.error("Error fetching event:", error);
+      console.error("❌ Error fetching event:", error);
       res.status(500).json({ message: error.message });
     }
   });
 
   // Event applications routes
+  app.get("/api/events/:eventId/applications", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const eventId = parseInt(req.params.eventId);
+      if (!eventId || isNaN(eventId)) {
+        return res.status(400).json({ message: "ID do evento inválido" });
+      }
+
+      const applications = await storage.getEventApplications(eventId);
+      res.json(applications || []);
+    } catch (error: any) {
+      console.error("Error fetching event applications:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   app.post("/api/events/:eventId/apply", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Não autenticado" });
@@ -1819,6 +1928,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Enhanced Event Applications System
+  // Rota esperada pelo frontend: PUT /api/event-applications/:id
+  app.put("/api/event-applications/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const applicationId = parseInt(req.params.id);
+      const { status, rejectionReason, contractTerms } = req.body;
+      const user = req.user as any;
+
+      // CORREÇÃO: Buscar candidatura específica por ID
+      const application = await storage.getEventApplicationById(applicationId);
+      
+      if (!application) {
+        return res.status(404).json({ message: "Candidatura não encontrada" });
+      }
+
+      const updatedApplication = await storage.updateEventApplication(applicationId, {
+        status,
+        rejectionReason: status === 'rejected' ? rejectionReason : undefined,
+        updatedAt: new Date()
+      });
+
+      // If approved, create contract
+      if (status === 'approved' && contractTerms) {
+        const contract = await storage.createContract({
+          eventId: application.eventId,
+          providerId: application.providerId,
+          organizerId: user.id,
+          terms: contractTerms,
+          amount: application.price,
+          status: 'pending_signature'
+        });
+
+        await storage.updateEventApplication(applicationId, {
+          contractId: contract.id
+        });
+      }
+
+      // Create notification for provider
+      const event = await storage.getEvent(application.eventId);
+      const statusText = status === 'approved' ? 'aprovada' : 'rejeitada';
+      
+      await storage.createNotification({
+        userId: application.providerId,
+        type: 'application_status',
+        title: `Candidatura ${statusText}`,
+        message: `Sua candidatura para "${event?.title}" foi ${statusText}`,
+        data: { eventId: application.eventId, applicationId, status }
+      });
+
+      res.json(updatedApplication);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Manter rota alternativa para compatibilidade
   app.patch("/api/applications/:id/status", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Não autenticado" });
@@ -1829,8 +1997,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { status, rejectionReason, contractTerms } = req.body;
       const user = req.user as any;
 
-      const applications = await storage.getEventApplications(0);
-      const application = applications.find(app => app.id === applicationId);
+      // CORREÇÃO: Buscar candidatura específica por ID
+      const application = await storage.getEventApplicationById(applicationId);
       
       if (!application) {
         return res.status(404).json({ message: "Candidatura não encontrada" });

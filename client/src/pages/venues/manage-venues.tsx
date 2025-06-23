@@ -305,14 +305,14 @@ export default function ManageVenues() {
               Novo Espaço
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] md:max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingVenue ? "Editar Espaço" : "Criar Novo Espaço"}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="name">Nome do espaço *</Label>
                   <Input
@@ -350,7 +350,7 @@ export default function ManageVenues() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="cep">CEP *</Label>
                   <Input
@@ -373,8 +373,8 @@ export default function ManageVenues() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-2">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-2">
                   <Label htmlFor="rua">Rua</Label>
                   <Input
                     id="rua"
@@ -395,7 +395,7 @@ export default function ManageVenues() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="bairro">Bairro</Label>
                   <Input
@@ -444,7 +444,7 @@ export default function ManageVenues() {
                 </Select>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="pricePerHour">Preço por hora</Label>
                   <div className="relative">
@@ -518,7 +518,7 @@ export default function ManageVenues() {
 
               <div>
                 <Label>Comodidades e facilidades</Label>
-                <div className="grid grid-cols-3 gap-2 mt-2">
+                                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
                   {AMENITIES_OPTIONS.map((amenity) => (
                     <div key={amenity} className="flex items-center space-x-2">
                       <Checkbox

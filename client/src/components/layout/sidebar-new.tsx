@@ -41,9 +41,11 @@ import {
 interface SidebarProps {
   collapsed: boolean;
   onToggle: (collapsed: boolean) => void;
+  isMobile?: boolean;
+  showMobile?: boolean;
 }
 
-export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export default function Sidebar({ collapsed, onToggle, isMobile = false, showMobile = false }: SidebarProps) {
   const { user, logout } = useAuth();
   const [location] = useLocation();
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
@@ -188,8 +190,10 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const menuItems = getMenuItems();
 
   return (
-    <div className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 transition-all duration-300 z-40 ${
-      collapsed ? 'w-16' : 'w-64'
+    <div className={`${isMobile ? 'fixed' : 'fixed'} left-0 top-0 h-full bg-white border-r border-gray-200 transition-all duration-300 z-40 ${
+      isMobile 
+        ? `w-64 ${showMobile ? 'translate-x-0' : '-translate-x-full'}`
+        : collapsed ? 'w-16' : 'w-64'
     }`}>
       <div className="flex flex-col h-full">
         {/* Header */}
@@ -276,29 +280,64 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-sm truncate">{user.username}</div>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge className={`text-xs ${getUserTypeBadgeColor(user.userType)}`}>
-                    {getUserTypeLabel(user.userType)}
-                  </Badge>
-                  
+                <div className="mt-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-5 w-5 p-0">
-                        <RefreshCw className="h-3 w-3" />
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className={`w-full justify-between text-xs h-7 ${getUserTypeBadgeColor(user.userType)} border-none`}
+                      >
+                        <div className="flex items-center gap-1">
+                          <User className="h-3 w-3" />
+                          {getUserTypeLabel(user.userType)}
+                        </div>
+                        <ChevronDown className="h-3 w-3" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
-                      <DropdownMenuItem onClick={() => handleUserTypeChange('prestador')}>
-                        <User className="h-4 w-4 mr-2" />
-                        Prestador
+                    <DropdownMenuContent align="start" className="w-48">
+                      <div className="px-2 py-1 text-xs text-gray-500 font-medium">Trocar tipo de perfil</div>
+                      <DropdownMenuItem 
+                        onClick={() => handleUserTypeChange('prestador')}
+                        className="flex items-center gap-2"
+                        disabled={user.userType === 'prestador'}
+                      >
+                        <div className="flex items-center gap-2 flex-1">
+                          <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                          <div>
+                            <div className="font-medium">Prestador</div>
+                            <div className="text-xs text-gray-500">Ofereça seus serviços</div>
+                          </div>
+                        </div>
+                        {user.userType === 'prestador' && <Star className="h-3 w-3 text-blue-500" />}
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleUserTypeChange('contratante')}>
-                        <Users className="h-4 w-4 mr-2" />
-                        Contratante
+                      <DropdownMenuItem 
+                        onClick={() => handleUserTypeChange('contratante')}
+                        className="flex items-center gap-2"
+                        disabled={user.userType === 'contratante'}
+                      >
+                        <div className="flex items-center gap-2 flex-1">
+                          <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                          <div>
+                            <div className="font-medium">Contratante</div>
+                            <div className="text-xs text-gray-500">Organize eventos</div>
+                          </div>
+                        </div>
+                        {user.userType === 'contratante' && <Star className="h-3 w-3 text-green-500" />}
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleUserTypeChange('anunciante')}>
-                        <MapPin className="h-4 w-4 mr-2" />
-                        Anunciante
+                      <DropdownMenuItem 
+                        onClick={() => handleUserTypeChange('anunciante')}
+                        className="flex items-center gap-2"
+                        disabled={user.userType === 'anunciante'}
+                      >
+                        <div className="flex items-center gap-2 flex-1">
+                          <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+                          <div>
+                            <div className="font-medium">Anunciante</div>
+                            <div className="text-xs text-gray-500">Anuncie espaços</div>
+                          </div>
+                        </div>
+                        {user.userType === 'anunciante' && <Star className="h-3 w-3 text-purple-500" />}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

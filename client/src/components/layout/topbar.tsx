@@ -15,15 +15,18 @@ import {
   Settings, 
   HelpCircle, 
   LogOut,
-  ChevronDown
+  ChevronDown,
+  Menu
 } from "lucide-react";
 import { Link } from "wouter";
 
 interface TopbarProps {
   sidebarCollapsed: boolean;
+  onMobileMenuToggle?: () => void;
+  isMobile?: boolean;
 }
 
-export default function Topbar({ sidebarCollapsed }: TopbarProps) {
+export default function Topbar({ sidebarCollapsed, onMobileMenuToggle, isMobile = false }: TopbarProps) {
   const { user, logout } = useAuth();
 
   if (!user) return null;
@@ -33,18 +36,38 @@ export default function Topbar({ sidebarCollapsed }: TopbarProps) {
   };
 
   return (
-    <div className={`fixed top-0 right-0 h-16 bg-white border-b border-gray-200 z-20 flex items-center justify-end px-6 transition-all duration-300 ${
-      sidebarCollapsed ? 'left-16' : 'left-64'
+    <div className={`fixed top-0 right-0 h-16 bg-white border-b border-gray-200 z-20 flex items-center justify-between px-4 md:px-6 transition-all duration-300 ${
+      isMobile ? 'left-0' : sidebarCollapsed ? 'left-16' : 'left-64'
     }`}>
-      <div className="flex items-center space-x-4">
+      
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onMobileMenuToggle}
+          className="mr-2"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      )}
+
+      {/* Logo para mobile */}
+      {isMobile && (
+        <div className="flex-1 flex justify-center">
+          <span className="text-lg font-bold text-[#3C5BFA]">Evento+</span>
+        </div>
+      )}
+
+      <div className="flex items-center space-x-2 md:space-x-4 ml-auto">
         {/* Notificações */}
         <NotificationCenter />
 
         {/* Menu do Usuário */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center space-x-2 px-3">
-              <Avatar className="w-8 h-8">
+            <Button variant="ghost" className="flex items-center space-x-2 px-2 md:px-3">
+              <Avatar className="w-7 h-7 md:w-8 md:h-8">
                 <AvatarFallback className="bg-primary text-white text-xs">
                   {user.username.charAt(0).toUpperCase()}
                 </AvatarFallback>

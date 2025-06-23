@@ -45,7 +45,7 @@ export const events = pgTable("events", {
   location: text("location").notNull(),
   budget: decimal("budget", { precision: 10, scale: 2 }).notNull(),
   category: varchar("category", { length: 50 }).notNull(),
-  guestCount: integer("guest_count").notNull(),
+  guestCount: integer("guest_count"),
   organizerId: integer("organizer_id").references(() => users.id).notNull(),
   status: varchar("status", { length: 20 }).default("active"), // active, closed, cancelled
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -447,8 +447,44 @@ export const insertEventSchema = createInsertSchema(events).omit({
   status: true,
   createdAt: true,
 }).extend({
-  date: z.union([z.string(), z.date()]).transform((val) => new Date(val)),
-  budget: z.union([z.string(), z.number()]).transform((val) => val.toString()),
+  // Campos obrigatórios mais flexíveis
+  title: z.string().min(1, "Título é obrigatório"),
+  description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
+  location: z.string().min(1, "Localização é obrigatória"),
+  category: z.string().min(1, "Categoria é obrigatória"),
+  
+  // Data flexível que aceita string ou Date
+  date: z.union([
+    z.string().transform((val) => {
+      const date = new Date(val);
+      if (isNaN(date.getTime())) {
+        throw new Error("Data inválida");
+      }
+      return date;
+    }),
+    z.date()
+  ]),
+  
+  // Budget flexível 
+  budget: z.union([
+    z.string().transform((val) => {
+      const num = parseFloat(val.replace(/[^\d,.-]/g, '').replace(',', '.'));
+      if (isNaN(num) || num < 0) {
+        throw new Error("Orçamento deve ser um número válido");
+      }
+      return num.toString();
+    }),
+    z.number().min(0, "Orçamento deve ser positivo").transform((val) => val.toString())
+  ]).optional(),
+  
+  // Campos opcionais que podem vir undefined/null
+  guestCount: z.union([z.string(), z.number()]).transform((val) => {
+    const num = typeof val === 'string' ? parseInt(val) : val;
+    return isNaN(num) ? null : num;
+  }).optional().nullable(),
+  
+  requirements: z.string().optional().nullable(),
+  images: z.array(z.string()).optional().nullable(),
 });
 
 export const insertEventApplicationSchema = createInsertSchema(eventApplications).omit({
@@ -494,9 +530,56 @@ export const insertVenueSchema = createInsertSchema(venues).omit({
   active: true,
   createdAt: true,
 }).extend({
-  pricePerHour: z.union([z.string(), z.number()]).optional().nullable(),
-  pricePerDay: z.union([z.string(), z.number()]).optional().nullable(),
-  pricePerWeekend: z.union([z.string(), z.number()]).optional().nullable(),
+  // Campos obrigatórios
+  name: z.string().min(1, "Nome do espaço é obrigatório"),
+  description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"), 
+  location: z.string().min(1, "Localização é obrigatória"),
+  category: z.string().min(1, "Categoria é obrigatória"),
+  capacity: z.union([
+    z.string().transform((val) => {
+      const num = parseInt(val);
+      if (isNaN(num) || num <= 0) {
+        throw new Error("Capacidade deve ser um número válido maior que 0");
+      }
+      return num;
+    }),
+    z.number().min(1, "Capacidade deve ser maior que 0")
+  ]),
+  
+  // Campos opcionais de preço com validação
+  pricePerHour: z.union([
+    z.string().transform((val) => {
+      if (!val || val.trim() === '') return null;
+      const num = parseFloat(val.replace(/[^\d,.-]/g, '').replace(',', '.'));
+      return isNaN(num) ? null : num.toString();
+    }),
+    z.number().transform((val) => val.toString())
+  ]).optional().nullable(),
+  
+  pricePerDay: z.union([
+    z.string().transform((val) => {
+      if (!val || val.trim() === '') return null;
+      const num = parseFloat(val.replace(/[^\d,.-]/g, '').replace(',', '.'));
+      return isNaN(num) ? null : num.toString();
+    }),
+    z.number().transform((val) => val.toString())
+  ]).optional().nullable(),
+  
+  pricePerWeekend: z.union([
+    z.string().transform((val) => {
+      if (!val || val.trim() === '') return null;
+      const num = parseFloat(val.replace(/[^\d,.-]/g, '').replace(',', '.'));
+      return isNaN(num) ? null : num.toString();
+    }),
+    z.number().transform((val) => val.toString())
+  ]).optional().nullable(),
+  
+  // Campos opcionais que podem ser undefined/null
+  number: z.string().optional().nullable(),
+  pricingModel: z.string().optional().nullable(),
+  amenities: z.array(z.string()).optional().nullable(),
+  images: z.array(z.string()).optional().nullable(),
+  addressData: z.string().optional().nullable(),
 });
 
 export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({

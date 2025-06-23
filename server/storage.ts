@@ -65,6 +65,7 @@ export interface IStorage {
   
   // Event Applications
   getEventApplications(eventId: number): Promise<EventApplication[]>;
+  getEventApplicationById(id: number): Promise<EventApplication | undefined>;
   createEventApplication(application: InsertEventApplication): Promise<EventApplication>;
   updateEventApplication(id: number, application: Partial<EventApplication>): Promise<EventApplication>;
   
@@ -360,6 +361,15 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     if (!result[0]) throw new Error("Application not found");
+    return result[0];
+  }
+
+  async getEventApplicationById(id: number): Promise<EventApplication | undefined> {
+    const result = await db.select()
+      .from(eventApplications)
+      .where(eq(eventApplications.id, id))
+      .limit(1);
+    
     return result[0];
   }
 

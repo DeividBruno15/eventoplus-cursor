@@ -171,39 +171,80 @@ export default function ManageServices() {
     }
   };
 
-  // Função para redimensionar imagem
+  // Função para redimensionar imagem com tratamento de erro adequado
   const resizeImage = (file: File, maxWidth: number = 800, maxHeight: number = 600, quality: number = 0.8): Promise<string> => {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
 
+      // Timeout para evitar travamento
+      const timeout = setTimeout(() => {
+        reject(new Error('Timeout ao processar imagem'));
+      }, 10000);
+
       img.onload = () => {
-        // Calcular novas dimensões mantendo proporção
-        let { width, height } = img;
-        
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width;
-          width = maxWidth;
-        }
-        
-        if (height > maxHeight) {
-          width = (width * maxHeight) / height;
-          height = maxHeight;
-        }
+        try {
+          clearTimeout(timeout);
+          
+          // Calcular novas dimensões mantendo proporção
+          let { width, height } = img;
+          
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+          
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
 
-        canvas.width = width;
-        canvas.height = height;
+          canvas.width = width;
+          canvas.height = height;
 
-        // Desenhar imagem redimensionada
-        ctx?.drawImage(img, 0, 0, width, height);
-        
-        // Converter para Base64 com qualidade reduzida
-        const resizedDataUrl = canvas.toDataURL('image/jpeg', quality);
-        resolve(resizedDataUrl);
+          if (!ctx) {
+            reject(new Error('Contexto canvas não disponível'));
+            return;
+          }
+
+          // Desenhar imagem redimensionada
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Converter para Base64 com qualidade reduzida
+          const resizedDataUrl = canvas.toDataURL('image/jpeg', quality);
+          
+          // Validar se o resultado é válido
+          if (!resizedDataUrl || !resizedDataUrl.startsWith('data:image/')) {
+            reject(new Error('Falha ao gerar imagem redimensionada'));
+            return;
+          }
+          
+          resolve(resizedDataUrl);
+        } catch (error) {
+          clearTimeout(timeout);
+          reject(error);
+        }
       };
 
-      img.src = URL.createObjectURL(file);
+      img.onerror = () => {
+        clearTimeout(timeout);
+        reject(new Error('Falha ao carregar imagem'));
+      };
+
+      try {
+        const objectUrl = URL.createObjectURL(file);
+        img.src = objectUrl;
+        
+        // Limpar URL do objeto após uso
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+          img.onload(); // Chama o handler original
+        };
+      } catch (error) {
+        clearTimeout(timeout);
+        reject(new Error('Falha ao criar URL do objeto'));
+      }
     });
   };
 
@@ -244,25 +285,66 @@ export default function ManageServices() {
 
     if (validFiles.length === 0) return;
 
-    // Processar arquivos
+    // Processar arquivos com upload real ao backend
     const newMediaFiles: string[] = [];
+    
+    // Mostrar toast de progresso
+    toast({
+      title: "Fazendo upload...",
+      description: `Enviando ${validFiles.length} arquivo(s) para o servidor`,
+    });
     
     for (const file of validFiles) {
       try {
+        let mediaData: string;
+        
         if (file.type.startsWith('image/')) {
-          // Redimensionar imagens
-          const resizedImage = await resizeImage(file);
-          newMediaFiles.push(resizedImage);
+          // Redimensionar imagens primeiro
+          mediaData = await resizeImage(file);
+        } else if (file.type.startsWith('video/')) {
+          // Para vídeos, criar preview temporário enquanto faz upload
+          mediaData = URL.createObjectURL(file);
         } else {
-          // Para vídeos, criar uma URL temporária mais simples
-          const url = `placeholder-video-${Date.now()}-${file.name}`;
-          newMediaFiles.push(url);
+          throw new Error(`Tipo de arquivo não suportado: ${file.type}`);
         }
+
+        // Fazer upload real para o backend
+        try {
+          const uploadResponse = await apiRequest("POST", "/api/upload", {
+            mediaData,
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error('Falha no upload para o servidor');
+          }
+
+          const uploadResult = await uploadResponse.json();
+          
+          if (uploadResult.success && uploadResult.url) {
+            newMediaFiles.push(uploadResult.url);
+          } else {
+            throw new Error('Resposta de upload inválida');
+          }
+        } catch (uploadError) {
+          console.error('Erro no upload para servidor:', uploadError);
+          
+          // Fallback: usar dados locais com aviso
+          newMediaFiles.push(mediaData);
+          toast({
+            title: "Upload falhou",
+            description: `${file.name} foi adicionado localmente. Salve o serviço para tentar novamente.`,
+            variant: "destructive",
+          });
+        }
+        
       } catch (error) {
         console.error('Erro ao processar arquivo:', error);
         toast({
-          title: "Erro no upload",
-          description: `Erro ao processar ${file.name}`,
+          title: "Erro no processamento",
+          description: `Erro ao processar ${file.name}: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
           variant: "destructive",
         });
       }
@@ -516,14 +598,14 @@ export default function ManageServices() {
               Novo Serviço
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] md:max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingService ? "Editar Serviço" : "Criar Novo Serviço"}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="title">Título *</Label>
                   <Input
@@ -605,7 +687,7 @@ export default function ManageServices() {
                   {formData.hasEquipment === 'Possuo' && (
                     <div>
                       <Label>Equipamentos disponíveis</Label>
-                      <div className="grid grid-cols-2 gap-2 mt-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
                         {EQUIPMENT_OPTIONS.map((equipment) => (
                           <div key={equipment} className="flex items-center space-x-2">
                             <Checkbox
@@ -646,7 +728,7 @@ export default function ManageServices() {
                   </div>
                   
                   {formData.mediaFiles.length > 0 && (
-                    <div className="mt-4 grid grid-cols-3 gap-2">
+                    <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2">
                       {formData.mediaFiles.map((file, index) => (
                         <div key={index} className="relative">
                           <div className="w-full h-20 bg-gray-200 rounded-lg flex items-center justify-center relative overflow-hidden">
@@ -689,7 +771,7 @@ export default function ManageServices() {
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="basePrice">Preço (R$) *</Label>
                   <Input
