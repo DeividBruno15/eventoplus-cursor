@@ -64,19 +64,24 @@ app.use((req, res, next) => {
   // It is the only port that is not firewalled.
   const port = 5000;
   
-  server.on('error', (err: any) => {
-    if (err.code === 'EADDRINUSE') {
-      console.log(`Port ${port} is busy, retrying in 1 second...`);
-      setTimeout(() => {
-        server.close();
-        server.listen(port, "0.0.0.0");
-      }, 1000);
-    } else {
-      console.error('Server error:', err);
-    }
-  });
+  const startServer = () => {
+    server.listen(port, "0.0.0.0", () => {
+      log(`serving on port ${port}`);
+    }).on('error', (err: any) => {
+      if (err.code === 'EADDRINUSE') {
+        console.log(`Port ${port} is busy, killing existing process and retrying...`);
+        // Kill existing processes on port 5000
+        require('child_process').exec(`pkill -f "tsx server/index.ts" || true`, () => {
+          setTimeout(() => {
+            startServer();
+          }, 2000);
+        });
+      } else {
+        console.error('Server error:', err);
+        process.exit(1);
+      }
+    });
+  };
 
-  server.listen(port, "0.0.0.0", () => {
-    log(`serving on port ${port}`);
-  });
+  startServer();
 })();
