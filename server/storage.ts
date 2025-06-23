@@ -62,6 +62,7 @@ export interface IStorage {
   getEventWithApplications(id: number): Promise<any>;
   createEvent(event: InsertEvent & { organizerId: number }): Promise<Event>;
   updateEvent(id: number, event: Partial<Event>): Promise<Event>;
+  deleteEvent(id: number): Promise<void>;
   
   // Event Applications
   getEventApplications(eventId: number): Promise<EventApplication[]>;
@@ -339,6 +340,34 @@ export class DatabaseStorage implements IStorage {
     
     if (!result[0]) throw new Error("Event not found");
     return result[0];
+  }
+
+  async deleteEvent(id: number): Promise<void> {
+    console.log(`Storage: Executando DELETE para evento ID: ${id}`);
+    
+    try {
+      // Primeiro, remove candidaturas associadas ao evento
+      console.log(`Storage: Removendo candidaturas do evento ID: ${id}`);
+      await db.delete(eventApplications).where(eq(eventApplications.eventId, id));
+      console.log(`Storage: Candidaturas removidas`);
+      
+      // Remove notificações relacionadas ao evento
+      await db.delete(notifications).where(
+        sql`${notifications.data}->>'eventId' = ${id.toString()}`
+      );
+      console.log(`Storage: Notificações relacionadas removidas`);
+      
+      // Remove o evento
+      const result = await db.delete(events).where(eq(events.id, id)).returning();
+      console.log(`Storage: Resultado da exclusão do evento:`, result.length > 0 ? `Excluído: ${JSON.stringify(result[0])}` : "Nenhum registro afetado");
+      
+      if (result.length === 0) {
+        throw new Error(`Evento com ID ${id} não foi encontrado para exclusão`);
+      }
+    } catch (error) {
+      console.error(`Storage: Erro na exclusão do evento ID ${id}:`, error);
+      throw error;
+    }
   }
 
   // Event Applications

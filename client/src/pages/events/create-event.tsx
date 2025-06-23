@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,7 +15,7 @@ import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { CEPInput } from "@/components/ui/cep-input";
 import { MediaUpload } from "@/components/ui/media-upload";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Edit } from "lucide-react";
 
 const serviceSchema = z.object({
   type: z.string().min(1, "Tipo de serviço é obrigatório"),
@@ -108,6 +108,23 @@ export default function CreateEvent() {
     state: ""
   });
 
+  // Detectar se está em modo de edição pela URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const editEventId = urlParams.get('edit');
+  const isEditMode = !!editEventId;
+
+  // Buscar dados do evento se estiver em modo de edição
+  const { data: eventToEdit, isLoading: loadingEvent } = useQuery({
+    queryKey: ["/api/events", editEventId],
+    queryFn: async () => {
+      if (!editEventId) return null;
+      const response = await apiRequest("GET", `/api/events/${editEventId}`);
+      if (!response.ok) throw new Error('Evento não encontrado');
+      return await response.json();
+    },
+    enabled: isEditMode,
+  });
+
   const form = useForm<CreateEventForm>({
     resolver: zodResolver(createEventSchema),
     defaultValues: {
@@ -127,6 +144,27 @@ export default function CreateEvent() {
   });
 
   const services = form.watch("services");
+
+  // Pré-preencher formulário quando estiver editando
+  useEffect(() => {
+    if (eventToEdit && isEditMode) {
+      const eventDate = new Date(eventToEdit.date);
+      const formattedDate = eventDate.toISOString().slice(0, 16); // formato datetime-local
+      
+      form.setValue('title', eventToEdit.title || '');
+      form.setValue('description', eventToEdit.description || '');
+      form.setValue('date', formattedDate);
+      form.setValue('category', eventToEdit.category || '');
+      form.setValue('guestCount', eventToEdit.guestCount?.toString() || '');
+      
+      // Tentar extrair cidade e estado da localização
+      const locationParts = eventToEdit.location?.split(', ') || [];
+      if (locationParts.length >= 2) {
+        form.setValue('city', locationParts[0] || '');
+        form.setValue('state', locationParts[1] || '');
+      }
+    }
+  }, [eventToEdit, isEditMode, form]);
 
   const handleCEPFound = (address: any) => {
     setAddressData({
@@ -161,19 +199,31 @@ export default function CreateEvent() {
           budget: service.budget / 100
         }))
       };
-      return apiRequest("POST", "/api/events", eventData);
+
+      if (isEditMode && editEventId) {
+        // Atualizar evento existente
+        return apiRequest("PUT", `/api/events/${editEventId}`, eventData);
+      } else {
+        // Criar novo evento
+        return apiRequest("POST", "/api/events", eventData);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/events"] });
+      if (isEditMode) {
+        queryClient.invalidateQueries({ queryKey: ["/api/events", editEventId] });
+      }
       toast({
-        title: "Evento criado com sucesso!",
-        description: "Seu evento foi publicado e está disponível para candidaturas.",
+        title: isEditMode ? "Evento atualizado com sucesso!" : "Evento criado com sucesso!",
+        description: isEditMode 
+          ? "As alterações foram salvas com sucesso." 
+          : "Seu evento foi publicado e está disponível para candidaturas.",
       });
       setLocation("/events");
     },
     onError: (error: any) => {
       toast({
-        title: "Erro ao criar evento",
+        title: isEditMode ? "Erro ao atualizar evento" : "Erro ao criar evento",
         description: error.message || "Ocorreu um erro inesperado",
         variant: "destructive",
       });
@@ -197,14 +247,39 @@ export default function CreateEvent() {
     }
   };
 
+  if (loadingEvent) {
+    return (
+      <div className="max-w-3xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>
+          <div className="space-y-4">
+            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-32 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-3xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-black mb-2">
-          Criar Novo Evento
+        <h1 className="text-2xl sm:text-3xl font-bold text-black mb-2 flex items-center gap-2">
+          {isEditMode ? (
+            <>
+              <Edit className="h-6 w-6" />
+              Editar Evento
+            </>
+          ) : (
+            "Criar Novo Evento"
+          )}
         </h1>
         <p className="text-sm sm:text-base text-gray-600">
-          Preencha os detalhes do seu evento para começar a receber propostas de prestadores qualificados.
+          {isEditMode 
+            ? "Atualize as informações do seu evento conforme necessário."
+            : "Preencha os detalhes do seu evento para começar a receber propostas de prestadores qualificados."
+          }
         </p>
       </div>
 
@@ -592,7 +667,10 @@ export default function CreateEvent() {
                   className="order-1 sm:order-2 bg-primary hover:bg-blue-700 text-sm sm:text-base"
                   disabled={createEventMutation.isPending}
                 >
-                  {createEventMutation.isPending ? "Criando..." : "Publicar Evento"}
+                  {createEventMutation.isPending 
+                    ? (isEditMode ? "Salvando..." : "Criando...") 
+                    : (isEditMode ? "Salvar Alterações" : "Publicar Evento")
+                  }
                 </Button>
               </div>
             </form>

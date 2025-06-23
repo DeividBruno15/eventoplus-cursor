@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRoute } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -13,16 +13,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { CalendarDays, MapPin, DollarSign, Users, Clock, Star, Send, CheckCircle, XCircle, User } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CalendarDays, MapPin, DollarSign, Users, Clock, Star, Send, CheckCircle, XCircle, User, Edit, Trash2, Image } from "lucide-react";
 
 export default function EventDetail() {
   const [, params] = useRoute("/events/:id");
+  const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [proposal, setProposal] = useState("");
   const [proposedPrice, setProposedPrice] = useState("");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const eventId = params?.id ? parseInt(params.id) : null;
 
@@ -102,6 +105,27 @@ export default function EventDetail() {
     },
   });
 
+  // Mutation para excluir evento
+  const deleteEventMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("DELETE", `/api/events/${eventId}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Evento excluído",
+        description: "O evento foi excluído com sucesso.",
+      });
+      setLocation("/events");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao excluir evento",
+        description: error.message || "Ocorreu um erro inesperado",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSubmitApplication = () => {
     if (!proposal.trim() || !proposedPrice) {
       toast({
@@ -122,6 +146,21 @@ export default function EventDetail() {
     updateApplicationMutation.mutate({ applicationId, status });
   };
 
+  const handleEditEvent = () => {
+    // Por enquanto, redirecionar para a página de criação com dados preenchidos
+    // Em uma implementação futura, pode ser criada uma página específica de edição
+    setLocation(`/events/create?edit=${eventId}`);
+  };
+
+  const handleDeleteEvent = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteEvent = () => {
+    deleteEventMutation.mutate();
+    setShowDeleteDialog(false);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -132,12 +171,56 @@ export default function EventDetail() {
             <div className="space-y-4">
               <div className="h-32 bg-gray-200 rounded"></div>
               <div className="h-32 bg-gray-200 rounded"></div>
-            </div>
-          </div>
+                      </div>
         </div>
       </div>
-    );
-  }
+
+      {/* Modal de Confirmação de Exclusão */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <Trash2 className="h-5 w-5" />
+              Excluir Evento
+            </DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir o evento <strong>"{event?.title}"</strong>?
+              <br /><br />
+              Esta ação não pode ser desfeita e todas as candidaturas associadas também serão removidas.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+              disabled={deleteEventMutation.isPending}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteEvent}
+              disabled={deleteEventMutation.isPending}
+              className="flex items-center gap-2"
+            >
+              {deleteEventMutation.isPending ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Excluindo...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4" />
+                  Confirmar Exclusão
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
 
   if (!event) {
     return (
@@ -179,9 +262,37 @@ export default function EventDetail() {
                 </div>
               </div>
             </div>
-            <Badge variant={event.status === 'active' ? 'default' : 'secondary'}>
-              {event.status === 'active' ? 'Ativo' : event.status}
-            </Badge>
+            
+            <div className="flex items-center gap-3">
+              <Badge variant={event.status === 'active' ? 'default' : 'secondary'}>
+                {event.status === 'active' ? 'Ativo' : event.status}
+              </Badge>
+              
+              {/* Opções de gerenciamento para o organizador */}
+              {isOrganizer && (
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleEditEvent}
+                    className="flex items-center gap-2"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Editar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDeleteEvent}
+                    disabled={deleteEventMutation.isPending}
+                    className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    {deleteEventMutation.isPending ? "Excluindo..." : "Excluir"}
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -196,6 +307,47 @@ export default function EventDetail() {
                 <p className="text-gray-700 whitespace-pre-wrap">{event.description}</p>
               </CardContent>
             </Card>
+
+            {/* Imagens do Evento */}
+            {event.images && event.images.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Image className="h-5 w-5" />
+                    Imagens do Evento
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {event.images.map((imageUrl: string, index: number) => (
+                      <div key={index} className="aspect-square bg-gray-100 rounded-lg overflow-hidden relative group cursor-pointer">
+                        <img
+                          src={imageUrl}
+                          alt={`Imagem ${index + 1} do evento`}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                        {/* Overlay para indicar que pode expandir */}
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity flex items-center justify-center">
+                          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Image className="h-8 w-8 text-white" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {event.images.length === 0 && (
+                    <div className="text-center py-8">
+                      <Image className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-500">Nenhuma imagem adicionada</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             <Card>
               <CardHeader>
@@ -239,7 +391,7 @@ export default function EventDetail() {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   Candidaturas ({applications.length})
-                  {isPrestador && !hasApplied && event.status === 'active' && (
+                  {isPrestador && !isOrganizer && !hasApplied && event.status === 'active' && (
                     <Button
                       onClick={() => setShowApplicationForm(!showApplicationForm)}
                       className="bg-primary hover:bg-blue-700"

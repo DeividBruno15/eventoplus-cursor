@@ -1174,6 +1174,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update event (apenas o organizador pode editar)
+  app.put("/api/events/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const eventId = parseInt(req.params.id);
+      if (!eventId || isNaN(eventId)) {
+        return res.status(400).json({ message: "ID do evento inválido" });
+      }
+
+      const userId = (req.user as any).id;
+      
+      // Verificar se o evento existe e se o usuário é o organizador
+      const existingEvent = await storage.getEvent(eventId);
+      if (!existingEvent) {
+        return res.status(404).json({ message: "Evento não encontrado" });
+      }
+
+      if (existingEvent.organizerId !== userId) {
+        return res.status(403).json({ message: "Você não tem permissão para editar este evento" });
+      }
+
+      // Validar dados de entrada
+      const updateData = {
+        ...req.body,
+        date: new Date(req.body.date || req.body.eventDate),
+        budget: req.body.budget?.toString() || existingEvent.budget
+      };
+      
+      // Remove eventDate if it exists since we use date
+      if (updateData.eventDate) {
+        delete updateData.eventDate;
+      }
+      
+      // Atualizar o evento
+      const updatedEvent = await storage.updateEvent(eventId, updateData);
+      
+      console.log(`✏️ Evento ${eventId} atualizado com sucesso pelo usuário ${userId}`);
+      res.json(updatedEvent);
+    } catch (error: any) {
+      console.error("❌ Erro ao atualizar evento:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Delete event (apenas o organizador pode excluir)
+  app.delete("/api/events/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const eventId = parseInt(req.params.id);
+      if (!eventId || isNaN(eventId)) {
+        return res.status(400).json({ message: "ID do evento inválido" });
+      }
+
+      const userId = (req.user as any).id;
+      
+      // Verificar se o evento existe e se o usuário é o organizador
+      const event = await storage.getEvent(eventId);
+      if (!event) {
+        return res.status(404).json({ message: "Evento não encontrado" });
+      }
+
+      if (event.organizerId !== userId) {
+        return res.status(403).json({ message: "Você não tem permissão para excluir este evento" });
+      }
+
+      // Excluir o evento
+      await storage.deleteEvent(eventId);
+      
+      console.log(`🗑️ Evento ${eventId} excluído com sucesso pelo usuário ${userId}`);
+      res.json({ message: "Evento excluído com sucesso" });
+    } catch (error: any) {
+      console.error("❌ Erro ao excluir evento:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Event applications routes
   app.get("/api/events/:eventId/applications", async (req, res) => {
     if (!req.isAuthenticated()) {
@@ -1201,15 +1283,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const eventId = parseInt(req.params.eventId);
+      const userId = (req.user as any).id;
+      
+      // Verificar se o usuário não é o organizador do evento
+      const event = await storage.getEventById(eventId);
+      if (!event) {
+        return res.status(404).json({ message: "Evento não encontrado" });
+      }
+      
+      if (event.organizerId === userId) {
+        return res.status(400).json({ message: "Você não pode se candidatar ao seu próprio evento" });
+      }
+      
+      // Verificar se já existe candidatura deste prestador para este evento
+      const existingApplications = await storage.getEventApplications();
+      const hasAlreadyApplied = existingApplications.some((app: any) => app.eventId === eventId && app.providerId === userId);
+      
+      if (hasAlreadyApplied) {
+        return res.status(400).json({ message: "Você já se candidatou a este evento" });
+      }
+      
+      console.log('Dados recebidos:', req.body);
+      console.log('EventId:', eventId);
+      console.log('ProviderId:', userId);
+      
       const validatedData = insertEventApplicationSchema.parse({
         ...req.body,
         eventId,
-        providerId: (req.user as any).id,
+        providerId: userId,
       });
+      
+      console.log('Dados validados:', validatedData);
       
       const application = await storage.createEventApplication(validatedData);
       res.json(application);
     } catch (error: any) {
+      console.error('Erro na candidatura:', error);
       res.status(400).json({ message: error.message });
     }
   });
