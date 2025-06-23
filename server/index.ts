@@ -69,19 +69,33 @@ app.use((req, res, next) => {
       log(`serving on port ${port}`);
     }).on('error', (err: any) => {
       if (err.code === 'EADDRINUSE') {
-        console.log(`Port ${port} is busy, killing existing process and retrying...`);
-        // Kill existing processes on port 5000
-        require('child_process').exec(`pkill -f "tsx server/index.ts" || true`, () => {
-          setTimeout(() => {
-            startServer();
-          }, 2000);
-        });
+        console.log(`Port ${port} is busy, waiting and retrying...`);
+        setTimeout(() => {
+          startServer();
+        }, 3000);
       } else {
         console.error('Server error:', err);
         process.exit(1);
       }
     });
   };
+
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
+  });
+
+  process.on('SIGINT', () => {
+    console.log('SIGINT received, shutting down gracefully');
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
+  });
 
   startServer();
 })();
