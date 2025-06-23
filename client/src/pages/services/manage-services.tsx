@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -28,12 +29,12 @@ interface Service {
   hasEquipment?: string;
   equipment?: string[];
   mediaFiles?: string[];
-  basePrice: number;
+  basePrice: string | number; // Pode vir como string do banco
   priceType: string;
   duration?: number;
   location?: string;
   portfolio: string[];
-  rating: number;
+  rating: string | number; // Pode vir como string do banco
   reviewCount: number;
   bookingCount: number;
   active: boolean;
@@ -100,6 +101,7 @@ export default function ManageServices() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [openLocationCombobox, setOpenLocationCombobox] = useState(false);
+  const [serviceToDelete, setServiceToDelete] = useState<Service | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -169,8 +171,44 @@ export default function ManageServices() {
     }
   };
 
-  // Função para lidar com upload de mídia
-  const handleMediaUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Função para redimensionar imagem
+  const resizeImage = (file: File, maxWidth: number = 800, maxHeight: number = 600, quality: number = 0.8): Promise<string> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+
+      img.onload = () => {
+        // Calcular novas dimensões mantendo proporção
+        let { width, height } = img;
+        
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+        
+        if (height > maxHeight) {
+          width = (width * maxHeight) / height;
+          height = maxHeight;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Desenhar imagem redimensionada
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Converter para Base64 com qualidade reduzida
+        const resizedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(resizedDataUrl);
+      };
+
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  // Função para lidar with upload de mídia
+  const handleMediaUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
 
@@ -190,33 +228,57 @@ export default function ManageServices() {
 
     const filesToProcess = Array.from(files).slice(0, remainingSlots);
     
-    // Converter arquivos para Base64 para persistência (simulação)
-    const newMediaFiles: string[] = [];
-    let processed = 0;
-    
-    filesToProcess.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          newMediaFiles.push(e.target.result as string);
-          processed++;
-          
-          // Quando todos os arquivos foram processados
-          if (processed === filesToProcess.length) {
-            setFormData(prev => ({
-              ...prev,
-              mediaFiles: [...prev.mediaFiles, ...newMediaFiles]
-            }));
-            
-            toast({
-              title: "Mídia adicionada",
-              description: `${newMediaFiles.length} arquivo(s) adicionado(s) com sucesso.`,
-            });
-          }
-        }
-      };
-      reader.readAsDataURL(file);
+    // Verificar tamanho dos arquivos
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
+    const validFiles = filesToProcess.filter(file => {
+      if (file.size > maxFileSize) {
+        toast({
+          title: "Arquivo muito grande",
+          description: `${file.name} excede o limite de 5MB`,
+          variant: "destructive",
+        });
+        return false;
+      }
+      return true;
     });
+
+    if (validFiles.length === 0) return;
+
+    // Processar arquivos
+    const newMediaFiles: string[] = [];
+    
+    for (const file of validFiles) {
+      try {
+        if (file.type.startsWith('image/')) {
+          // Redimensionar imagens
+          const resizedImage = await resizeImage(file);
+          newMediaFiles.push(resizedImage);
+        } else {
+          // Para vídeos, criar uma URL temporária mais simples
+          const url = `placeholder-video-${Date.now()}-${file.name}`;
+          newMediaFiles.push(url);
+        }
+      } catch (error) {
+        console.error('Erro ao processar arquivo:', error);
+        toast({
+          title: "Erro no upload",
+          description: `Erro ao processar ${file.name}`,
+          variant: "destructive",
+        });
+      }
+    }
+
+    if (newMediaFiles.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        mediaFiles: [...prev.mediaFiles, ...newMediaFiles]
+      }));
+      
+      toast({
+        title: "Mídia adicionada",
+        description: `${newMediaFiles.length} arquivo(s) adicionado(s) com sucesso.`,
+      });
+    }
   };
 
   // Função para remover mídia
@@ -267,28 +329,65 @@ export default function ManageServices() {
         description: "Suas alterações foram salvas.",
       });
       setEditingService(null);
+      setIsCreateDialogOpen(false);
       resetForm();
       queryClient.invalidateQueries({ queryKey: ['/api/services', user?.id] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao atualizar serviço",
+        description: error.message || "Tente novamente mais tarde",
+        variant: "destructive",
+      });
     },
   });
 
   const deleteServiceMutation = useMutation({
     mutationFn: async (id: number) => {
+      console.log('Excluindo serviço ID:', id);
       const response = await apiRequest("DELETE", `/api/services/${id}`);
+      console.log('Resposta DELETE:', response.status, response.statusText);
       if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Erro na resposta DELETE:', errorData);
         throw new Error('Erro ao excluir serviço');
       }
       return response;
     },
-    onSuccess: () => {
+    onMutate: async (deletedId) => {
+      // Cancelar queries em andamento
+      await queryClient.cancelQueries({ queryKey: ['/api/services', user?.id] });
+      
+      // Snapshot do estado anterior
+      const previousServices = queryClient.getQueryData(['/api/services', user?.id]);
+      
+      // Atualização otimista - remove o serviço da lista imediatamente
+      queryClient.setQueryData(['/api/services', user?.id], (old: any[]) => {
+        if (!old) return [];
+        console.log('Removendo serviço da lista otimisticamente:', deletedId);
+        return old.filter(service => service.id !== deletedId);
+      });
+      
+      return { previousServices };
+    },
+    onSuccess: async () => {
+      console.log('Exclusão bem-sucedida!');
       toast({
         title: "Serviço excluído",
         description: "O serviço foi removido do seu catálogo.",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/services', user?.id] });
-      queryClient.refetchQueries({ queryKey: ['/api/services', user?.id] });
+      
+      // Invalidar e recarregar para garantir sincronização
+      await queryClient.invalidateQueries({ queryKey: ['/api/services', user?.id] });
     },
-    onError: (error: any) => {
+    onError: (error: any, deletedId, context) => {
+      console.error('Erro na exclusão, revertendo otimismo:', error);
+      
+      // Reverter a mudança otimista em caso de erro
+      if (context?.previousServices) {
+        queryClient.setQueryData(['/api/services', user?.id], context.previousServices);
+      }
+      
       toast({
         title: "Erro ao excluir",
         description: error.message || "Não foi possível excluir o serviço",
@@ -371,7 +470,7 @@ export default function ManageServices() {
       hasEquipment: service.hasEquipment || "",
       equipment: service.equipment || [],
       mediaFiles: service.mediaFiles || [],
-      basePrice: `R$ ${service.basePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      basePrice: `R$ ${parseFloat(service.basePrice?.toString() || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
       priceType: service.priceType,
       duration: service.duration?.toString() || "",
       location: service.location || "",
@@ -380,9 +479,14 @@ export default function ManageServices() {
     setIsCreateDialogOpen(true);
   };
 
-  const handleDelete = (serviceId: number) => {
-    if (window.confirm("Tem certeza que deseja excluir este serviço?")) {
-      deleteServiceMutation.mutate(serviceId);
+  const handleDelete = (service: Service) => {
+    setServiceToDelete(service);
+  };
+
+  const confirmDelete = () => {
+    if (serviceToDelete) {
+      deleteServiceMutation.mutate(serviceToDelete.id);
+      setServiceToDelete(null);
     }
   };
 
@@ -757,7 +861,7 @@ export default function ManageServices() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => handleDelete(service.id)}
+                      onClick={() => handleDelete(service)}
                       disabled={deleteServiceMutation.isPending}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -773,7 +877,7 @@ export default function ManageServices() {
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center text-gray-600">
                     <DollarSign className="w-4 h-4 mr-2" />
-                    <span>R$ {typeof service.basePrice === 'number' ? service.basePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'} ({service.priceType || 'por evento'})</span>
+                    <span>R$ {parseFloat(service.basePrice?.toString() || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2 })} ({service.priceType || 'fixed'})</span>
                   </div>
                   
                   {service.duration && (
@@ -792,7 +896,7 @@ export default function ManageServices() {
                   
                   <div className="flex items-center text-gray-600">
                     <Star className="w-4 h-4 mr-2" />
-                    <span>{typeof service.rating === 'number' ? service.rating.toFixed(1) : '0.0'} ({service.reviewCount || 0} avaliações)</span>
+                    <span>{parseFloat(service.rating?.toString() || '0').toFixed(1)} ({service.reviewCount || 0} avaliações)</span>
                   </div>
                   
                   <div className="flex items-center text-gray-600">
@@ -835,6 +939,31 @@ export default function ManageServices() {
           })}
         </div>
       )}
+
+      {/* Modal de confirmação de exclusão */}
+      <AlertDialog open={!!serviceToDelete} onOpenChange={() => setServiceToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o serviço "{serviceToDelete?.title}"? 
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setServiceToDelete(null)}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+              disabled={deleteServiceMutation.isPending}
+            >
+              {deleteServiceMutation.isPending ? "Excluindo..." : "Confirmar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

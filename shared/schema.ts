@@ -75,6 +75,10 @@ export const services = pgTable("services", {
   description: text("description").notNull(),
   category: varchar("category", { length: 50 }).notNull(),
   subcategory: varchar("subcategory", { length: 100 }),
+  musicalGenre: varchar("musical_genre", { length: 100 }),
+  hasEquipment: varchar("has_equipment", { length: 50 }),
+  equipment: text("equipment").array(),
+  mediaFiles: text("media_files").array(),
   basePrice: decimal("base_price", { precision: 10, scale: 2 }),
   priceType: varchar("price_type", { length: 20 }).default("fixed"), // fixed, hourly, daily, negotiable
   minPrice: decimal("min_price", { precision: 10, scale: 2 }),
@@ -466,6 +470,10 @@ export const insertServiceSchema = createInsertSchema(services).omit({
 }).extend({
   // Make optional fields actually optional
   subcategory: z.string().optional(),
+  musicalGenre: z.string().optional(),
+  hasEquipment: z.string().optional(),
+  equipment: z.array(z.string()).optional(),
+  mediaFiles: z.array(z.string()).optional(),
   basePrice: z.union([z.string(), z.number()]).optional().nullable(),
   priceType: z.string().optional(),
   minPrice: z.union([z.string(), z.number()]).optional().nullable(),

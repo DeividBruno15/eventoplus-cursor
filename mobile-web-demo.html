@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evento+ Mobile - Demo Web</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 25px;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: #3C5BFA;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .content {
+            padding: 20px;
+            height: calc(100% - 44px - 80px);
+            overflow-y: auto;
+        }
+        
+        .welcome {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: #3C5BFA;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .title {
+            color: #3C5BFA;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: #3C5BFA;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .nav-item.active {
+            color: #3C5BFA;
+        }
+        
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            background: currentColor;
+            border-radius: 50%;
+            margin-bottom: 4px;
+        }
+        
+        .expo-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #3C5BFA;
+        }
+        
+        .qr-placeholder {
+            width: 120px;
+            height: 120px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            margin: 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #ccc;
+            font-size: 12px;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="status-bar">
+                Evento+ Mobile App
+            </div>
+            
+            <div class="content">
+                <div class="welcome">
+                    <div class="logo">E+</div>
+                    <h1 class="title">Evento+</h1>
+                    <p class="subtitle">Conectando eventos e prestadores</p>
+                </div>
+                
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <div class="feature-icon">📱</div>
+                        <div>
+                            <strong>App Mobile Nativo</strong><br>
+                            <small>React Native + Expo</small>
+                        </div>
+                    </li>
+                    
+                    <li class="feature-item">
+                        <div class="feature-icon">🔐</div>
+                        <div>
+                            <strong>Autenticação Biométrica</strong><br>
+                            <small>Face ID / Touch ID</small>
+                        </div>
+                    </li>
+                    
+                    <li class="feature-item">
+                        <div class="feature-icon">💬</div>
+                        <div>
+                            <strong>Chat em Tempo Real</strong><br>
+                            <small>WebSocket + Notificações</small>
+                        </div>
+                    </li>
+                    
+                    <li class="feature-item">
+                        <div class="feature-icon">📷</div>
+                        <div>
+                            <strong>Câmera Integrada</strong><br>
+                            <small>Fotos de perfil e eventos</small>
+                        </div>
+                    </li>
+                    
+                    <li class="feature-item">
+                        <div class="feature-icon">📍</div>
+                        <div>
+                            <strong>Geolocalização</strong><br>
+                            <small>Eventos e espaços próximos</small>
+                        </div>
+                    </li>
+                </ul>
+                
+                <div class="expo-info">
+                    <strong>🧪 Para testar no seu celular:</strong>
+                    <div class="qr-placeholder">
+                        QR Code<br>
+                        (Expo Go)
+                    </div>
+                    <ol style="font-size: 14px; margin-top: 10px;">
+                        <li>Baixe "Expo Go" no seu celular</li>
+                        <li>Execute: <code>npx expo start --tunnel</code></li>
+                        <li>Escaneie o QR code</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="bottom-nav">
+                <div class="nav-item active">
+                    <div class="nav-icon"></div>
+                    Dashboard
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon"></div>
+                    Eventos
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon"></div>
+                    Chat
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon"></div>
+                    Perfil
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simular algumas interações
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📱 Evento+ Mobile App Demo carregado!');
+            
+            // Simular mudança de abas
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach((item, index) => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    console.log(`Navegando para: ${this.textContent.trim()}`);
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

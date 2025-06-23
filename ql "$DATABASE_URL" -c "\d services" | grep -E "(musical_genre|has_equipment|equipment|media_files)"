@@ -1,0 +1,8 @@
+  column_name  
+---------------
+ musical_genre
+ has_equipment
+ equipment
+ media_files
+(4 rows)
+

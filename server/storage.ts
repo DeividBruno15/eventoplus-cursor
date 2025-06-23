@@ -70,7 +70,10 @@ export interface IStorage {
   
   // Services
   getServices(providerId?: number): Promise<Service[]>;
+  getServiceById(id: number): Promise<Service | undefined>;
   createService(service: InsertService & { providerId: number }): Promise<Service>;
+  updateService(id: number, service: Partial<Service>): Promise<Service>;
+  deleteService(id: number): Promise<void>;
   
   // Venues
   getVenues(ownerId?: number): Promise<Venue[]>;
@@ -368,12 +371,55 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(services);
   }
 
+  async getServiceById(id: number): Promise<Service | undefined> {
+    const service = await db.select().from(services).where(eq(services.id, id)).limit(1);
+    return service[0];
+  }
+
   async createService(serviceData: InsertService & { providerId: number }): Promise<Service> {
     const result = await db.insert(services).values({
       ...serviceData,
       active: true
     }).returning();
     return result[0];
+  }
+
+  async updateService(id: number, serviceData: Partial<Service>): Promise<Service> {
+    const [service] = await db.update(services)
+      .set({ ...serviceData, updatedAt: new Date() })
+      .where(eq(services.id, id))
+      .returning();
+    return service;
+  }
+
+  async deleteService(id: number): Promise<void> {
+    console.log(`Storage: Executando DELETE para serviço ID: ${id}`);
+    
+    try {
+      // Primeiro, remove registros dependentes se existirem
+      console.log(`Storage: Removendo dependências do serviço ID: ${id}`);
+      
+      // Remove itens do carrinho que referenciam este serviço
+      await db.delete(cartItems).where(eq(cartItems.serviceId, id));
+      console.log(`Storage: Itens do carrinho removidos`);
+      
+      // Remove aplicações de eventos que referenciam este serviço
+      await db.update(eventApplications)
+        .set({ serviceId: null })
+        .where(eq(eventApplications.serviceId, id));
+      console.log(`Storage: Referências em event_applications atualizadas`);
+      
+      // Agora remove o serviço
+      const result = await db.delete(services).where(eq(services.id, id)).returning();
+      console.log(`Storage: Resultado da exclusão do serviço:`, result.length > 0 ? `Excluído: ${JSON.stringify(result[0])}` : "Nenhum registro afetado");
+      
+      if (result.length === 0) {
+        throw new Error(`Serviço com ID ${id} não foi encontrado para exclusão`);
+      }
+    } catch (error) {
+      console.error(`Storage: Erro na exclusão do serviço ID ${id}:`, error);
+      throw error;
+    }
   }
 
   // Venues

@@ -637,10 +637,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertServiceSchema.parse(req.body);
       const userId = (req.user as any).id;
       
-      const service = await storage.createService({
+      // Ensure basePrice is converted to string for database storage
+      const serviceData = {
         ...validatedData,
-        providerId: userId
-      });
+        providerId: userId,
+        active: true,
+        basePrice: validatedData.basePrice ? String(validatedData.basePrice) : null,
+        minPrice: validatedData.minPrice ? String(validatedData.minPrice) : null,
+        maxPrice: validatedData.maxPrice ? String(validatedData.maxPrice) : null,
+      };
+      
+      console.log("Processed service data:", JSON.stringify(serviceData, null, 2));
+      
+      const service = await storage.createService(serviceData);
 
       res.status(201).json(service);
     } catch (error: any) {
@@ -652,6 +661,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: error.message,
         issues: error.issues || []
       });
+    }
+  });
+
+  // Update service endpoint
+  app.put("/api/services/:id", createLimiter, async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const serviceId = parseInt(req.params.id);
+      const userId = (req.user as any).id;
+      
+      // Check if service exists and belongs to user
+      const existingService = await storage.getServiceById(serviceId);
+      if (!existingService || existingService.providerId !== userId) {
+        return res.status(404).json({ message: "Serviço não encontrado" });
+      }
+
+      const validatedData = insertServiceSchema.parse(req.body);
+      
+      // Ensure numeric fields are converted to string for database storage
+      const serviceUpdateData = {
+        ...validatedData,
+        basePrice: validatedData.basePrice ? String(validatedData.basePrice) : null,
+        minPrice: validatedData.minPrice ? String(validatedData.minPrice) : null,
+        maxPrice: validatedData.maxPrice ? String(validatedData.maxPrice) : null,
+      };
+      
+      const updatedService = await storage.updateService(serviceId, serviceUpdateData);
+
+      res.json(updatedService);
+    } catch (error: any) {
+      console.error("Update service error:", error);
+      if (error.issues) {
+        console.error("Zod validation issues:", JSON.stringify(error.issues, null, 2));
+      }
+      res.status(400).json({ 
+        message: error.message,
+        issues: error.issues || []
+      });
+    }
+  });
+
+  // Delete service endpoint
+  app.delete("/api/services/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const serviceId = parseInt(req.params.id);
+      const userId = (req.user as any).id;
+      
+      console.log(`Tentando excluir serviço ID: ${serviceId} pelo usuário ID: ${userId}`);
+      
+      // Check if service exists and belongs to user
+      const existingService = await storage.getServiceById(serviceId);
+      console.log("Serviço encontrado:", existingService ? `ID: ${existingService.id}, Provider: ${existingService.providerId}` : "Não encontrado");
+      
+      if (!existingService || existingService.providerId !== userId) {
+        console.log("Serviço não encontrado ou não pertence ao usuário");
+        return res.status(404).json({ message: "Serviço não encontrado" });
+      }
+
+      console.log(`Executando exclusão do serviço ID: ${serviceId}`);
+      await storage.deleteService(serviceId);
+      console.log(`Serviço ID: ${serviceId} excluído com sucesso`);
+      
+      res.json({ message: "Serviço excluído com sucesso" });
+    } catch (error: any) {
+      console.error("Delete service error:", error);
+      res.status(500).json({ message: error.message || "Erro ao excluir serviço" });
     }
   });
 
