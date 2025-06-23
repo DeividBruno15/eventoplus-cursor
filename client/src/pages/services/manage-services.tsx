@@ -50,10 +50,10 @@ const SERVICE_CATEGORIES = {
     "Buffet", "Chef", "Bartender", "Confeitaria", "Catering", "Food Truck"
   ],
   "organizacao": [
-    "Cerimonial", "Wedding Planner", "Decoração", "Floricultura", "Coordenação"
+    "Cerimonial", "Wedding Planner", "Coordenação", "Assessoria"
   ],
   "producao": [
-    "Foto/Vídeo", "Som/Luz", "Cerimônia", "Cenografia", "Iluminação"
+    "Foto/Vídeo", "Som/Luz", "Decoração", "Floricultura", "Cenografia", "Iluminação"
   ],
   "limpeza": [
     "Limpeza pré-evento", "Limpeza pós-evento", "Organização", "Manutenção"
