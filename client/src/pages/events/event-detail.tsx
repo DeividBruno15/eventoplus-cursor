@@ -171,56 +171,12 @@ export default function EventDetail() {
             <div className="space-y-4">
               <div className="h-32 bg-gray-200 rounded"></div>
               <div className="h-32 bg-gray-200 rounded"></div>
-                      </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Modal de Confirmação de Exclusão */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-red-600">
-              <Trash2 className="h-5 w-5" />
-              Excluir Evento
-            </DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja excluir o evento <strong>"{event?.title}"</strong>?
-              <br /><br />
-              Esta ação não pode ser desfeita e todas as candidaturas associadas também serão removidas.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowDeleteDialog(false)}
-              disabled={deleteEventMutation.isPending}
-            >
-              Cancelar
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDeleteEvent}
-              disabled={deleteEventMutation.isPending}
-              className="flex items-center gap-2"
-            >
-              {deleteEventMutation.isPending ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Excluindo...
-                </>
-              ) : (
-                <>
-                  <Trash2 className="h-4 w-4" />
-                  Confirmar Exclusão
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
+    );
+  }
 
   if (!event) {
     return (
@@ -587,6 +543,50 @@ export default function EventDetail() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Confirmação de Exclusão */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <Trash2 className="h-5 w-5" />
+              Excluir Evento
+            </DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir o evento <strong>"{event?.title}"</strong>?
+              <br /><br />
+              Esta ação não pode ser desfeita e todas as candidaturas associadas também serão removidas.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+              disabled={deleteEventMutation.isPending}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteEvent}
+              disabled={deleteEventMutation.isPending}
+              className="flex items-center gap-2"
+            >
+              {deleteEventMutation.isPending ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Excluindo...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4" />
+                  Confirmar Exclusão
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1286,7 +1286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = (req.user as any).id;
       
       // Verificar se o usuário não é o organizador do evento
-      const event = await storage.getEventById(eventId);
+      const event = await storage.getEvent(eventId);
       if (!event) {
         return res.status(404).json({ message: "Evento não encontrado" });
       }
