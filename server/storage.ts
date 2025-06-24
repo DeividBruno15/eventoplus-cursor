@@ -351,14 +351,14 @@ export class DatabaseStorage implements IStorage {
       await db.delete(eventApplications).where(eq(eventApplications.eventId, id));
       console.log(`Storage: Candidaturas removidas`);
       
-      // Remove notificações relacionadas ao evento (usando CAST para corrigir tipos)
+      // Remove notificações relacionadas ao evento (usando LIKE para buscar no texto)
       try {
         await db.delete(notifications).where(
-          sql`CAST(${notifications.metadata}->>'eventId' AS INTEGER) = ${id}`
+          sql`${notifications.metadata} LIKE ${'%"eventId":' + id + '%'} OR ${notifications.metadata} LIKE ${'%"eventId":"' + id + '"%'}`
         );
         console.log(`Storage: Notificações relacionadas removidas`);
       } catch (notificationError) {
-        console.log(`Storage: Aviso - erro ao remover notificações (tabela pode não existir):`, notificationError);
+        console.log(`Storage: Aviso - erro ao remover notificações (pode ser ignorado):`, notificationError);
       }
       
       // Remove o evento
