@@ -21,9 +21,13 @@ export class EmailService {
   private mailService: MailService;
 
   constructor() {
-    this.baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://your-domain.replit.app' 
+    // Use Replit domain in development and production
+    const replitDomain = process.env.REPLIT_DOMAINS;
+    this.baseUrl = replitDomain 
+      ? `https://${replitDomain}` 
       : 'http://localhost:5000';
+    
+    console.log(`📧 EmailService initialized with baseUrl: ${this.baseUrl}`);
 
     // Initialize SendGrid
     if (!process.env.SENDGRID_API_KEY) {
