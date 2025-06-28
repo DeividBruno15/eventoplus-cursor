@@ -435,6 +435,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PASSWORD RESET ROUTES
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ message: "E-mail é obrigatório" });
+      }
+
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal if email exists or not for security
+        return res.json({ 
+          message: "Se este e-mail estiver cadastrado, você receberá instruções para redefinir sua senha.",
+          success: true
+        });
+      }
+
+      // Generate password reset token
+      const resetToken = EmailService.generatePasswordResetToken();
+      await storage.setPasswordResetToken(user.id, resetToken);
+
+      // Send password reset email
+      const resetUrl = emailService.createPasswordResetUrl(resetToken);
+      const emailSent = await emailService.sendPasswordReset(user.email, {
+        username: user.username,
+        resetUrl
+      });
+
+      if (!emailSent) {
+        return res.status(500).json({ message: "Erro ao enviar e-mail de redefinição" });
+      }
+
+      res.json({ 
+        message: "Se este e-mail estiver cadastrado, você receberá instruções para redefinir sua senha.",
+        success: true
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/auth/validate-reset-token", async (req, res) => {
+    try {
+      const { token } = req.query;
+
+      if (!token) {
+        return res.status(400).json({ message: "Token é obrigatório" });
+      }
+
+      const user = await storage.getUserByPasswordResetToken(token as string);
+      if (!user) {
+        return res.status(400).json({ message: "Token inválido ou expirado" });
+      }
+
+      // Check if token is expired (1 hour)
+      const tokenAge = Date.now() - (user.passwordResetSentAt?.getTime() || 0);
+      if (tokenAge > 60 * 60 * 1000) { // 1 hour in milliseconds
+        return res.status(400).json({ message: "Token expirado" });
+      }
+
+      res.json({ 
+        message: "Token válido",
+        success: true
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { token, password } = req.body;
+
+      if (!token || !password) {
+        return res.status(400).json({ message: "Token e senha são obrigatórios" });
+      }
+
+      if (password.length < 8) {
+        return res.status(400).json({ message: "Senha deve ter pelo menos 8 caracteres" });
+      }
+
+      const user = await storage.getUserByPasswordResetToken(token);
+      if (!user) {
+        return res.status(400).json({ message: "Token inválido ou expirado" });
+      }
+
+      // Check if token is expired (1 hour)
+      const tokenAge = Date.now() - (user.passwordResetSentAt?.getTime() || 0);
+      if (tokenAge > 60 * 60 * 1000) { // 1 hour in milliseconds
+        return res.status(400).json({ message: "Token expirado" });
+      }
+
+      // Hash new password
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+      // Update password and clear reset token
+      await storage.updateUser(user.id, {
+        password: hashedPassword,
+        passwordResetToken: null,
+        passwordResetSentAt: null
+      });
+
+      res.json({ 
+        message: "Senha redefinida com sucesso!",
+        success: true
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
 
   // WHATSAPP BUSINESS API
   app.post("/api/whatsapp/send", async (req, res) => {

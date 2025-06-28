@@ -61,6 +61,19 @@ export class EmailService {
   }
 
   /**
+   * Sends password reset email
+   */
+  async sendPasswordReset(to: string, data: PasswordResetData): Promise<boolean> {
+    const template: EmailTemplate = {
+      subject: 'Redefinir senha - Evento+',
+      html: this.generatePasswordResetEmailHTML(data),
+      text: this.generatePasswordResetEmailText(data)
+    };
+
+    return await this.sendEmail(to, template);
+  }
+
+  /**
    * Generates email verification HTML template
    */
   private generateVerificationEmailHTML(data: EmailVerificationData): string {
@@ -151,6 +164,111 @@ Este é um e-mail automático, não responda.
    */
   createVerificationUrl(token: string): string {
     return `${this.baseUrl}/auth/verify-email?token=${token}`;
+  }
+
+  /**
+   * Generates password reset HTML template
+   */
+  private generatePasswordResetEmailHTML(data: PasswordResetData): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <meta charset="utf-8">
+          <title>Redefinir senha</title>
+          <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: #3C5BFA; color: white; padding: 20px; text-align: center; }
+              .content { padding: 30px 20px; }
+              .button { 
+                  display: inline-block; 
+                  background: #3C5BFA; 
+                  color: white; 
+                  padding: 12px 30px; 
+                  text-decoration: none; 
+                  border-radius: 5px; 
+                  margin: 20px 0; 
+              }
+              .footer { background: #f4f4f4; padding: 20px; text-align: center; font-size: 12px; color: #666; }
+              .warning { background: #FFF3CD; border: 1px solid #FFEAA7; padding: 15px; border-radius: 5px; margin: 20px 0; }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+              <div class="header">
+                  <h1>🔐 Redefinir Senha</h1>
+                  <p>Evento+ - Plataforma de Eventos</p>
+              </div>
+              <div class="content">
+                  <h2>Olá ${data.username}!</h2>
+                  <p>Você solicitou a redefinição da sua senha no Evento+.</p>
+                  <p>Para criar uma nova senha, clique no botão abaixo:</p>
+                  <div style="text-align: center;">
+                      <a href="${data.resetUrl}" class="button">Redefinir Senha</a>
+                  </div>
+                  <div class="warning">
+                      <strong>⚠️ Importante:</strong>
+                      <ul>
+                          <li>Este link expira em 1 hora por segurança</li>
+                          <li>Se você não solicitou esta redefinição, ignore este e-mail</li>
+                          <li>Sua senha atual permanece ativa até você criar uma nova</li>
+                      </ul>
+                  </div>
+                  <p>Se o botão não funcionar, copie e cole este link no seu navegador:</p>
+                  <p style="word-break: break-all; color: #3C5BFA;">${data.resetUrl}</p>
+              </div>
+              <div class="footer">
+                  <p>© 2024 Evento+ - Plataforma de Eventos</p>
+                  <p>Este é um e-mail automático, não responda.</p>
+                  <p>Se você não solicitou esta redefinição, pode ignorar este e-mail com segurança.</p>
+              </div>
+          </div>
+      </body>
+      </html>
+    `;
+  }
+
+  /**
+   * Generates password reset text template (fallback)
+   */
+  private generatePasswordResetEmailText(data: PasswordResetData): string {
+    return `
+Redefinir Senha - Evento+
+
+Olá ${data.username},
+
+Você solicitou a redefinição da sua senha no Evento+.
+
+Para criar uma nova senha, acesse este link:
+${data.resetUrl}
+
+IMPORTANTE:
+- Este link expira em 1 hora por segurança
+- Se você não solicitou esta redefinição, ignore este e-mail
+- Sua senha atual permanece ativa até você criar uma nova
+
+Se você não solicitou esta redefinição, pode ignorar este e-mail com segurança.
+
+© 2024 Evento+ - Plataforma de Eventos
+Este é um e-mail automático, não responda.
+    `;
+  }
+
+  /**
+   * Generates password reset token
+   */
+  static generatePasswordResetToken(): string {
+    return Math.random().toString(36).substring(2, 15) + 
+           Math.random().toString(36).substring(2, 15) + 
+           Date.now().toString(36);
+  }
+
+  /**
+   * Creates password reset URL
+   */
+  createPasswordResetUrl(token: string): string {
+    return `${this.baseUrl}/auth/reset-password?token=${token}`;
   }
 }
 
