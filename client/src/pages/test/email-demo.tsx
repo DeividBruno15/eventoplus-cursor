@@ -14,12 +14,13 @@ export default function EmailDemo() {
   const testForgotPassword = async () => {
     setLoading(true);
     try {
-      const response = await apiRequest("/api/auth/forgot-password", {
+      const response = await fetch("/api/auth/forgot-password", {
         method: "POST",
         body: JSON.stringify({ email }),
         headers: { "Content-Type": "application/json" }
       });
-      setResult({ success: true, data: response });
+      const data = await response.json();
+      setResult({ success: response.ok, data });
     } catch (error) {
       setResult({ success: false, error });
     }
