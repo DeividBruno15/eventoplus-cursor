@@ -2057,6 +2057,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // N8N Integration Diagnostics
+  app.get("/api/diagnostics/n8n", async (req, res) => {
+    try {
+      const diagnostics = {
+        configuration: {
+          webhookUrl: process.env.N8N_WEBHOOK_URL || null,
+          isEnabled: !!process.env.N8N_WEBHOOK_URL,
+          timestamp: new Date().toISOString()
+        },
+        connectivity: {
+          status: 'unknown',
+          lastTest: null,
+          error: null
+        },
+        database: {
+          whatsappFields: [],
+          userStats: {
+            totalUsers: 0,
+            usersWithWhatsapp: 0,
+            usersWithNotificationsEnabled: 0
+          }
+        },
+        implementation: {
+          serviceFile: 'notifications.ts',
+          integrationPoints: [
+            'notifyNewEvent',
+            'notifyNewChat', 
+            'notifyVenueReservation',
+            'notifyEventApplication',
+            'notifyApplicationStatus'
+          ],
+          testEndpoint: '/api/notifications/test'
+        }
+      };
+
+      // Test connectivity if URL is configured
+      if (process.env.N8N_WEBHOOK_URL) {
+        try {
+          const isConnected = await notificationService.testConnection();
+          diagnostics.connectivity.status = isConnected ? 'connected' : 'failed';
+          diagnostics.connectivity.lastTest = new Date().toISOString();
+        } catch (error: any) {
+          diagnostics.connectivity.status = 'error';
+          diagnostics.connectivity.error = error.message;
+          diagnostics.connectivity.lastTest = new Date().toISOString();
+        }
+      }
+
+      // Check database schema
+      try {
+        const schemaResult = await storage.db.execute(`
+          SELECT column_name, data_type, is_nullable 
+          FROM information_schema.columns 
+          WHERE table_name = 'users' 
+          AND column_name LIKE '%whatsapp%'
+          ORDER BY column_name
+        `);
+        
+        diagnostics.database.whatsappFields = schemaResult.rows;
+
+        // Get user statistics
+        const statsResult = await storage.db.execute(`
+          SELECT 
+            COUNT(*) as total_users,
+            COUNT(whatsapp_number) as users_with_whatsapp,
+            COUNT(CASE WHEN whatsapp_notifications_enabled = true THEN 1 END) as users_with_notifications_enabled
+          FROM users
+        `);
+        
+        if (statsResult.rows.length > 0) {
+          const stats = statsResult.rows[0];
+          diagnostics.database.userStats = {
+            totalUsers: parseInt(stats.total_users) || 0,
+            usersWithWhatsapp: parseInt(stats.users_with_whatsapp) || 0,
+            usersWithNotificationsEnabled: parseInt(stats.users_with_notifications_enabled) || 0
+          };
+        }
+      } catch (error: any) {
+        diagnostics.database.error = error.message;
+      }
+
+      res.json(diagnostics);
+    } catch (error: any) {
+      console.error("Erro no diagnóstico n8n:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Event Application Status Update Routes
   app.put("/api/events/:eventId/applications/:applicationId/approve", async (req, res) => {
     if (!req.isAuthenticated()) {
