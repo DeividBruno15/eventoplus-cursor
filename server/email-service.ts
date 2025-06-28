@@ -51,7 +51,7 @@ export class EmailService {
     try {
       await this.mailService.send({
         to: to,
-        from: 'noreply@sandbox-123.mailgun.org', // SendGrid sandbox format
+        from: 'noreply@eventoplataforma.com.br', // Substitua pelo seu domínio verificado
         subject: template.subject,
         text: template.text,
         html: template.html,
