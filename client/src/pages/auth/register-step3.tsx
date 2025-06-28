@@ -110,16 +110,24 @@ export default function RegisterStep3() {
 
   const registerMutation = useMutation({
     mutationFn: async (userData: any) => {
-      const response = await apiRequest("POST", "/api/register", userData);
+      const response = await apiRequest("POST", "/api/auth/register", userData);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       localStorage.removeItem("registrationData");
+      
+      // Save email for verification page
+      if (data.email) {
+        localStorage.setItem("registrationEmail", data.email);
+      }
+      
       toast({
         title: "Conta criada com sucesso!",
-        description: "Bem-vindo ao Evento+",
+        description: "Verifique seu e-mail para confirmar o cadastro",
       });
-      setLocation("/dashboard");
+      
+      // Redirect to email sent page
+      setLocation(data.redirectTo || "/auth/email-sent");
     },
     onError: (error: any) => {
       toast({

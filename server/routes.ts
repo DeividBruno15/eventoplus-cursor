@@ -256,7 +256,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json({ 
         message: "Cadastro realizado com sucesso! Verifique seu e-mail para confirmar a conta.",
         emailSent: emailSent,
-        email: user.email
+        email: user.email,
+        redirectTo: "/auth/email-sent"
       });
     } catch (error: any) {
       res.status(400).json({ message: error.message || "Erro ao criar usuário" });
