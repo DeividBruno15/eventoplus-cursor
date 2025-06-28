@@ -9,6 +9,11 @@ interface EmailVerificationData {
   verificationUrl: string;
 }
 
+interface PasswordResetData {
+  username: string;
+  resetUrl: string;
+}
+
 export class EmailService {
   private baseUrl: string;
 

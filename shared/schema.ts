@@ -13,6 +13,8 @@ export const users = pgTable("users", {
   emailVerified: boolean("email_verified").default(false),
   emailVerificationToken: text("email_verification_token"),
   emailVerificationSentAt: timestamp("email_verification_sent_at"),
+  passwordResetToken: text("password_reset_token"),
+  passwordResetSentAt: timestamp("password_reset_sent_at"),
   userType: varchar("user_type", { length: 20 }).notNull(), // prestador, contratante, anunciante
   personType: varchar("person_type", { length: 20 }).default("fisica"), // fisica, juridica
   cpf: text("cpf"),

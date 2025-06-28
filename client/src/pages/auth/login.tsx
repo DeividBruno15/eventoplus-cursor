@@ -158,7 +158,11 @@ export default function Login() {
 
 
 
-            <div className="mt-6 text-center">
+            <div className="mt-6 text-center space-y-3">
+              <Link href="/auth/forgot-password" className="text-sm text-[#3C5BFA] hover:underline block">
+                Esqueceu sua senha?
+              </Link>
+              
               <p className="text-sm text-gray-600">
                 Não tem uma conta?{" "}
                 <Link href="/auth/register-step1" className="text-[#3C5BFA] hover:underline">
