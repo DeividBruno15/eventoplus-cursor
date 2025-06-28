@@ -20,6 +20,7 @@ import Pricing from "@/pages/pricing";
 import ComoFunciona from "@/pages/como-funciona";
 import QuemSomos from "@/pages/quem-somos";
 import Contato from "@/pages/contato";
+import EmailDemo from "@/pages/test/email-demo";
 
 // Protected Pages
 import Dashboard from "@/pages/dashboard/dashboard-clean";
@@ -108,6 +109,7 @@ function Router() {
       <Route path="/como-funciona" component={ComoFunciona} />
       <Route path="/quem-somos" component={QuemSomos} />
       <Route path="/contato" component={Contato} />
+      <Route path="/test/email-demo" component={EmailDemo} />
       
       {/* Protected Routes - With Layout */}
       <Route path="/dashboard">
