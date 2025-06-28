@@ -50,6 +50,12 @@ export default function Login() {
           setLocation("/dashboard");
         }, 1000);
       } else {
+        // Check if should redirect for email verification
+        if ((result as any).redirectTo) {
+          setLocation((result as any).redirectTo + `?email=${encodeURIComponent(data.email)}`);
+          return;
+        }
+        
         // Tratamento específico de erros
         let errorMessage = "Erro ao fazer login. Tente novamente.";
         
@@ -59,6 +65,9 @@ export default function Login() {
           errorMessage = "Senha incorreta. Tente novamente.";
         } else if (result.error?.includes("muitas tentativas") || result.error?.includes("many attempts")) {
           errorMessage = "Muitas tentativas de login. Tente novamente em alguns minutos.";
+        } else if (result.error?.includes("E-mail não verificado")) {
+          // Don't show toast for email verification error since we're redirecting
+          return;
         }
         
         toast({

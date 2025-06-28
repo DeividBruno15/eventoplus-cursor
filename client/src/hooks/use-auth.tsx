@@ -97,6 +97,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await loginMutation.mutateAsync({ email, password });
       return { success: true };
     } catch (error: any) {
+      // Handle email verification errors specially
+      if (error.message?.includes("E-mail não verificado") || error.message?.includes("emailVerificationRequired")) {
+        // Store email for the verification page
+        localStorage.setItem("unverifiedEmail", email);
+        
+        return { 
+          success: false, 
+          error: error.message || "E-mail não verificado",
+          redirectTo: "/auth/email-not-verified"
+        };
+      }
+      
       return { 
         success: false, 
         error: error.message || "Erro ao fazer login" 

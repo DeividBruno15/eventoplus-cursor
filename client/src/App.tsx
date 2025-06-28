@@ -12,6 +12,7 @@ import RegisterStep2 from "@/pages/auth/register-step2";
 import RegisterStep3 from "@/pages/auth/register-step3";
 import EmailSent from "@/pages/auth/email-sent";
 import VerifyEmail from "@/pages/auth/verify-email";
+import EmailNotVerified from "@/pages/auth/email-not-verified";
 import SelectUserType from "@/pages/auth/select-user-type";
 import Pricing from "@/pages/pricing";
 import ComoFunciona from "@/pages/como-funciona";
@@ -97,6 +98,7 @@ function Router() {
       <Route path="/auth/register-step3" component={RegisterStep3} />
       <Route path="/auth/email-sent" component={EmailSent} />
       <Route path="/auth/verify-email" component={VerifyEmail} />
+      <Route path="/auth/email-not-verified" component={EmailNotVerified} />
       <Route path="/select-user-type" component={SelectUserType} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/como-funciona" component={ComoFunciona} />
