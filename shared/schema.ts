@@ -10,6 +10,9 @@ export const users = pgTable("users", {
   companyName: text("company_name"),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  emailVerified: boolean("email_verified").default(false),
+  emailVerificationToken: text("email_verification_token"),
+  emailVerificationSentAt: timestamp("email_verification_sent_at"),
   userType: varchar("user_type", { length: 20 }).notNull(), // prestador, contratante, anunciante
   personType: varchar("person_type", { length: 20 }).default("fisica"), // fisica, juridica
   cpf: text("cpf"),
@@ -34,6 +37,13 @@ export const users = pgTable("users", {
   twoFactorLastUsed: timestamp("two_factor_last_used"),
   apiKey: text("api_key"),
   apiKeyLastUsed: timestamp("api_key_last_used"),
+  whatsappNumber: text("whatsapp_number"),
+  whatsappNotificationsEnabled: boolean("whatsapp_notifications_enabled").default(false),
+  whatsappNewEventNotifications: boolean("whatsapp_new_event_notifications").default(true),
+  whatsappNewChatNotifications: boolean("whatsapp_new_chat_notifications").default(true),
+  whatsappVenueReservationNotifications: boolean("whatsapp_venue_reservation_notifications").default(true),
+  whatsappApplicationNotifications: boolean("whatsapp_application_notifications").default(true),
+  whatsappStatusNotifications: boolean("whatsapp_status_notifications").default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

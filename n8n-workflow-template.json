@@ -1,0 +1,123 @@
+{
+  "name": "EventoPlus Notifications",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "eventoplus-notifications",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-eventoplus",
+      "name": "Webhook EventoPlus",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [320, 300],
+      "webhookId": "eventoplus-notifications"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.type }}",
+              "operation": "equal",
+              "value2": "new_event"
+            }
+          ]
+        }
+      },
+      "id": "check-notification-type",
+      "name": "Verificar Tipo",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Processar notificação de novo evento\nconst data = $input.first().json;\n\nconst message = `🎉 *Novo evento compatível!*\n\n📅 *${data.data.eventTitle}*\n📍 ${data.data.eventLocation}\n💰 Orçamento: ${data.data.budget}\n📋 Categoria: ${data.data.category}\n\nVer detalhes: ${data.data.eventUrl}`;\n\nconsole.log('📱 Processando notificação:', data.type);\nconsole.log('🎯 Usuário:', data.userId);\nconsole.log('📝 Mensagem:', message);\n\nreturn [{\n  json: {\n    userId: data.userId,\n    userType: data.userType,\n    message: message,\n    timestamp: data.timestamp,\n    processed: true\n  }\n}];"
+      },
+      "id": "process-new-event",
+      "name": "Processar Novo Evento",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log para debug\nconst data = $input.first().json;\n\nconsole.log('✅ Notificação processada com sucesso!');\nconsole.log('📊 Dados:', JSON.stringify(data, null, 2));\n\nreturn [{\n  json: {\n    success: true,\n    message: 'Notificação processada',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "log-success",
+      "name": "Log Sucesso",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "respond-to-webhook",
+      "name": "Responder Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Webhook EventoPlus": {
+      "main": [
+        [
+          {
+            "node": "Verificar Tipo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar Tipo": {
+      "main": [
+        [
+          {
+            "node": "Processar Novo Evento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Sucesso",
+            "type": "main", 
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processar Novo Evento": {
+      "main": [
+        [
+          {
+            "node": "Log Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Sucesso": {
+      "main": [
+        [
+          {
+            "node": "Responder Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "1.0.0"
+} 

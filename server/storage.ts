@@ -201,6 +201,21 @@ export interface IStorage {
   createChatbotConversation(conversation: InsertChatbotConversation): Promise<ChatbotConversation>;
   updateChatbotConversation(id: number, conversation: Partial<ChatbotConversation>): Promise<ChatbotConversation>;
   getChatbotConversations(userId: number): Promise<ChatbotConversation[]>;
+  
+  // WhatsApp settings
+  updateUserWhatsAppSettings(userId: number, data: {
+    whatsappNumber?: string | null;
+    whatsappNotificationsEnabled?: boolean;
+    whatsappNewEventNotifications?: boolean;
+    whatsappNewChatNotifications?: boolean;
+    whatsappVenueReservationNotifications?: boolean;
+    whatsappApplicationNotifications?: boolean;
+    whatsappStatusNotifications?: boolean;
+  }): Promise<User>;
+  
+  // Event application management
+  updateEventApplicationStatus(applicationId: number, status: 'approved' | 'rejected' | 'pending', rejectionReason?: string): Promise<EventApplication>;
+  getEventApplication(id: number): Promise<EventApplication | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -879,6 +894,56 @@ export class DatabaseStorage implements IStorage {
       .set({ apiKeyLastUsed: new Date() })
       .where(eq(users.id, result[0].id));
     
+    return result[0];
+  }
+
+  // WhatsApp settings
+  async updateUserWhatsAppSettings(userId: number, data: {
+    whatsappNumber?: string | null;
+    whatsappNotificationsEnabled?: boolean;
+    whatsappNewEventNotifications?: boolean;
+    whatsappNewChatNotifications?: boolean;
+    whatsappVenueReservationNotifications?: boolean;
+    whatsappApplicationNotifications?: boolean;
+    whatsappStatusNotifications?: boolean;
+  }): Promise<User> {
+    const result = await db.update(users)
+      .set(data)
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error('Usuário não encontrado');
+    }
+    
+    return result[0];
+  }
+
+  // Event application status management
+  async updateEventApplicationStatus(
+    applicationId: number, 
+    status: 'approved' | 'rejected' | 'pending', 
+    rejectionReason?: string
+  ): Promise<EventApplication> {
+    const updateData: any = { status };
+    if (rejectionReason) {
+      updateData.rejectionReason = rejectionReason;
+    }
+    
+    const result = await db.update(eventApplications)
+      .set(updateData)
+      .where(eq(eventApplications.id, applicationId))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error('Candidatura não encontrada');
+    }
+    
+    return result[0];
+  }
+
+  async getEventApplication(id: number): Promise<EventApplication | undefined> {
+    const result = await db.select().from(eventApplications).where(eq(eventApplications.id, id));
     return result[0];
   }
 }

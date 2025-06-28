@@ -86,9 +86,12 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 - Environment variable: `DATABASE_URL`
 
 ### UI Components
-- **Radix UI**: Headless UI primitives for accessibility
+- **shadcn/ui**: Complete component library with "new-york" style configuration
+- **Radix UI**: Headless UI primitives for accessibility (used by shadcn/ui)
 - **Lucide React**: Icon library for consistent iconography
-- **Tailwind CSS**: Utility-first CSS framework
+- **Tailwind CSS**: Utility-first CSS framework with CSS variables for theming
+- **Class Variance Authority**: For component variant management
+- **Tailwind Merge**: For optimal class name merging
 
 ### Development Tools
 - **Replit Integration**: Cartographer plugin for development environment
@@ -250,6 +253,7 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+UI Framework preference: Use shadcn/ui components library throughout the entire project.
 
 ### June 18, 2025 - Advanced ClickMax.io Recreation with Modern Effects
 - **Faithful Design Copy**: Created exact replica of https://clickmax.io/ design structure and visual elements adapted for Evento+ scope

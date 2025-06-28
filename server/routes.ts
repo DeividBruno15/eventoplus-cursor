@@ -25,6 +25,7 @@ import {
   insertChatMessageSchema
 } from "@shared/schema";
 import { apiLimiter, authLimiter, createLimiter, webhookLimiter } from "./rateLimiter";
+import { notificationService } from "./notifications";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -567,6 +568,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Profile update endpoint
+  app.put("/api/profile", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const { username, phone, location, bio, website, company } = req.body;
+      
+      console.log('Profile update request for user:', userId);
+      console.log('Profile data:', { username, phone, location, bio, website, company });
+      
+      // Update user profile data
+      const updatedUser = await storage.updateUser(userId, {
+        username,
+        phone,
+        location,
+        bio,
+        website,
+        company
+      });
+      
+      // Clear user cache to refresh data
+      userCache.delete(userId);
+      
+      console.log('Profile updated successfully for user:', userId);
+      res.json({ 
+        message: "Perfil atualizado com sucesso", 
+        user: { ...updatedUser, password: undefined } 
+      });
+    } catch (error: any) {
+      console.error("Profile update error:", error);
+      res.status(500).json({ message: "Erro ao atualizar perfil: " + error.message });
+    }
+  });
+
   // Mobile Authentication Routes
   app.post("/api/mobile/login", authLimiter, async (req, res) => {
     try {
@@ -695,7 +733,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/services", async (req, res) => {
     try {
       const providerId = req.query.providerId ? parseInt(req.query.providerId as string) : undefined;
-      const services = await storage.getServices(providerId);
+      const userLocation = req.isAuthenticated() ? (req.user as any).location : null;
+      
+      let services = await storage.getServices(providerId);
+      
+      // Sort services by location proximity if user has location
+      if (userLocation && !providerId && req.isAuthenticated()) {
+        const userCity = userLocation.split(',')[0]?.trim().toLowerCase();
+        
+        services.sort((a, b) => {
+          const cityA = a.location?.split(',')[0]?.trim().toLowerCase() || '';
+          const cityB = b.location?.split(',')[0]?.trim().toLowerCase() || '';
+          
+          // Services in the same city as user get priority
+          const aIsSameCity = cityA === userCity;
+          const bIsSameCity = cityB === userCity;
+          
+          if (aIsSameCity && !bIsSameCity) return -1;
+          if (!aIsSameCity && bIsSameCity) return 1;
+          
+          // Secondary sort by rating or creation date
+          const ratingA = parseFloat(a.rating || '0');
+          const ratingB = parseFloat(b.rating || '0');
+          
+          if (ratingA !== ratingB) return ratingB - ratingA;
+          
+          return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
+        });
+      }
+      
       res.json(services);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -712,6 +778,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validatedData = insertServiceSchema.parse(req.body);
       const userId = (req.user as any).id;
+      
+      // Verificar se o prestador já tem um serviço cadastrado do mesmo tipo
+      const existingServices = await storage.getServices(userId);
+      const { category, subcategory, musicalGenre } = validatedData;
+      
+      const isDuplicateService = existingServices.some(service => {
+        // Para cantores, verificar também o gênero musical
+        if (category === 'entretenimento' && subcategory === 'Cantor' && musicalGenre) {
+          return service.category === category && 
+                 service.subcategory === subcategory && 
+                 service.musicalGenre === musicalGenre;
+        }
+        
+        // Para outros serviços, verificar categoria e subcategoria
+        return service.category === category && service.subcategory === subcategory;
+      });
+      
+      if (isDuplicateService) {
+        let duplicateMessage = `Você já possui um serviço cadastrado de ${category}`;
+        if (subcategory) {
+          duplicateMessage += ` - ${subcategory}`;
+        }
+        if (musicalGenre && subcategory === 'Cantor') {
+          duplicateMessage += ` (${musicalGenre})`;
+        }
+        duplicateMessage += '. Para criar um novo anúncio, edite o serviço existente ou entre em contato com o suporte.';
+        
+        return res.status(400).json({ 
+          message: duplicateMessage,
+          code: 'DUPLICATE_SERVICE'
+        });
+      }
       
       // Ensure basePrice is converted to string for database storage
       const serviceData = {
@@ -1047,6 +1145,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const message = await storage.createChatMessage(validatedData);
+      
+      // Notificar destinatário via n8n sobre nova conversa
+      try {
+        const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+        const sender = await storage.getUser(userId);
+        
+        const senderName = `${sender?.firstName} ${sender?.lastName}`.trim() || sender?.companyName || 'Usuário';
+        
+        await notificationService.notifyNewChat({
+          receiverId: validatedData.receiverId,
+          senderName,
+          firstMessage: validatedData.message.length > 100 
+            ? validatedData.message.substring(0, 100) + '...' 
+            : validatedData.message,
+          chatId: userId.toString(),
+          baseUrl
+        });
+      } catch (notificationError) {
+        console.error('Erro ao enviar notificação via n8n de nova conversa:', notificationError);
+        // Não falhar o envio da mensagem por causa de erro de notificação
+      }
+      
       res.status(201).json(message);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -1075,20 +1195,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const userServices = await storage.getServices(userId);
         const userLocation = (req.user as any).location || '';
         
-        // Get provider's service categories
-        const providerCategories = userServices.map(service => service.category);
+        // Get provider's service categories and subcategories
+        const providerServices = userServices.map(service => ({
+          category: service.category?.toLowerCase(),
+          subcategory: service.subcategory?.toLowerCase(),
+          musicalGenre: service.musicalGenre?.toLowerCase()
+        }));
         
-        // Filter events that match provider's categories and are active
-        userEvents = allEvents.filter(event => {
+        // Filter events that match provider's services and are active
+        let filteredEvents = allEvents.filter(event => {
           if (event.status !== 'active') return false;
           
-          // Check if event category matches any of the provider's service categories
-          const hasMatchingService = providerCategories.includes(event.category);
+          // Check if event has matching services
+          const hasMatchingService = providerServices.some(providerService => {
+            // Normalize event service categories for comparison
+            const eventServiceTypes = event.serviceTypes || [];
+            
+            return eventServiceTypes.some((eventService: string) => {
+              const normalizedEventService = eventService.toLowerCase();
+              
+              // Check for exact category match
+              if (providerService.category && normalizedEventService.includes(providerService.category)) {
+                return true;
+              }
+              
+              // Check for subcategory match
+              if (providerService.subcategory && normalizedEventService.includes(providerService.subcategory)) {
+                return true;
+              }
+              
+              // Check for musical genre match for singers
+              if (providerService.musicalGenre && normalizedEventService.includes(providerService.musicalGenre)) {
+                return true;
+              }
+              
+              return false;
+            });
+          });
           
-          // For now, return events with matching categories
-          // Location filtering will be handled on the frontend with modal warning
+          // If no services are specified in event, show events that match main categories
+          if (!event.serviceTypes || event.serviceTypes.length === 0) {
+            const eventCategory = event.category?.toLowerCase();
+            return providerServices.some(ps => ps.category === eventCategory);
+          }
+          
           return hasMatchingService;
         });
+
+        // Sort events by location proximity (prioritize same city)
+        if (userLocation) {
+          const userCity = userLocation.split(',')[0]?.trim().toLowerCase();
+          
+          filteredEvents.sort((a, b) => {
+            const cityA = a.location?.split(',')[0]?.trim().toLowerCase() || '';
+            const cityB = b.location?.split(',')[0]?.trim().toLowerCase() || '';
+            
+            // Events in the same city as user get priority
+            const aIsSameCity = cityA === userCity;
+            const bIsSameCity = cityB === userCity;
+            
+            if (aIsSameCity && !bIsSameCity) return -1;
+            if (!aIsSameCity && bIsSameCity) return 1;
+            
+            // Secondary sort by date (newest first)
+            return new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime();
+          });
+        }
+
+        userEvents = filteredEvents;
       } else {
         // Anunciantes see all events for venue matching
         userEvents = allEvents;
@@ -1123,6 +1297,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...validatedData,
         organizerId: (req.user as any).id,
       });
+      
+      // Notificar prestadores compatíveis via n8n
+      try {
+        const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+        
+        // Buscar prestadores com serviços compatíveis
+        const allServices = await storage.getServices();
+        const compatibleProviders = new Set<number>();
+        
+        // Verificar serviços compatíveis
+        for (const service of allServices) {
+          const serviceCategory = service.category?.toLowerCase();
+          const eventCategory = event.category?.toLowerCase();
+          const eventServiceTypes = event.serviceTypes || [];
+          
+          // Verificar compatibilidade
+          const isCompatible = 
+            serviceCategory === eventCategory ||
+            eventServiceTypes.some((type: string) => 
+              type.toLowerCase().includes(serviceCategory) ||
+              type.toLowerCase().includes(service.subcategory?.toLowerCase() || '') ||
+              type.toLowerCase().includes(service.musicalGenre?.toLowerCase() || '')
+            );
+          
+          if (isCompatible) {
+            compatibleProviders.add(service.providerId);
+          }
+        }
+        
+        // Enviar notificação via n8n para prestadores compatíveis
+        if (compatibleProviders.size > 0) {
+          await notificationService.notifyNewEvent({
+            providerIds: Array.from(compatibleProviders),
+            eventTitle: event.title,
+            eventLocation: event.location,
+            budget: event.budget,
+            category: event.category,
+            eventId: event.id,
+            baseUrl
+          });
+        }
+      } catch (notificationError) {
+        console.error('Erro ao enviar notificações via n8n:', notificationError);
+        // Não falhar a criação do evento por causa de erro de notificação
+      }
+      
       res.json(event);
     } catch (error: any) {
       console.error("Error creating event:", error);
@@ -1316,6 +1536,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Dados validados:', validatedData);
       
       const application = await storage.createEventApplication(validatedData);
+      
+      // Notificar organizador do evento via n8n
+      try {
+        const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+        const provider = await storage.getUser(userId);
+        
+        await notificationService.notifyEventApplication({
+          organizerId: event.organizerId,
+          eventTitle: event.title,
+          providerName: `${provider?.firstName} ${provider?.lastName}`.trim() || provider?.companyName || 'Prestador',
+          serviceCategory: validatedData.proposal || 'Serviço',
+          proposedPrice: validatedData.price.toString(),
+          eventId: event.id,
+          baseUrl
+        });
+      } catch (notificationError) {
+        console.error('Erro ao enviar notificação via n8n para organizador:', notificationError);
+        // Não falhar a candidatura por causa de erro de notificação
+      }
+      
       res.json(application);
     } catch (error: any) {
       console.error('Erro na candidatura:', error);
@@ -1473,6 +1713,194 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Note: We would need to add deleteNotification method to storage
       res.json({ success: true });
     } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // WhatsApp Notification Routes
+  app.put("/api/profile/whatsapp-settings", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const {
+        whatsappNumber,
+        whatsappNotificationsEnabled,
+        whatsappNewEventNotifications,
+        whatsappNewChatNotifications,
+        whatsappVenueReservationNotifications,
+        whatsappApplicationNotifications,
+        whatsappStatusNotifications
+      } = req.body;
+
+      // Validar número de WhatsApp se fornecido
+      if (whatsappNumber && !whatsappService.validateWhatsAppNumber(whatsappNumber)) {
+        return res.status(400).json({ 
+          message: "Número de WhatsApp inválido. Use o formato: +5511999999999" 
+        });
+      }
+
+      const updateData = {
+        whatsappNumber: whatsappNumber || null,
+        whatsappNotificationsEnabled: whatsappNotificationsEnabled ?? false,
+        whatsappNewEventNotifications: whatsappNewEventNotifications ?? true,
+        whatsappNewChatNotifications: whatsappNewChatNotifications ?? true,
+        whatsappVenueReservationNotifications: whatsappVenueReservationNotifications ?? true,
+        whatsappApplicationNotifications: whatsappApplicationNotifications ?? true,
+        whatsappStatusNotifications: whatsappStatusNotifications ?? true
+      };
+
+      await storage.updateUserWhatsAppSettings(userId, updateData);
+      
+      res.json({ 
+        success: true,
+        message: "Configurações de WhatsApp atualizadas com sucesso"
+      });
+    } catch (error: any) {
+      console.error("Erro ao atualizar configurações WhatsApp:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/notifications/test", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const user = req.user as any;
+      
+      if (!user.whatsappNumber || !user.whatsappNotificationsEnabled) {
+        return res.status(400).json({ 
+          message: "Notificações não configuradas" 
+        });
+      }
+
+      // Testar conectividade com n8n
+      const isConnected = await notificationService.testConnection();
+      
+      if (!isConnected) {
+        return res.status(503).json({ 
+          message: "Sistema de notificações temporariamente indisponível" 
+        });
+      }
+
+      const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+      const userName = `${user.firstName} ${user.lastName}`.trim() || user.companyName || 'Usuário';
+
+      // Enviar notificação de teste via n8n
+      await notificationService.notifyNewChat({
+        receiverId: user.id,
+        senderName: 'Sistema EventoPlus',
+        firstMessage: `Olá ${userName}! Este é um teste de conectividade. Suas notificações estão funcionando perfeitamente! 🎉`,
+        chatId: 'test',
+        baseUrl
+      });
+
+      res.json({ 
+        success: true,
+        message: "Teste de conectividade enviado com sucesso!" 
+      });
+    } catch (error: any) {
+      console.error("Erro no teste de conectividade:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Event Application Status Update Routes
+  app.put("/api/events/:eventId/applications/:applicationId/approve", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const eventId = parseInt(req.params.eventId);
+      const applicationId = parseInt(req.params.applicationId);
+      const userId = (req.user as any).id;
+
+      // Verificar se o usuário é o organizador do evento
+      const event = await storage.getEvent(eventId);
+      if (!event || event.organizerId !== userId) {
+        return res.status(403).json({ message: "Não autorizado" });
+      }
+
+      // Atualizar status da candidatura
+      await storage.updateEventApplicationStatus(applicationId, 'approved');
+      
+      // Buscar dados da candidatura e prestador
+      const application = await storage.getEventApplication(applicationId);
+      const provider = await storage.getUser(application.providerId);
+
+      // Notificar prestador via n8n
+      try {
+        const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+        
+        await notificationService.notifyApplicationStatus({
+          providerId: application.providerId,
+          status: 'approved',
+          eventTitle: event.title,
+          eventLocation: event.location,
+          eventDate: event.date.toLocaleDateString('pt-BR'),
+          eventId: event.id,
+          baseUrl
+        });
+      } catch (notificationError) {
+        console.error('Erro ao notificar aprovação via n8n:', notificationError);
+      }
+
+      res.json({ success: true, message: "Candidatura aprovada com sucesso" });
+    } catch (error: any) {
+      console.error("Erro ao aprovar candidatura:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.put("/api/events/:eventId/applications/:applicationId/reject", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const eventId = parseInt(req.params.eventId);
+      const applicationId = parseInt(req.params.applicationId);
+      const userId = (req.user as any).id;
+      const { reason } = req.body;
+
+      // Verificar se o usuário é o organizador do evento
+      const event = await storage.getEvent(eventId);
+      if (!event || event.organizerId !== userId) {
+        return res.status(403).json({ message: "Não autorizado" });
+      }
+
+      // Atualizar status da candidatura
+      await storage.updateEventApplicationStatus(applicationId, 'rejected', reason);
+      
+      // Buscar dados da candidatura e prestador
+      const application = await storage.getEventApplication(applicationId);
+      const provider = await storage.getUser(application.providerId);
+
+      // Notificar prestador via n8n
+      try {
+        const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+        
+        await notificationService.notifyApplicationStatus({
+          providerId: application.providerId,
+          status: 'rejected',
+          eventTitle: event.title,
+          eventLocation: event.location,
+          eventDate: event.date.toLocaleDateString('pt-BR'),
+          eventId: event.id,
+          baseUrl
+        });
+      } catch (notificationError) {
+        console.error('Erro ao notificar rejeição via n8n:', notificationError);
+      }
+
+      res.json({ success: true, message: "Candidatura rejeitada" });
+    } catch (error: any) {
+      console.error("Erro ao rejeitar candidatura:", error);
       res.status(500).json({ message: error.message });
     }
   });
