@@ -44,14 +44,16 @@ passport.use(new LocalStrategy({
   try {
     const user = await storage.getUserByEmail(email);
     if (!user) {
-      return done(null, false);
+      return done(null, false, { message: "E-mail ou senha incorretos" });
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      return done(null, false);
+      return done(null, false, { message: "E-mail ou senha incorretos" });
     }
 
+    // Check if email is verified - but allow the authentication to continue
+    // We'll handle the verification check in the route handler
     return done(null, user);
   } catch (error) {
     return done(error);
@@ -265,7 +267,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/auth/login", passport.authenticate("local"), (req, res) => {
-    const { password, ...userWithoutPassword } = req.user as any;
+    const user = req.user as any;
+    
+    // Check if email is verified
+    if (!user.emailVerified) {
+      // Logout the user immediately
+      req.logout((err) => {
+        if (err) {
+          console.error("Erro ao fazer logout:", err);
+        }
+      });
+      
+      return res.status(403).json({ 
+        message: "E-mail não verificado. Verifique sua caixa de entrada e confirme seu e-mail antes de fazer login.",
+        emailVerificationRequired: true,
+        email: user.email
+      });
+    }
+    
+    const { password, ...userWithoutPassword } = user;
     res.json(userWithoutPassword);
   });
 
