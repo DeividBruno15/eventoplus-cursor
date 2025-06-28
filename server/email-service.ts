@@ -1,3 +1,5 @@
+import { MailService } from '@sendgrid/mail';
+
 interface EmailTemplate {
   subject: string;
   html: string;
@@ -16,11 +18,20 @@ interface PasswordResetData {
 
 export class EmailService {
   private baseUrl: string;
+  private mailService: MailService;
 
   constructor() {
     this.baseUrl = process.env.NODE_ENV === 'production' 
       ? 'https://your-domain.replit.app' 
       : 'http://localhost:5000';
+
+    // Initialize SendGrid
+    if (!process.env.SENDGRID_API_KEY) {
+      throw new Error("SENDGRID_API_KEY environment variable must be set");
+    }
+
+    this.mailService = new MailService();
+    this.mailService.setApiKey(process.env.SENDGRID_API_KEY);
   }
 
   /**
@@ -29,7 +40,7 @@ export class EmailService {
    */
   async sendEmail(to: string, template: EmailTemplate): Promise<boolean> {
     try {
-      // For development, we'll log the email content
+      // Log email for debugging
       console.log('\n=== EMAIL ENVIADO ===');
       console.log(`Para: ${to}`);
       console.log(`Assunto: ${template.subject}`);
@@ -37,12 +48,19 @@ export class EmailService {
       console.log(`Conteúdo Texto: ${template.text}`);
       console.log('===================\n');
 
-      // Simulate email service delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Send email using SendGrid
+      await this.mailService.send({
+        to: to,
+        from: 'noreply@evento.com', // You may need to verify this email with SendGrid
+        subject: template.subject,
+        text: template.text,
+        html: template.html,
+      });
 
+      console.log(`✅ E-mail enviado com sucesso para ${to}`);
       return true;
     } catch (error) {
-      console.error('Erro ao enviar e-mail:', error);
+      console.error('❌ Erro ao enviar e-mail:', error);
       return false;
     }
   }
