@@ -1,0 +1,242 @@
+{
+  "name": "EventoPlus WhatsApp Evolution API",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "eventoplus-notifications",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-eventoplus",
+      "name": "Webhook EventoPlus",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 400],
+      "webhookId": "eventoplus-notifications"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "new_event",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "new_event",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "new_chat",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "new_chat",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "event_application",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "event_application",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "application_status",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "application_status",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "venue_reservation",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "venue_reservation",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        }
+      },
+      "id": "switch-notification-type",
+      "name": "Tipo de Notificação",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [460, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nlet message = '';\nlet phone = data.userPhone;\n\n// Formatar telefone para formato internacional (remover caracteres especiais)\nif (phone) {\n  phone = phone.replace(/[^0-9]/g, '');\n  if (phone.startsWith('0')) phone = phone.substring(1);\n  if (!phone.startsWith('55')) phone = '55' + phone;\n}\n\nswitch(data.type) {\n  case 'new_event':\n    message = `🎉 *Novo evento compatível!*\\n\\n📅 *${data.data.eventTitle}*\\n📍 ${data.data.eventLocation}\\n💰 Orçamento: ${data.data.budget}\\n📋 Categoria: ${data.data.category}\\n\\nVer detalhes: ${data.data.eventUrl}`;\n    break;\n    \n  case 'new_chat':\n    message = `💬 *Nova mensagem!*\\n\\nDe: ${data.data.senderName}\\nEvento: ${data.data.eventTitle}\\n\\n\"${data.data.messagePreview}\"\\n\\nResponder: ${data.data.chatUrl}`;\n    break;\n    \n  case 'event_application':\n    message = `📝 *Nova candidatura!*\\n\\nEvento: ${data.data.eventTitle}\\nPrestador: ${data.data.providerName}\\nServiço: ${data.data.serviceType}\\n💰 Valor: ${data.data.proposedPrice}\\n\\nVer candidatura: ${data.data.applicationUrl}`;\n    break;\n    \n  case 'application_status':\n    const status = data.data.status === 'approved' ? '✅ APROVADA' : '❌ REJEITADA';\n    message = `${status} *Candidatura ${data.data.status}*\\n\\nEvento: ${data.data.eventTitle}\\nServiço: ${data.data.serviceType}\\n\\n${data.data.status === 'approved' ? 'Parabéns! Entre em contato com o organizador.' : 'Continue se candidatando a outros eventos.'}\\n\\nVer detalhes: ${data.data.applicationUrl}`;\n    break;\n    \n  case 'venue_reservation':\n    message = `🏢 *Nova reserva de espaço!*\\n\\nLocal: ${data.data.venueName}\\nCliente: ${data.data.clientName}\\n📅 Data: ${data.data.eventDate}\\n💰 Valor: ${data.data.totalPrice}\\n\\nVer reserva: ${data.data.reservationUrl}`;\n    break;\n    \n  default:\n    message = `📢 Nova notificação do EventoPlus!\\n\\nTipo: ${data.type}\\nDetalhes disponíveis na plataforma.`;\n}\n\nconsole.log('📱 Processando notificação:', data.type);\nconsole.log('📞 Telefone formatado:', phone);\nconsole.log('📝 Mensagem:', message);\n\nreturn [{\n  json: {\n    number: phone,\n    message: message,\n    userId: data.userId,\n    userType: data.userType,\n    notificationType: data.type,\n    timestamp: data.timestamp\n  }\n}];"
+      },
+      "id": "process-message",
+      "name": "Processar Mensagem",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_EVOLUTION_API_URL/message/sendText/YOUR_INSTANCE_NAME",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $json.number }}"
+            },
+            {
+              "name": "textMessage",
+              "value": "={{ { \"text\": $json.message } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-whatsapp-evolution",
+      "name": "Enviar WhatsApp Evolution",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst webhookData = $('Webhook EventoPlus').first().json;\n\nconsole.log('✅ WhatsApp enviado via Evolution API!');\nconsole.log('📱 Response:', JSON.stringify(data, null, 2));\nconsole.log('📊 Dados originais:', JSON.stringify(webhookData, null, 2));\n\nreturn [{\n  json: {\n    success: true,\n    message: 'WhatsApp enviado com sucesso via Evolution API',\n    timestamp: new Date().toISOString(),\n    notificationType: webhookData.type,\n    userId: webhookData.userId,\n    response: data\n  }\n}];"
+      },
+      "id": "log-success",
+      "name": "Log Sucesso",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "respond-to-webhook",
+      "name": "Responder Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 400]
+    }
+  ],
+  "connections": {
+    "Webhook EventoPlus": {
+      "main": [
+        [
+          {
+            "node": "Tipo de Notificação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tipo de Notificação": {
+      "main": [
+        [
+          {
+            "node": "Processar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Processar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Processar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Processar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Processar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processar Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Enviar WhatsApp Evolution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar WhatsApp Evolution": {
+      "main": [
+        [
+          {
+            "node": "Log Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Sucesso": {
+      "main": [
+        [
+          {
+            "node": "Responder Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "2.0.0-evolution"
+}

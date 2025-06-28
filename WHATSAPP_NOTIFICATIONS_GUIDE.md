@@ -5,14 +5,20 @@ Este guia mostra como configurar notificações WhatsApp automáticas usando n8n
 
 ## ⚡ Setup Rápido (15 minutos)
 
-### Passo 1: Configurar Z-API (5 min)
-1. **Criar conta**: https://z-api.io → "Criar Conta Grátis"
-2. **Confirmar e-mail** recebido
-3. **Nova instância**: No painel → "Nova Instância" → Nome: "EventoPlus"
-4. **Conectar WhatsApp**: Escanear QR Code com seu WhatsApp
-5. **Anotar credenciais**:
-   - Instance ID: (ex: 3C4E...)
-   - Token: (ex: B6D48A...)
+### Passo 1: Configurar Evolution API (10 min) - RECOMENDADO ⭐
+1. **Criar conta**: https://railway.app → Login com GitHub
+2. **Deploy Evolution API**: 
+   - New Project → Deploy from GitHub
+   - URL: `https://github.com/EvolutionAPI/evolution-api`
+   - Aguardar build (5-10 min)
+3. **Configurar variáveis** no Railway:
+   ```
+   AUTHENTICATION_API_KEY=eventoplus2024
+   SERVER_URL=https://evolution-api-production.up.railway.app
+   STORE_MESSAGES=true
+   ```
+4. **Acessar painel**: URL-do-deploy/manager
+5. **Conectar WhatsApp**: Criar instância → Escanear QR Code
 
 ### Passo 2: Configurar n8n Cloud (5 min)  
 1. **Criar conta**: https://n8n.cloud → "Sign up"
@@ -21,11 +27,13 @@ Este guia mostra como configurar notificações WhatsApp automáticas usando n8n
 
 ### Passo 3: Configurar Integração (5 min)
 1. **No n8n**: Copie a URL do webhook (ex: `https://seu-workspace.app.n8n.cloud/webhook/eventoplus-notifications`)
-2. **Configurar nó Z-API**: 
-   - Substitua `YOUR_INSTANCE_ID` pelo seu Instance ID
-   - Substitua `YOUR_TOKEN` pelo seu Token
-3. **Ativar workflow**: Botão "Active" → ON
-4. **Atualizar EventoPlus**: No arquivo `.env`, adicione:
+2. **Importar template**: Use o arquivo `n8n-evolution-template.json` (Evolution API)
+3. **Configurar nó Evolution**:
+   - Substitua `YOUR_EVOLUTION_API_URL` pela URL do Railway
+   - Substitua `YOUR_INSTANCE_NAME` pelo nome da instância
+   - Substitua `YOUR_API_KEY` pela chave configurada
+4. **Ativar workflow**: Botão "Active" → ON
+5. **Atualizar EventoPlus**: No arquivo `.env`, adicione:
    ```
    N8N_WEBHOOK_URL=https://seu-workspace.app.n8n.cloud/webhook/eventoplus-notifications
    ```
@@ -42,18 +50,34 @@ curl http://localhost:5000/api/diagnostics/n8n
 curl http://localhost:5000/api/notifications/test
 ```
 
-## 💰 Custos Estimados
+## 💰 Custos Estimados (ATUALIZADO)
 
-### Z-API
-- **Plano Starter**: R$ 19/mês
-- **Inclui**: 1000 mensagens
-- **Adicional**: R$ 0,05 por mensagem extra
+### ⚠️ Z-API - CARO DEMAIS
+- **Plano atual**: R$ 99/mês (só 2 dias grátis)
+- **Não recomendado** para início
+
+### 🏆 ALTERNATIVAS MELHORES:
+
+### 1. Evolution API (GRATUITA) ⭐
+- **Custo**: R$ 0/mês (open source)
+- **Hospedagem**: Railway/Render (~R$ 25/mês)
+- **Total**: ~R$ 25/mês
+
+### 2. WhatsApp Business API Oficial
+- **Custo**: R$ 0,039 por conversa
+- **Primeiras 1000**: Gratuitas/mês
+- **Total**: ~R$ 0-40/mês
+
+### 3. Baileys (GRATUITA)
+- **Custo**: R$ 0/mês (biblioteca open source)
+- **Hospedagem**: Própria infraestrutura
+- **Total**: ~R$ 0-15/mês
 
 ### n8n Cloud
 - **Plano Starter**: Gratuito (até 5.000 execuções/mês)
 - **Plano Pro**: $20/mês (ilimitado)
 
-### Total Mensal: ~R$ 19-119 (dependendo do volume)
+### 🎯 RECOMENDAÇÃO: Evolution API + n8n = ~R$ 25/mês total
 
 ## 📋 5 Tipos de Notificação
 
