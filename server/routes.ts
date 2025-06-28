@@ -16,6 +16,7 @@ import { storage } from "./storage";
 import { pixService } from "./pix";
 import { aiMatchingService } from "./ai-matching";
 import { monitoringService } from "./monitoring";
+import { emailService, EmailService } from "./email-service";
 import { 
   insertEventSchema, 
   insertEventApplicationSchema, 
@@ -234,17 +235,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userData.address = `${streetField}, ${neighborhoodField}`;
       }
 
-      // Create user
+      // Create user without email verification
       const user = await storage.createUser(userData);
 
-      // Auto-login after registration
-      req.login(user, (err) => {
-        if (err) {
-          return res.status(500).json({ message: "Erro ao fazer login automático" });
-        }
-        
-        const { password, ...userWithoutPassword } = user;
-        res.status(201).json(userWithoutPassword);
+      // Generate verification token
+      const verificationToken = EmailService.generateVerificationToken();
+      await storage.setEmailVerificationToken(user.id, verificationToken);
+
+      // Send verification email
+      const verificationUrl = emailService.createVerificationUrl(verificationToken);
+      const emailSent = await emailService.sendEmailVerification(user.email, {
+        username: user.username,
+        verificationUrl
+      });
+
+      if (!emailSent) {
+        console.error("Falha ao enviar e-mail de verificação");
+      }
+
+      res.status(201).json({ 
+        message: "Cadastro realizado com sucesso! Verifique seu e-mail para confirmar a conta.",
+        emailSent: emailSent,
+        email: user.email
       });
     } catch (error: any) {
       res.status(400).json({ message: error.message || "Erro ao criar usuário" });
@@ -298,6 +310,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json({ message: "Logout realizado com sucesso" });
     });
+  });
+
+  // Email verification routes
+  app.get("/api/auth/verify-email", async (req, res) => {
+    try {
+      const { token } = req.query;
+
+      if (!token) {
+        return res.status(400).json({ message: "Token de verificação é obrigatório" });
+      }
+
+      // Verify email with token
+      const user = await storage.verifyEmailWithToken(token as string);
+
+      if (!user) {
+        return res.status(400).json({ 
+          message: "Token inválido ou expirado",
+          expired: true
+        });
+      }
+
+      res.json({ 
+        message: "E-mail verificado com sucesso!",
+        success: true,
+        user: {
+          email: user.email,
+          username: user.username
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/auth/resend-verification", async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ message: "E-mail é obrigatório" });
+      }
+
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      // Check if already verified
+      if (user.emailVerified) {
+        return res.status(400).json({ 
+          message: "E-mail já está verificado",
+          alreadyVerified: true
+        });
+      }
+
+      // Generate new verification token
+      const verificationToken = EmailService.generateVerificationToken();
+      await storage.setEmailVerificationToken(user.id, verificationToken);
+
+      // Send verification email
+      const verificationUrl = emailService.createVerificationUrl(verificationToken);
+      const emailSent = await emailService.sendEmailVerification(user.email, {
+        username: user.username,
+        verificationUrl
+      });
+
+      if (!emailSent) {
+        return res.status(500).json({ message: "Erro ao enviar e-mail de verificação" });
+      }
+
+      res.json({ 
+        message: "E-mail de verificação reenviado com sucesso!",
+        success: true,
+        email: user.email
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/auth/check-verification", async (req, res) => {
+    try {
+      const { email } = req.query;
+
+      if (!email) {
+        return res.status(400).json({ message: "E-mail é obrigatório" });
+      }
+
+      const user = await storage.getUserByEmail(email as string);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      res.json({
+        email: user.email,
+        emailVerified: user.emailVerified || false,
+        verificationSent: !!user.emailVerificationToken
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
   });
 
 

@@ -56,6 +56,11 @@ export interface IStorage {
   generateApiKey(userId: number): Promise<string>;
   validateApiKey(apiKey: string): Promise<User | null>;
   
+  // Email verification
+  setEmailVerificationToken(userId: number, token: string): Promise<User>;
+  verifyEmailWithToken(token: string): Promise<User | null>;
+  getUserByVerificationToken(token: string): Promise<User | undefined>;
+  
   // Events
   getEvents(): Promise<Event[]>;
   getEvent(id: number): Promise<Event | undefined>;
@@ -286,6 +291,41 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     if (!result[0]) throw new Error("User not found");
+    return result[0];
+  }
+
+  // Email verification methods
+  async setEmailVerificationToken(userId: number, token: string): Promise<User> {
+    const result = await db.update(users)
+      .set({ 
+        emailVerificationToken: token,
+        emailVerificationSentAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!result[0]) throw new Error("User not found");
+    return result[0];
+  }
+
+  async verifyEmailWithToken(token: string): Promise<User | null> {
+    const result = await db.update(users)
+      .set({ 
+        emailVerified: true,
+        emailVerificationToken: null,
+        emailVerificationSentAt: null
+      })
+      .where(eq(users.emailVerificationToken, token))
+      .returning();
+    
+    return result[0] || null;
+  }
+
+  async getUserByVerificationToken(token: string): Promise<User | undefined> {
+    const result = await db.select().from(users)
+      .where(eq(users.emailVerificationToken, token))
+      .limit(1);
+    
     return result[0];
   }
 
