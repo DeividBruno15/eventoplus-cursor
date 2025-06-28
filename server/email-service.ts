@@ -51,7 +51,7 @@ export class EmailService {
     try {
       await this.mailService.send({
         to: to,
-        from: 'noreply@eventoplus.com.br', // E-mail verificado no SendGrid
+        from: 'noreply@eventoplus.com.br', // Single Sender Verification (não precisa de DNS)
         subject: template.subject,
         text: template.text,
         html: template.html,
