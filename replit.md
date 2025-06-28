@@ -255,6 +255,18 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 Preferred communication style: Simple, everyday language.
 UI Framework preference: Use shadcn/ui components library throughout the entire project.
 
+### June 28, 2025 - Sistema de Verificação de E-mail Obrigatório Implementado
+- **Sistema Completo de Verificação**: Sistema de verificação de e-mail obrigatório implementado com fluxo completo de registro
+- **Bloqueio de Login**: Usuários não verificados são impedidos de fazer login com erro 403 e redirecionamento para verificação
+- **Páginas de Interface**: Criadas páginas específicas para notificação de e-mail enviado (/auth/email-sent) e confirmação de verificação (/auth/verify-email)
+- **Service de E-mail**: EmailService completo com templates HTML e texto, geração de tokens e URLs de verificação
+- **APIs de Verificação**: Rotas completas para verificar e-mail, reenvio de verificação e checagem de status
+- **Fluxo de Registro Atualizado**: Registro agora não faz login automático, envia e-mail de verificação e redireciona para página de confirmação
+- **Integração com shadcn/ui**: Todas as interfaces usam componentes shadcn/ui (Card, Button, Alert, etc.) conforme preferência do usuário
+- **Segurança Implementada**: Tokens de verificação com expiração de 24 horas, logout automático de usuários não verificados
+- **Funcionalidades Testadas**: Sistema totalmente testado com criação de usuários, envio de e-mails, verificação e bloqueio de login
+- **Database Schema**: Campos de verificação de e-mail (emailVerified, emailVerificationToken, emailVerificationSentAt) já existentes no schema
+
 ### June 18, 2025 - Advanced ClickMax.io Recreation with Modern Effects
 - **Faithful Design Copy**: Created exact replica of https://clickmax.io/ design structure and visual elements adapted for Evento+ scope
 - **Glassmorphism Dashboard Mockup**: Modern dashboard with backdrop-blur effects, gradient overlays, and floating glass elements matching reference image
