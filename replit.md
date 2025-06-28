@@ -255,17 +255,17 @@ Evento+ is a comprehensive SaaS marketplace platform that connects event organiz
 Preferred communication style: Simple, everyday language.
 UI Framework preference: Use shadcn/ui components library throughout the entire project.
 
-### June 28, 2025 - Sistema de Verificação de E-mail Obrigatório Implementado
-- **Sistema Completo de Verificação**: Sistema de verificação de e-mail obrigatório implementado com fluxo completo de registro
-- **Bloqueio de Login**: Usuários não verificados são impedidos de fazer login com erro 403 e redirecionamento para verificação
-- **Páginas de Interface**: Criadas páginas específicas para notificação de e-mail enviado (/auth/email-sent) e confirmação de verificação (/auth/verify-email)
-- **Service de E-mail**: EmailService completo com templates HTML e texto, geração de tokens e URLs de verificação
-- **APIs de Verificação**: Rotas completas para verificar e-mail, reenvio de verificação e checagem de status
-- **Fluxo de Registro Atualizado**: Registro agora não faz login automático, envia e-mail de verificação e redireciona para página de confirmação
-- **Integração com shadcn/ui**: Todas as interfaces usam componentes shadcn/ui (Card, Button, Alert, etc.) conforme preferência do usuário
-- **Segurança Implementada**: Tokens de verificação com expiração de 24 horas, logout automático de usuários não verificados
-- **Funcionalidades Testadas**: Sistema totalmente testado com criação de usuários, envio de e-mails, verificação e bloqueio de login
-- **Database Schema**: Campos de verificação de e-mail (emailVerified, emailVerificationToken, emailVerificationSentAt) já existentes no schema
+### June 28, 2025 - Sistema Completo de E-mail e Reset de Senha Implementado
+- **Sistema de "Esqueceu sua Senha"**: Fluxo completo implementado e testado com sucesso - solicitação, geração de token, envio de e-mail e redefinição
+- **Templates E-mail Profissionais**: Templates HTML responsivos com design da marca Evento+ (cores #3C5BFA, #FFA94D) para reset de senha e verificação
+- **Integração SendGrid Configurada**: SendGrid integrado com fallback para desenvolvimento, remetente verificado (noreply@eventoplus.com.br)
+- **Segurança Robusta**: Tokens de reset expiram em 1 hora, tokens de verificação em 24 horas, logout automático de usuários não verificados
+- **Sistema de Verificação de E-mail**: Verificação obrigatória implementada - usuários não verificados são bloqueios no login com redirecionamento
+- **Páginas de Interface**: Páginas completas usando shadcn/ui - /auth/email-sent, /auth/verify-email, /auth/reset-password, /auth/forgot-password
+- **APIs Completas**: Rotas de verificação, reenvio, reset de senha, validação de tokens com tratamento robusto de erros
+- **Configuração Produção**: Sistema preparado para produção com domínio eventoplus.com.br, aguardando verificação DNS no SendGrid
+- **Funcionalidades Testadas**: Reset de senha testado com token gerado (scxbli1iplk0ekyyic0vrmcghaq5w), e-mails processados com sucesso
+- **Database Schema**: Campos completos para verificação (emailVerified, emailVerificationToken) e reset (passwordResetToken, passwordResetExpires)
 
 ### June 18, 2025 - Advanced ClickMax.io Recreation with Modern Effects
 - **Faithful Design Copy**: Created exact replica of https://clickmax.io/ design structure and visual elements adapted for Evento+ scope
