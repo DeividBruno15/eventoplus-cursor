@@ -61,6 +61,10 @@ export interface IStorage {
   verifyEmailWithToken(token: string): Promise<User | null>;
   getUserByVerificationToken(token: string): Promise<User | undefined>;
   
+  // Password reset
+  setPasswordResetToken(userId: number, token: string): Promise<User>;
+  getUserByPasswordResetToken(token: string): Promise<User | undefined>;
+  
   // Events
   getEvents(): Promise<Event[]>;
   getEvent(id: number): Promise<Event | undefined>;
@@ -324,6 +328,30 @@ export class DatabaseStorage implements IStorage {
   async getUserByVerificationToken(token: string): Promise<User | undefined> {
     const result = await db.select().from(users)
       .where(eq(users.emailVerificationToken, token))
+      .limit(1);
+    
+    return result[0];
+  }
+
+  // Password reset methods
+  async setPasswordResetToken(userId: number, token: string): Promise<User> {
+    const result = await db
+      .update(users)
+      .set({ 
+        passwordResetToken: token,
+        passwordResetSentAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    return result[0];
+  }
+
+  async getUserByPasswordResetToken(token: string): Promise<User | undefined> {
+    const result = await db
+      .select()
+      .from(users)
+      .where(eq(users.passwordResetToken, token))
       .limit(1);
     
     return result[0];
