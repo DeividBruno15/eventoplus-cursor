@@ -270,6 +270,16 @@ UI Framework preference: Use shadcn/ui components library throughout the entire 
 - **Database Schema**: Campos completos para verificação (emailVerified, emailVerificationToken) e reset (passwordResetToken, passwordResetExpires)
 - **URLs de E-mail Corrigidas**: EmailService configurado para usar domínio Replit correto, links nos e-mails funcionam perfeitamente
 
+### June 30, 2025 - Tela de Login Moderna com Design Split-Screen IMPLEMENTADA
+- **Design Split-Screen**: Layout moderno seguindo referência fornecida com lado esquerdo animado e formulário clean no direito
+- **Animações Avançadas**: Lado esquerdo com gradiente azul, elementos flutuantes, ícones animados e efeitos de brilho
+- **Funcionalidade Integrada**: Sistema "Esqueceu sua senha" integrado na mesma tela com transição suave entre formulários
+- **UI/UX Moderna**: Formulários com inputs estilizados, sombras, bordas arredondadas e transições suaves
+- **Responsividade**: Layout adaptável para desktop (split-screen) e mobile (formulário centralizado)
+- **Elementos Visuais**: Ícones de recursos da plataforma, texto promocional e elementos decorativos animados
+- **Sistema de Estados**: Alternância fluida entre login e recuperação de senha mantendo o mesmo layout
+- **Integração com Backend**: Formulários conectados com APIs existentes de autenticação e reset de senha
+
 ### June 28, 2025 - Integração n8n WhatsApp 100% IMPLEMENTADA E VERIFICADA
 - **Sistema n8n Completo**: Serviço de notificações totalmente implementado com 5 tipos de notificação (new_event, new_chat, venue_reservation, event_application, application_status)
 - **7 Pontos de Integração**: Notificações ativas em criação de eventos, chat, aplicações, aprovações e reservas de locais
