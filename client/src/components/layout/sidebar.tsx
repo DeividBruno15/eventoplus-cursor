@@ -70,6 +70,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: FileText, label: "Contratos", path: "/contracts" },
       { icon: Code, label: "API Pública", path: "/public-api" },
       { icon: Percent, label: "Comissões Variáveis", path: "/variable-commissions" },
+      { icon: Brain, label: "Recomendações IA", path: "/ai-recommendations" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
       { icon: TrendingUp, label: "BI Dashboard", path: "/bi-dashboard" },
     ],
@@ -84,6 +85,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: FileText, label: "Contratos", path: "/contracts" },
       { icon: Code, label: "API Pública", path: "/public-api" },
       { icon: Percent, label: "Comissões Variáveis", path: "/variable-commissions" },
+      { icon: Brain, label: "Recomendações IA", path: "/ai-recommendations" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
       { icon: TrendingUp, label: "BI Dashboard", path: "/bi-dashboard" },
     ],
@@ -97,6 +99,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: Bell, label: "Notificações", path: "/notifications" },
       { icon: FileText, label: "Contratos", path: "/contracts" },
       { icon: Percent, label: "Comissões Variáveis", path: "/variable-commissions" },
+      { icon: Brain, label: "Recomendações IA", path: "/ai-recommendations" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
       { icon: TrendingUp, label: "BI Dashboard", path: "/bi-dashboard" },
     ]
