@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useLocation } from "wouter";
-import { Calendar, Users, MapPin, Star, PartyPopper, Heart } from "lucide-react";
+import { Calendar, Users, MapPin, Star, PartyPopper, Heart, ArrowLeft, Mail } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { apiRequest } from "@/lib/queryClient";
 import eventoLogo from "@assets/logo evennto_1750165135991.png";
 
 const loginSchema = z.object({
@@ -16,7 +17,12 @@ const loginSchema = z.object({
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Email inválido"),
+});
+
 type LoginForm = z.infer<typeof loginSchema>;
+type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -24,12 +30,21 @@ export default function Login() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [isLoadingForgot, setIsLoadingForgot] = useState(false);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
+    },
+  });
+
+  const forgotPasswordForm = useForm<ForgotPasswordForm>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
     },
   });
 
@@ -82,6 +97,32 @@ export default function Login() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const onSubmitForgotPassword = async (data: ForgotPasswordForm) => {
+    setIsLoadingForgot(true);
+    try {
+      const response = await apiRequest("/api/auth/forgot-password", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+
+      if (response) {
+        toast({
+          title: "Email enviado!",
+          description: "Verifique seu email para redefinir sua senha.",
+        });
+        setLocation(`/auth/email-sent?email=${encodeURIComponent(data.email)}&type=reset`);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erro ao enviar email",
+        description: error.message || "Tente novamente em alguns minutos.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingForgot(false);
     }
   };
 
@@ -164,87 +205,165 @@ export default function Login() {
               className="h-8 object-contain mx-auto mb-8"
             />
             
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Entrar na sua conta
-            </h2>
-            <p className="text-gray-600 text-sm">
-              Digite suas credenciais para acessar o Evento+
-            </p>
+            {!showForgotPassword ? (
+              <>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  Entrar na sua conta
+                </h2>
+                <p className="text-gray-600 text-sm">
+                  Digite suas credenciais para acessar o Evento+
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  Esqueceu sua senha?
+                </h2>
+                <p className="text-gray-600 text-sm">
+                  Digite seu email para receber as instruções de redefinição
+                </p>
+              </>
+            )}
           </div>
 
-          {/* Login Form */}
+          {/* Form Container */}
           <div className="bg-white rounded-2xl shadow-xl p-8 animate-fade-in-up animate-delay-200">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-700 font-medium">Email</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="seu@email.com" 
-                          type="email" 
-                          className="h-12 border-gray-200 focus:border-[#3C5BFA] focus:ring-[#3C5BFA] rounded-lg"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            {!showForgotPassword ? (
+              // Login Form
+              <>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-700 font-medium">Email</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="seu@email.com" 
+                              type="email" 
+                              className="h-12 border-gray-200 focus:border-[#3C5BFA] focus:ring-[#3C5BFA] rounded-lg"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-700 font-medium">Senha</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="••••••••" 
-                          type="password" 
-                          className="h-12 border-gray-200 focus:border-[#3C5BFA] focus:ring-[#3C5BFA] rounded-lg"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-700 font-medium">Senha</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="••••••••" 
+                              type="password" 
+                              className="h-12 border-gray-200 focus:border-[#3C5BFA] focus:ring-[#3C5BFA] rounded-lg"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <Button 
-                  type="submit" 
-                  className="w-full h-12 bg-[#3C5BFA] hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 hover:shadow-lg" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Entrando..." : "Entrar"}
-                </Button>
-              </form>
-            </Form>
+                    <Button 
+                      type="submit" 
+                      className="w-full h-12 bg-[#3C5BFA] hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 hover:shadow-lg" 
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Entrando..." : "Entrar"}
+                    </Button>
+                  </form>
+                </Form>
 
-            {/* Links */}
-            <div className="mt-6 text-center space-y-4">
-              <Link 
-                href="/auth/forgot-password" 
-                className="text-sm text-[#3C5BFA] hover:text-blue-700 hover:underline block transition-colors"
-              >
-                Esqueceu sua senha?
-              </Link>
-              
-              <div className="pt-4 border-t border-gray-100">
-                <p className="text-sm text-gray-600">
-                  Não tem uma conta?{" "}
-                  <Link 
-                    href="/auth/register-step1" 
-                    className="text-[#3C5BFA] hover:text-blue-700 font-medium hover:underline transition-colors"
+                {/* Login Links */}
+                <div className="mt-6 text-center space-y-4">
+                  <button 
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-sm text-[#3C5BFA] hover:text-blue-700 hover:underline block transition-colors w-full"
                   >
-                    Cadastre-se
-                  </Link>
-                </p>
-              </div>
-            </div>
+                    Esqueceu sua senha?
+                  </button>
+                  
+                  <div className="pt-4 border-t border-gray-100">
+                    <p className="text-sm text-gray-600">
+                      Não tem uma conta?{" "}
+                      <Link 
+                        href="/auth/register-step1" 
+                        className="text-[#3C5BFA] hover:text-blue-700 font-medium hover:underline transition-colors"
+                      >
+                        Cadastre-se
+                      </Link>
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              // Forgot Password Form
+              <>
+                <Form {...forgotPasswordForm}>
+                  <form onSubmit={forgotPasswordForm.handleSubmit(onSubmitForgotPassword)} className="space-y-6">
+                    <FormField
+                      control={forgotPasswordForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-700 font-medium">Email</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Mail className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
+                              <Input 
+                                placeholder="seu@email.com" 
+                                type="email" 
+                                className="h-12 pl-10 border-gray-200 focus:border-[#3C5BFA] focus:ring-[#3C5BFA] rounded-lg"
+                                {...field} 
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button 
+                      type="submit" 
+                      className="w-full h-12 bg-[#3C5BFA] hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 hover:shadow-lg" 
+                      disabled={isLoadingForgot}
+                    >
+                      {isLoadingForgot ? "Enviando..." : "Enviar instrução"}
+                    </Button>
+                  </form>
+                </Form>
+
+                {/* Forgot Password Links */}
+                <div className="mt-6 text-center space-y-4">
+                  <button 
+                    onClick={() => setShowForgotPassword(false)}
+                    className="flex items-center justify-center text-sm text-gray-600 hover:text-[#3C5BFA] transition-colors w-full"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Voltar para o login
+                  </button>
+                  
+                  <div className="pt-4 border-t border-gray-100">
+                    <p className="text-sm text-gray-600">
+                      Não tem uma conta?{" "}
+                      <Link 
+                        href="/auth/register-step1" 
+                        className="text-[#3C5BFA] hover:text-blue-700 font-medium hover:underline transition-colors"
+                      >
+                        Cadastre-se
+                      </Link>
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
