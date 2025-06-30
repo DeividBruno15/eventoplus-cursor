@@ -4510,6 +4510,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // =================== BI ANALYTICS ENDPOINTS ===================
+
+  // Obter métricas de negócio completas
+  app.get('/api/bi-analytics/metrics', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const { biAnalyticsService } = await import('./bi-analytics');
+      const metrics = await biAnalyticsService.generateBusinessMetrics();
+      res.json(metrics);
+    } catch (error) {
+      console.error('Error generating BI metrics:', error);
+      res.status(500).json({ error: 'Failed to generate business metrics' });
+    }
+  });
+
+  // Obter tendências de KPIs dos últimos 12 meses
+  app.get('/api/bi-analytics/kpi-trends', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const { biAnalyticsService } = await import('./bi-analytics');
+      const trends = await biAnalyticsService.generateKPITrends();
+      res.json(trends);
+    } catch (error) {
+      console.error('Error generating KPI trends:', error);
+      res.status(500).json({ error: 'Failed to generate KPI trends' });
+    }
+  });
+
+  // Obter indicadores de performance
+  app.get('/api/bi-analytics/performance', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const { biAnalyticsService } = await import('./bi-analytics');
+      const indicators = await biAnalyticsService.calculatePerformanceIndicators();
+      res.json(indicators);
+    } catch (error) {
+      console.error('Error calculating performance indicators:', error);
+      res.status(500).json({ error: 'Failed to calculate performance indicators' });
+    }
+  });
+
+  // Obter resumo executivo
+  app.get('/api/bi-analytics/executive-summary', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const { biAnalyticsService } = await import('./bi-analytics');
+      const summary = await biAnalyticsService.generateExecutiveSummary();
+      res.json(summary);
+    } catch (error) {
+      console.error('Error generating executive summary:', error);
+      res.status(500).json({ error: 'Failed to generate executive summary' });
+    }
+  });
+
   // =================== VARIABLE COMMISSION ENDPOINTS ===================
 
   // Listar todas as regras de comissão

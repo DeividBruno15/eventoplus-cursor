@@ -62,6 +62,7 @@ import AnalyticsAdvanced from "@/pages/analytics-advanced";
 import SplitPayments from "@/pages/split-payments";
 import PublicApi from "@/pages/public-api";
 import VariableCommissions from "@/pages/variable-commissions";
+import BIDashboard from "@/pages/bi-dashboard";
 import { useAuth } from "@/hooks/use-auth";
 
 // Analytics Wrapper Component
