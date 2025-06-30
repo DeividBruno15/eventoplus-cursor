@@ -37,70 +37,95 @@ export default function Agenda() {
   const [selectedFilter, setSelectedFilter] = useState("todos");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<AgendaEvent | null>(null);
 
   // Calcular início e fim da semana
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 }); // Segunda-feira
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
-  // Mock data baseado no design fornecido
-  const mockEvents: AgendaEvent[] = [
-    {
-      id: 1,
-      title: "John West",
-      eventDate: format(addDays(weekStart, 0), 'yyyy-MM-dd'),
-      startTime: "09:00",
-      endTime: "10:00",
-      status: "confirmed",
-      type: "meeting",
-      description: "Meeting with client",
-      clientName: "John West",
-      color: "bg-blue-100 text-blue-800",
-      avatar: "JW"
-    },
-    {
-      id: 2,
-      title: "Design Review",
-      eventDate: format(addDays(weekStart, 1), 'yyyy-MM-dd'),
-      startTime: "14:00",
-      endTime: "15:30",
-      status: "scheduled",
-      type: "meeting",
-      description: "Review design proposals",
-      color: "bg-purple-100 text-purple-800",
-      avatar: "DR"
-    },
-    {
-      id: 3,
-      title: "Summer Hall",
-      eventDate: format(addDays(weekStart, 2), 'yyyy-MM-dd'),
-      startTime: "10:00",
-      endTime: "11:00",
-      status: "confirmed",
-      type: "event",
-      description: "Event planning session",
-      clientName: "Summer Hall",
-      color: "bg-green-100 text-green-800",
-      avatar: "SH"
-    },
-    {
-      id: 4,
-      title: "Marketing Team",
-      eventDate: format(addDays(weekStart, 3), 'yyyy-MM-dd'),
-      startTime: "16:00",
-      endTime: "17:00",
-      status: "scheduled",
-      type: "meeting",
-      description: "Weekly marketing sync",
-      color: "bg-orange-100 text-orange-800",
-      avatar: "MT"
-    }
-  ];
-
-  // Buscar eventos da agenda baseado no tipo de usuário
-  const { data: agendaEvents = mockEvents, isLoading } = useQuery<AgendaEvent[]>({
-    queryKey: ["/api/agenda"],
-    enabled: !!user,
+  // Buscar dados reais baseados no tipo de usuário
+  const { data: userEvents, isLoading: eventsLoading } = useQuery({
+    queryKey: ['/api/events', user?.id],
+    enabled: !!user && user.userType === 'contratante'
   });
+
+  const { data: userApplications, isLoading: applicationsLoading } = useQuery({
+    queryKey: ['/api/event-applications/accepted', user?.id],
+    enabled: !!user && user.userType === 'prestador'
+  });
+
+  const { data: venueReservations, isLoading: reservationsLoading } = useQuery({
+    queryKey: ['/api/venues/reservations', user?.id],
+    enabled: !!user && user.userType === 'anunciante'
+  });
+
+  // Processar dados para formato da agenda baseado no tipo de usuário
+  const processAgendaEvents = (): AgendaEvent[] => {
+    if (!user) return [];
+
+    let events: AgendaEvent[] = [];
+
+    // PRESTADOR: Aplicações aceitas viram eventos na agenda
+    if (user.userType === 'prestador' && userApplications && Array.isArray(userApplications)) {
+      events = userApplications
+        .filter((app: any) => app.status === 'approved')
+        .map((app: any) => ({
+          id: app.id,
+          title: app.event?.title || 'Serviço Contratado',
+          eventDate: format(new Date(app.event?.date), 'yyyy-MM-dd'),
+          startTime: app.availableDate ? format(new Date(app.availableDate), 'HH:mm') : "09:00",
+          endTime: app.estimatedHours ? format(new Date(new Date(app.availableDate).getTime() + (app.estimatedHours * 60 * 60 * 1000)), 'HH:mm') : "18:00",
+          status: "confirmed",
+          type: "service",
+          description: app.proposal || 'Serviço aprovado',
+          clientName: app.event?.organizer?.username || 'Cliente',
+          color: "bg-green-100 text-green-800",
+          avatar: app.event?.organizer?.username?.slice(0, 2).toUpperCase() || 'CL',
+          originalData: app
+        }));
+    }
+
+    // CONTRATANTE: Eventos criados aparecem na agenda
+    if (user.userType === 'contratante' && userEvents && Array.isArray(userEvents)) {
+      events = userEvents.map((event: any) => ({
+        id: event.id,
+        title: event.title,
+        eventDate: format(new Date(event.date), 'yyyy-MM-dd'),
+        startTime: format(new Date(event.date), 'HH:mm'),
+        endTime: format(new Date(new Date(event.date).getTime() + (4 * 60 * 60 * 1000)), 'HH:mm'), // +4 horas por padrão
+        status: event.status || "scheduled",
+        type: "event",
+        description: event.description,
+        clientName: event.location,
+        color: "bg-blue-100 text-blue-800",
+        avatar: event.title?.slice(0, 2).toUpperCase() || 'EV',
+        originalData: event
+      }));
+    }
+
+    // ANUNCIANTE: Reservas de locais aparecem na agenda
+    if (user.userType === 'anunciante' && venueReservations) {
+      events = venueReservations.map((reservation: any) => ({
+        id: reservation.id,
+        title: `Reserva - ${reservation.venue?.name}`,
+        eventDate: format(new Date(reservation.eventDate), 'yyyy-MM-dd'),
+        startTime: reservation.startTime || "09:00",
+        endTime: reservation.endTime || "18:00",
+        status: "reserved",
+        type: "reservation",
+        description: `Local reservado para ${reservation.eventTitle || 'evento'}`,
+        clientName: reservation.clientName || 'Cliente',
+        color: "bg-purple-100 text-purple-800",
+        avatar: reservation.clientName?.slice(0, 2).toUpperCase() || 'RS',
+        originalData: reservation
+      }));
+    }
+
+    return events;
+  };
+
+  const agendaEvents = processAgendaEvents();
+  const isLoading = eventsLoading || applicationsLoading || reservationsLoading;
 
   // Função para navegar semanas
   const navigateWeek = (direction: 'prev' | 'next') => {
@@ -312,7 +337,7 @@ export default function Agenda() {
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               {/* Cabeçalho dos dias */}
               <div className="grid grid-cols-8 border-b border-gray-200">
-                <div className="p-4 text-center text-sm font-medium text-gray-500 bg-gray-50 border-r border-gray-200">
+                <div className="p-4 text-center text-sm font-medium text-gray-500 bg-gray-50 border-r-2 border-gray-200">
                   Horário
                 </div>
                 {weekDays.map((day, index) => {
@@ -320,9 +345,7 @@ export default function Agenda() {
                   return (
                     <div
                       key={day.toISOString()}
-                      className={`p-4 text-center ${
-                        index < weekDays.length - 1 ? 'border-r border-gray-200' : ''
-                      } ${
+                      className={`p-4 text-center border-r-2 border-gray-200 ${
                         isToday ? 'bg-blue-50' : 'bg-gray-50'
                       }`}
                     >
@@ -344,7 +367,7 @@ export default function Agenda() {
                 {timeSlots.map((hour) => (
                   <div key={hour} className="grid grid-cols-8 border-b border-gray-100 min-h-16">
                     {/* Coluna de horário */}
-                    <div className="p-3 text-sm text-gray-500 bg-gray-50 border-r border-gray-200 flex items-start">
+                    <div className="p-3 text-sm text-gray-500 bg-gray-50 border-r-2 border-gray-200 flex items-start">
                       {hour.toString().padStart(2, '0')}:00
                     </div>
 
@@ -354,9 +377,7 @@ export default function Agenda() {
                       return (
                         <div
                           key={`${day.toISOString()}-${hour}`}
-                          className={`p-2 relative min-h-16 ${
-                            index < weekDays.length - 1 ? 'border-r border-gray-200' : ''
-                          }`}
+                          className="p-2 relative min-h-16 border-r-2 border-gray-200"
                         >
                           {events.map((event) => (
                             <div
