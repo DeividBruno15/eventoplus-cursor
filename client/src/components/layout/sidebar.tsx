@@ -40,7 +40,8 @@ import {
   QrCode,
   Code,
   Percent,
-  TrendingUp
+  TrendingUp,
+  Brain
 } from "lucide-react";
 
 interface SidebarProps {

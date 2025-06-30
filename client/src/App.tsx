@@ -63,6 +63,7 @@ import SplitPayments from "@/pages/split-payments";
 import PublicApi from "@/pages/public-api";
 import VariableCommissions from "@/pages/variable-commissions";
 import BIDashboard from "@/pages/bi-dashboard";
+import AIRecommendations from "@/pages/ai-recommendations";
 import { useAuth } from "@/hooks/use-auth";
 
 // Analytics Wrapper Component
@@ -355,6 +356,14 @@ function Router() {
         <Layout>
           <AuthGuard>
             <BIDashboard />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/ai-recommendations">
+        <Layout>
+          <AuthGuard>
+            <AIRecommendations />
           </AuthGuard>
         </Layout>
       </Route>
