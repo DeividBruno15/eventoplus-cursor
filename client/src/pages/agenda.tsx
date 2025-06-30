@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar, Clock, MapPin, User, CheckCircle, XCircle, AlarmClock, Search, Filter, ChevronLeft, ChevronRight, Plus, Settings } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Calendar, Clock, MapPin, User, CheckCircle, XCircle, AlarmClock, Search, Filter, ChevronLeft, ChevronRight, Plus, Settings, Download, Mail, Printer, Share2, UserPlus, Eye, Moon, Sun } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { format, parseISO, startOfWeek, addDays, isSameDay, addWeeks, subWeeks } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -32,7 +34,9 @@ export default function Agenda() {
   const { user } = useAuth();
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [selectedFilter, setSelectedFilter] = useState("todos");
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
   // Calcular início e fim da semana
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 }); // Segunda-feira
@@ -140,10 +144,10 @@ export default function Agenda() {
           <div className="p-6">
             {/* Header da Sidebar */}
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-xl font-semibold text-gray-900">Schedule</h1>
+              <h1 className="text-xl font-semibold text-gray-900">Agenda</h1>
               <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
                 <Plus className="w-4 h-4 mr-2" />
-                Week
+                Evento
               </Button>
             </div>
 
@@ -151,7 +155,7 @@ export default function Agenda() {
             <div className="relative mb-6">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
-                placeholder="Search"
+                placeholder="Buscar eventos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 border-gray-200"
@@ -162,20 +166,25 @@ export default function Agenda() {
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-3">
                 <Filter className="w-4 h-4 text-gray-400" />
-                <span className="text-sm font-medium text-gray-700">Filters</span>
+                <span className="text-sm font-medium text-gray-700">Filtros</span>
               </div>
               <div className="space-y-2">
-                {["All", "Client", "Team", "Personal"].map((filter) => (
+                {[
+                  { key: "todos", label: "Todos" },
+                  { key: "clientes", label: "Clientes" },
+                  { key: "equipe", label: "Equipe" },
+                  { key: "pessoal", label: "Pessoal" }
+                ].map((filter) => (
                   <button
-                    key={filter}
-                    onClick={() => setSelectedFilter(filter.toLowerCase())}
+                    key={filter.key}
+                    onClick={() => setSelectedFilter(filter.key)}
                     className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
-                      selectedFilter === filter.toLowerCase()
+                      selectedFilter === filter.key
                         ? "bg-blue-50 text-blue-700 font-medium"
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
-                    {filter}
+                    {filter.label}
                   </button>
                 ))}
               </div>
@@ -183,7 +192,7 @@ export default function Agenda() {
 
             {/* Lista de próximos eventos */}
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Upcoming Events</h3>
+              <h3 className="text-sm font-medium text-gray-700 mb-3">Próximos Eventos</h3>
               <ScrollArea className="h-96">
                 <div className="space-y-3">
                   {agendaEvents.slice(0, 5).map((event) => (
@@ -228,12 +237,72 @@ export default function Agenda() {
                 </h2>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
-                  Actions
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Settings className="w-4 h-4" />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      Ações
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={() => window.print()}>
+                      <Printer className="w-4 h-4 mr-2" />
+                      Imprimir Agenda
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigator.share?.({ title: 'Minha Agenda' })}>
+                      <Share2 className="w-4 h-4 mr-2" />
+                      Compartilhar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Download className="w-4 h-4 mr-2" />
+                      Exportar PDF
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Mail className="w-4 h-4 mr-2" />
+                      Enviar por Email
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Convidar Participante
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                
+                <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <Settings className="w-4 h-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Configurações da Agenda</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium">Modo Escuro</label>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDarkMode(!darkMode)}
+                        >
+                          {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium">Visualização Compacta</label>
+                        <Button variant="ghost" size="sm">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium">Notificações</label>
+                        <Button variant="ghost" size="sm">
+                          <AlarmClock className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>
@@ -243,15 +312,17 @@ export default function Agenda() {
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               {/* Cabeçalho dos dias */}
               <div className="grid grid-cols-8 border-b border-gray-200">
-                <div className="p-4 text-center text-sm font-medium text-gray-500 bg-gray-50">
-                  Time
+                <div className="p-4 text-center text-sm font-medium text-gray-500 bg-gray-50 border-r border-gray-200">
+                  Horário
                 </div>
-                {weekDays.map((day) => {
+                {weekDays.map((day, index) => {
                   const isToday = isSameDay(day, new Date());
                   return (
                     <div
                       key={day.toISOString()}
-                      className={`p-4 text-center border-l border-gray-200 ${
+                      className={`p-4 text-center ${
+                        index < weekDays.length - 1 ? 'border-r border-gray-200' : ''
+                      } ${
                         isToday ? 'bg-blue-50' : 'bg-gray-50'
                       }`}
                     >
@@ -278,12 +349,14 @@ export default function Agenda() {
                     </div>
 
                     {/* Colunas dos dias */}
-                    {weekDays.map((day) => {
+                    {weekDays.map((day, index) => {
                       const events = getEventsForTimeSlot(day, hour);
                       return (
                         <div
                           key={`${day.toISOString()}-${hour}`}
-                          className="p-2 border-l border-gray-100 relative min-h-16"
+                          className={`p-2 relative min-h-16 ${
+                            index < weekDays.length - 1 ? 'border-r border-gray-200' : ''
+                          }`}
                         >
                           {events.map((event) => (
                             <div
