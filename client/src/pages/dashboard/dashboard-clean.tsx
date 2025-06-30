@@ -87,14 +87,14 @@ export default function DashboardClean() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 section-padding">
-        <div className="container-max">
+      <div className="bg-white border-b border-gray-100 py-8 px-6">
+        <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-heading-xl">{dashboardData.greeting}</h1>
-              <p className="text-body-sm mt-2">{dashboardData.subtitle}</p>
+              <h1 className="text-3xl font-bold text-gray-900">{dashboardData.greeting}</h1>
+              <p className="text-gray-600 mt-2">{dashboardData.subtitle}</p>
             </div>
-            <Badge variant="secondary" className="status-info">
+            <Badge variant="secondary">
               {user.userType === "prestador" && "Prestador"}
               {user.userType === "contratante" && "Organizador"}
               {user.userType === "anunciante" && "Anunciante"}
@@ -103,21 +103,21 @@ export default function DashboardClean() {
         </div>
       </div>
 
-      <div className="container-max section-padding">
+      <div className="max-w-7xl mx-auto py-8 px-6">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {dashboardData.stats.map((stat, index) => {
             const IconComponent = stat.icon;
             return (
-              <div key={index} className="card-elevated p-6">
+              <div key={index} className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-caption mb-2">{stat.label}</p>
-                    <p className="text-heading-lg mb-1">{stat.value}</p>
+                    <p className="text-sm text-gray-500 mb-2">{stat.label}</p>
+                    <p className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</p>
                     <p className="text-xs text-green-600 font-medium">{stat.trend}</p>
                   </div>
-                  <div className="ml-4 p-3 bg-[#3C5BFA]/10 rounded-xl">
-                    <IconComponent className="w-6 h-6 text-[#3C5BFA]" />
+                  <div className="ml-4 p-3 bg-gray-100 rounded-lg">
+                    <IconComponent className="w-6 h-6 text-gray-600" />
                   </div>
                 </div>
               </div>
@@ -126,10 +126,10 @@ export default function DashboardClean() {
         </div>
 
         {/* Quick Actions */}
-        <div className="card-elevated">
-          <div className="p-6 border-b border-gray-50">
-            <h3 className="text-heading-md">Ações Rápidas</h3>
-            <p className="text-body-sm mt-1">Principais funcionalidades da sua conta</p>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+          <div className="p-6 border-b border-gray-100">
+            <h3 className="text-xl font-semibold text-gray-900">Ações Rápidas</h3>
+            <p className="text-gray-600 mt-1">Principais funcionalidades da sua conta</p>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

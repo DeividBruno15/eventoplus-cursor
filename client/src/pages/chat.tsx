@@ -224,28 +224,28 @@ export default function ModernChat() {
             </div>
           </div>
           
-          <ScrollArea className="h-full px-4">
+          <ScrollArea className="h-full px-3">
             {filteredContacts.length === 0 ? (
               <div className="text-center py-12 px-4">
-                <div className="w-16 h-16 bg-[#3C5BFA]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-[#3C5BFA]/20 to-[#5B7CFF]/20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <MessageCircle className="h-8 w-8 text-[#3C5BFA]" />
                 </div>
-                <p className="text-body font-medium">
+                <p className="text-gray-500 text-sm font-medium">
                   {searchTerm ? 'Nenhum contato encontrado' : 'Nenhuma conversa ainda'}
                 </p>
-                <p className="text-caption mt-1">
+                <p className="text-gray-400 text-xs mt-1">
                   Suas conversas aparecerão aqui
                 </p>
               </div>
             ) : (
-              <div className="space-y-3 py-4">
+              <div className="space-y-2 py-3">
                 {filteredContacts.map((contact: ChatContact) => (
                   <div
                     key={contact.id}
-                    className={`p-4 cursor-pointer transition-all duration-200 rounded-xl ${
+                    className={`p-4 cursor-pointer hover:bg-white/60 transition-all duration-200 rounded-2xl group ${
                       selectedContact?.id === contact.id 
-                        ? 'bg-[#3C5BFA]/10 border border-[#3C5BFA]/20 shadow-md' 
-                        : 'card-interactive border-transparent'
+                        ? 'bg-gradient-to-r from-[#3C5BFA]/10 to-[#5B7CFF]/10 shadow-md border-l-4 border-[#3C5BFA]' 
+                        : 'hover:shadow-sm'
                     }`}
                     onClick={() => setSelectedContact(contact)}
                   >
@@ -299,41 +299,41 @@ export default function ModernChat() {
         {selectedContact ? (
           <>
             {/* Chat Header */}
-            <div className="p-6 bg-white border-b border-gray-100 shadow-sm">
+            <div className="p-6 bg-white/90 backdrop-blur-lg border-b border-white/20 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <Avatar className="w-12 h-12 shadow-md">
+                    <Avatar className="w-12 h-12 ring-2 ring-white shadow-lg">
                       <AvatarImage src="" />
                       <AvatarFallback className="bg-gradient-to-br from-[#3C5BFA] to-[#5B7CFF] text-white font-bold">
                         {selectedContact.name.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
+                    <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
                   </div>
                   <div>
-                    <h2 className="text-heading-md">{selectedContact.name}</h2>
+                    <h2 className="font-bold text-gray-900 text-lg">{selectedContact.name}</h2>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <p className="text-caption text-green-600 font-semibold">Online agora</p>
+                      <p className="text-sm text-green-600 font-medium">Online agora</p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <button className="h-10 w-10 rounded-full hover:bg-[#3C5BFA]/10 flex items-center justify-center transition-all duration-200">
+                <div className="flex items-center gap-3">
+                  <Button variant="ghost" size="sm" className="h-10 w-10 rounded-full hover:bg-[#3C5BFA]/10">
                     <Search className="w-5 h-5 text-[#3C5BFA]" />
-                  </button>
-                  <button className="h-10 w-10 rounded-full hover:bg-[#3C5BFA]/10 flex items-center justify-center transition-all duration-200">
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-10 w-10 rounded-full hover:bg-[#3C5BFA]/10">
                     <MessageCircle className="w-5 h-5 text-[#3C5BFA]" />
-                  </button>
-                  <button className="h-10 w-10 rounded-full hover:bg-[#3C5BFA]/10 flex items-center justify-center transition-all duration-200">
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-10 w-10 rounded-full hover:bg-[#3C5BFA]/10">
                     <svg className="w-5 h-5 text-[#3C5BFA]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <circle cx="12" cy="12" r="1"/>
                       <circle cx="19" cy="12" r="1"/>
                       <circle cx="5" cy="12" r="1"/>
                     </svg>
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
