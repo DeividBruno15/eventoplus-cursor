@@ -3780,6 +3780,169 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===== REVIEWS ROUTES =====
+
+  // GET /api/reviews/received/:userId - Buscar avaliações recebidas
+  app.get('/api/reviews/received/:userId', async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      const reviews = await storage.db.select({
+        id: reviewsEnhanced.id,
+        rating: reviewsEnhanced.rating,
+        title: reviewsEnhanced.title,
+        comment: reviewsEnhanced.comment,
+        pros: reviewsEnhanced.pros,
+        cons: reviewsEnhanced.cons,
+        wouldRecommend: reviewsEnhanced.wouldRecommend,
+        isAnonymous: reviewsEnhanced.isAnonymous,
+        helpfulVotes: reviewsEnhanced.helpfulVotes,
+        createdAt: reviewsEnhanced.createdAt,
+        reviewer: {
+          id: users.id,
+          username: users.username,
+          profileImage: users.profileImage
+        },
+        reviewed: {
+          id: sql`${reviewsEnhanced.reviewedId}`.as('reviewed_id'),
+          username: sql`reviewed_user.username`.as('reviewed_username'),
+          userType: sql`reviewed_user.user_type`.as('reviewed_user_type')
+        }
+      })
+      .from(reviewsEnhanced)
+      .leftJoin(users, eq(reviewsEnhanced.reviewerId, users.id))
+      .leftJoin(sql`users reviewed_user`, sql`${reviewsEnhanced.reviewedId} = reviewed_user.id`)
+      .where(eq(reviewsEnhanced.reviewedId, userId))
+      .orderBy(desc(reviewsEnhanced.createdAt));
+
+      res.json(reviews);
+    } catch (error) {
+      console.error('Error fetching received reviews:', error);
+      res.status(500).json({ message: 'Erro ao buscar avaliações recebidas' });
+    }
+  });
+
+  // GET /api/reviews/sent/:userId - Buscar avaliações enviadas
+  app.get('/api/reviews/sent/:userId', async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      const reviews = await storage.db.select({
+        id: reviewsEnhanced.id,
+        rating: reviewsEnhanced.rating,
+        title: reviewsEnhanced.title,
+        comment: reviewsEnhanced.comment,
+        pros: reviewsEnhanced.pros,
+        cons: reviewsEnhanced.cons,
+        wouldRecommend: reviewsEnhanced.wouldRecommend,
+        isAnonymous: reviewsEnhanced.isAnonymous,
+        helpfulVotes: reviewsEnhanced.helpfulVotes,
+        createdAt: reviewsEnhanced.createdAt,
+        reviewer: {
+          id: users.id,
+          username: users.username,
+          profileImage: users.profileImage
+        },
+        reviewed: {
+          id: sql`${reviewsEnhanced.reviewedId}`.as('reviewed_id'),
+          username: sql`reviewed_user.username`.as('reviewed_username'),
+          userType: sql`reviewed_user.user_type`.as('reviewed_user_type')
+        }
+      })
+      .from(reviewsEnhanced)
+      .leftJoin(users, eq(reviewsEnhanced.reviewerId, users.id))
+      .leftJoin(sql`users reviewed_user`, sql`${reviewsEnhanced.reviewedId} = reviewed_user.id`)
+      .where(eq(reviewsEnhanced.reviewerId, userId))
+      .orderBy(desc(reviewsEnhanced.createdAt));
+
+      res.json(reviews);
+    } catch (error) {
+      console.error('Error fetching sent reviews:', error);
+      res.status(500).json({ message: 'Erro ao buscar avaliações enviadas' });
+    }
+  });
+
+  // GET /api/reviews/eligible/:userId - Buscar itens elegíveis para avaliação
+  app.get('/api/reviews/eligible/:userId', async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      // Buscar contratos finalizados que ainda não foram avaliados
+      const eligibleContracts = await storage.db.select({
+        id: contracts.id,
+        userId: sql`CASE 
+          WHEN ${contracts.providerId} = ${userId} THEN ${contracts.clientId}
+          ELSE ${contracts.providerId}
+        END`.as('userId'),
+        username: sql`u.username`.as('username'),
+        type: sql`'contrato'`.as('type'),
+        contractId: contracts.id
+      })
+      .from(contracts)
+      .leftJoin(sql`users u`, sql`u.id = CASE 
+        WHEN ${contracts.providerId} = ${userId} THEN ${contracts.clientId}
+        ELSE ${contracts.providerId}
+      END`)
+      .where(
+        and(
+          or(
+            eq(contracts.providerId, userId),
+            eq(contracts.clientId, userId)
+          ),
+          eq(contracts.status, 'completed')
+        )
+      );
+
+      res.json(eligibleContracts);
+    } catch (error) {
+      console.error('Error fetching eligible items:', error);
+      res.status(500).json({ message: 'Erro ao buscar itens elegíveis' });
+    }
+  });
+
+  // POST /api/reviews - Criar nova avaliação
+  app.post('/api/reviews', async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Não autenticado' });
+      }
+
+      const reviewData = {
+        ...req.body,
+        reviewerId: req.user.id
+      };
+
+      const [newReview] = await storage.db.insert(reviewsEnhanced).values(reviewData).returning();
+
+      res.status(201).json(newReview);
+    } catch (error) {
+      console.error('Error creating review:', error);
+      res.status(500).json({ message: 'Erro ao criar avaliação' });
+    }
+  });
+
+  // POST /api/reviews/:id/helpful - Marcar avaliação como útil
+  app.post('/api/reviews/:id/helpful', async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Não autenticado' });
+      }
+
+      const reviewId = parseInt(req.params.id);
+
+      await storage.db.update(reviewsEnhanced)
+        .set({ 
+          helpfulVotes: sql`${reviewsEnhanced.helpfulVotes} + 1` 
+        })
+        .where(eq(reviewsEnhanced.id, reviewId));
+
+      res.json({ message: 'Avaliação marcada como útil' });
+    } catch (error) {
+      console.error('Error marking review as helpful:', error);
+      res.status(500).json({ message: 'Erro ao marcar como útil' });
+    }
+  });
+
   // Apply monitoring middleware
   app.use(monitoringService.trackRequest.bind(monitoringService));
   app.use(monitoringService.trackError.bind(monitoringService));
