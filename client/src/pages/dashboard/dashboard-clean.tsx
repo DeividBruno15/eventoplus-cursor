@@ -85,16 +85,16 @@ export default function DashboardClean() {
   const dashboardData = getDashboardContent();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="border-b border-gray-100 px-6 py-6">
-        <div className="max-w-7xl mx-auto">
+      <div className="bg-white border-b border-gray-100 section-padding">
+        <div className="container-max">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">{dashboardData.greeting}</h1>
-              <p className="text-gray-500 mt-1">{dashboardData.subtitle}</p>
+              <h1 className="text-heading-xl">{dashboardData.greeting}</h1>
+              <p className="text-body-sm mt-2">{dashboardData.subtitle}</p>
             </div>
-            <Badge variant="secondary" className="bg-gray-50 text-gray-700 border-gray-200">
+            <Badge variant="secondary" className="status-info">
               {user.userType === "prestador" && "Prestador"}
               {user.userType === "contratante" && "Organizador"}
               {user.userType === "anunciante" && "Anunciante"}
@@ -103,126 +103,123 @@ export default function DashboardClean() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="container-max section-padding">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {dashboardData.stats.map((stat, index) => {
             const IconComponent = stat.icon;
             return (
-              <Card key={index} className="border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-500 mb-1">{stat.label}</p>
-                      <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
-                      <p className="text-xs text-green-600 mt-1">{stat.trend}</p>
-                    </div>
-                    <div className="ml-4 p-3 bg-gray-50 rounded-lg">
-                      <IconComponent className="w-5 h-5 text-gray-600" />
-                    </div>
+              <div key={index} className="card-elevated p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-caption mb-2">{stat.label}</p>
+                    <p className="text-heading-lg mb-1">{stat.value}</p>
+                    <p className="text-xs text-green-600 font-medium">{stat.trend}</p>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="ml-4 p-3 bg-[#3C5BFA]/10 rounded-xl">
+                    <IconComponent className="w-6 h-6 text-[#3C5BFA]" />
+                  </div>
+                </div>
+              </div>
             );
           })}
         </div>
 
         {/* Quick Actions */}
-        <Card className="border border-gray-100 shadow-sm">
-          <CardHeader className="border-b border-gray-50">
-            <CardTitle className="text-lg font-semibold text-gray-900">Ações Rápidas</CardTitle>
-            <CardDescription>Principais funcionalidades da sua conta</CardDescription>
-          </CardHeader>
-          <CardContent className="p-6">
+        <div className="card-elevated">
+          <div className="p-6 border-b border-gray-50">
+            <h3 className="text-heading-md">Ações Rápidas</h3>
+            <p className="text-body-sm mt-1">Principais funcionalidades da sua conta</p>
+          </div>
+          <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {dashboardData.actions.map((action, index) => {
                 const IconComponent = action.icon;
                 return (
                   <Link key={index} href={action.href}>
-                    <Button 
-                      variant={index === 0 ? "default" : "outline"} 
-                      className={`w-full h-16 flex items-center justify-start space-x-3 hover:scale-[1.02] transition-transform duration-200 ${
-                        index === 0 ? "bg-[#3C5BFA] hover:bg-blue-700" : "border-gray-200 hover:bg-gray-50"
+                    <button 
+                      className={`w-full h-16 flex items-center justify-start space-x-3 ${
+                        index === 0 ? "btn-primary-enhanced" : "btn-secondary-enhanced"
                       }`}
                     >
                       <IconComponent className="w-5 h-5" />
-                      <span className="font-medium">{action.label}</span>
-                    </Button>
+                      <span className="font-semibold">{action.label}</span>
+                    </button>
                   </Link>
                 );
               })}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Recent Activity */}
-        <Card className="mt-8 border border-gray-100 shadow-sm">
-          <CardHeader className="border-b border-gray-50">
-            <CardTitle className="text-lg font-semibold text-gray-900">Atividades Recentes</CardTitle>
-            <CardDescription>Últimas atualizações da sua conta</CardDescription>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-4">
+        <div className="mt-12 card-elevated">
+          <div className="p-6 border-b border-gray-50">
+            <h3 className="text-heading-md">Atividades Recentes</h3>
+            <p className="text-body-sm mt-1">Últimas atualizações da sua conta</p>
+          </div>
+          <div className="p-6">
+            <div className="space-y-5">
               {user.userType === "prestador" && (
                 <>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">Nova candidatura aprovada para "Casamento Silva"</span>
-                    <span className="text-xs text-gray-400 ml-auto">2h atrás</span>
+                  <div className="flex items-center space-x-4 p-4 bg-green-50 rounded-lg border border-green-100">
+                    <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
+                    <span className="text-body flex-1">Nova candidatura aprovada para "Casamento Silva"</span>
+                    <span className="text-caption">2h atrás</span>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">Serviço "DJ Profissional" visualizado 15 vezes</span>
-                    <span className="text-xs text-gray-400 ml-auto">1 dia</span>
+                  <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+                    <span className="text-body flex-1">Serviço "DJ Profissional" visualizado 15 vezes</span>
+                    <span className="text-caption">1 dia</span>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">Nova avaliação recebida: 5 estrelas</span>
-                    <span className="text-xs text-gray-400 ml-auto">2 dias</span>
+                  <div className="flex items-center space-x-4 p-4 bg-yellow-50 rounded-lg border border-yellow-100">
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full flex-shrink-0"></div>
+                    <span className="text-body flex-1">Nova avaliação recebida: 5 estrelas</span>
+                    <span className="text-caption">2 dias</span>
                   </div>
                 </>
               )}
               {user.userType === "contratante" && (
                 <>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">Evento "Aniversário João" criado com sucesso</span>
-                    <span className="text-xs text-gray-400 ml-auto">1h atrás</span>
+                  <div className="flex items-center space-x-4 p-4 bg-green-50 rounded-lg border border-green-100">
+                    <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
+                    <span className="text-body flex-1">Evento "Aniversário João" criado com sucesso</span>
+                    <span className="text-caption">1h atrás</span>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">3 prestadores se candidataram ao seu evento</span>
-                    <span className="text-xs text-gray-400 ml-auto">3h atrás</span>
+                  <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+                    <span className="text-body flex-1">3 prestadores se candidataram ao seu evento</span>
+                    <span className="text-caption">3h atrás</span>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">Pagamento de R$ 500 processado</span>
-                    <span className="text-xs text-gray-400 ml-auto">1 dia</span>
+                  <div className="flex items-center space-x-4 p-4 bg-purple-50 rounded-lg border border-purple-100">
+                    <div className="w-3 h-3 bg-purple-500 rounded-full flex-shrink-0"></div>
+                    <span className="text-body flex-1">Pagamento de R$ 500 processado</span>
+                    <span className="text-caption">1 dia</span>
                   </div>
                 </>
               )}
               {user.userType === "anunciante" && (
                 <>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">Nova reserva confirmada para "Salão Primavera"</span>
-                    <span className="text-xs text-gray-400 ml-auto">30min</span>
+                  <div className="flex items-center space-x-4 p-4 bg-green-50 rounded-lg border border-green-100">
+                    <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
+                    <span className="text-body flex-1">Nova reserva confirmada para "Salão Primavera"</span>
+                    <span className="text-caption">30min</span>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">Espaço visualizado 45 vezes esta semana</span>
-                    <span className="text-xs text-gray-400 ml-auto">2h atrás</span>
+                  <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+                    <span className="text-body flex-1">Espaço visualizado 45 vezes esta semana</span>
+                    <span className="text-caption">2h atrás</span>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">Fotos do espaço atualizadas</span>
-                    <span className="text-xs text-gray-400 ml-auto">1 dia</span>
+                  <div className="flex items-center space-x-4 p-4 bg-yellow-50 rounded-lg border border-yellow-100">
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full flex-shrink-0"></div>
+                    <span className="text-body flex-1">Fotos do espaço atualizadas</span>
+                    <span className="text-caption">1 dia</span>
                   </div>
                 </>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
