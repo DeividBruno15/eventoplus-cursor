@@ -28,7 +28,7 @@ interface ChatContact {
   unreadCount: number;
 }
 
-export default function Chat() {
+export default function ModernChat() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -159,7 +159,7 @@ export default function Chat() {
             <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
               <MessageCircle className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold">Conversas</h1>
+            <h1 className="text-xl font-bold">💬 Conversas</h1>
             <div className="ml-auto flex items-center gap-2">
               <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
                 <span className="text-white text-sm font-medium">{filteredContacts.length}</span>

@@ -32,7 +32,7 @@ import ManageServices from "@/pages/services/manage-services";
 import ManageVenues from "@/pages/venues/manage-venues";
 import CreateVenue from "@/pages/venues/create-venue";
 import ManageSubscription from "@/pages/subscription/manage-subscription";
-import Chat from "@/pages/chat/chat";
+import Chat from "@/pages/chat";
 import Services from "@/pages/services/index";
 import Venues from "@/pages/venues/index";
 import Analytics from "@/pages/analytics";
