@@ -4227,6 +4227,288 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public API v1 endpoints
+  const { apiKeyAuth } = await import('./public-api');
+  
+  // API Documentation endpoint
+  app.get('/api/v1/docs', async (req, res) => {
+    try {
+      const { apiDocumentation } = await import('./public-api');
+      res.json(apiDocumentation);
+    } catch (error) {
+      console.error('Error serving API documentation:', error);
+      res.status(500).json({ error: 'Failed to load API documentation' });
+    }
+  });
+
+  // Public API - Events
+  app.get('/api/v1/events', apiKeyAuth('events:read'), async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+      const category = req.query.category as string;
+      const location = req.query.location as string;
+      
+      const offset = (page - 1) * limit;
+      
+      let events = await storage.getEvents();
+      
+      // Apply filters
+      if (category) {
+        events = events.filter(event => event.category.toLowerCase().includes(category.toLowerCase()));
+      }
+      if (location) {
+        events = events.filter(event => event.location.toLowerCase().includes(location.toLowerCase()));
+      }
+      
+      const total = events.length;
+      const paginatedEvents = events.slice(offset, offset + limit);
+      
+      const responseData = paginatedEvents.map(event => ({
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        category: event.category,
+        location: event.location,
+        date: event.date.toISOString(),
+        budget: event.budget,
+        guestCount: event.guestCount,
+        status: event.status,
+        organizerId: event.organizerId,
+        createdAt: event.createdAt.toISOString()
+      }));
+      
+      res.json({
+        data: responseData,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit)
+        }
+      });
+    } catch (error) {
+      console.error('Public API - Events error:', error);
+      res.status(500).json({
+        error: 'Internal server error',
+        message: 'Failed to fetch events'
+      });
+    }
+  });
+
+  app.get('/api/v1/events/:id', apiKeyAuth('events:read'), async (req, res) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      if (isNaN(eventId)) {
+        return res.status(400).json({
+          error: 'Invalid event ID',
+          message: 'Event ID must be a valid number'
+        });
+      }
+      
+      const event = await storage.getEventById(eventId);
+      if (!event) {
+        return res.status(404).json({
+          error: 'Event not found',
+          message: `Event with ID ${eventId} does not exist`
+        });
+      }
+      
+      res.json({
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        category: event.category,
+        location: event.location,
+        date: event.date.toISOString(),
+        budget: event.budget,
+        guestCount: event.guestCount,
+        status: event.status,
+        organizerId: event.organizerId,
+        createdAt: event.createdAt.toISOString()
+      });
+    } catch (error) {
+      console.error('Public API - Event by ID error:', error);
+      res.status(500).json({
+        error: 'Internal server error',
+        message: 'Failed to fetch event'
+      });
+    }
+  });
+
+  // Public API - Services
+  app.get('/api/v1/services', apiKeyAuth('services:read'), async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+      const category = req.query.category as string;
+      
+      const offset = (page - 1) * limit;
+      
+      let services = await storage.getServices();
+      
+      // Apply filters
+      if (category) {
+        services = services.filter(service => service.category.toLowerCase().includes(category.toLowerCase()));
+      }
+      
+      const total = services.length;
+      const paginatedServices = services.slice(offset, offset + limit);
+      
+      const responseData = paginatedServices.map(service => ({
+        id: service.id,
+        title: service.title,
+        description: service.description,
+        category: service.category,
+        subcategory: service.subcategory,
+        providerId: service.providerId,
+        pricing: service.pricing ? {
+          type: service.pricing.type,
+          value: parseFloat(service.pricing.value)
+        } : null,
+        createdAt: service.createdAt.toISOString()
+      }));
+      
+      res.json({
+        data: responseData,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit)
+        }
+      });
+    } catch (error) {
+      console.error('Public API - Services error:', error);
+      res.status(500).json({
+        error: 'Internal server error',
+        message: 'Failed to fetch services'
+      });
+    }
+  });
+
+  // Public API - Venues
+  app.get('/api/v1/venues', apiKeyAuth('venues:read'), async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+      const category = req.query.category as string;
+      const location = req.query.location as string;
+      
+      const offset = (page - 1) * limit;
+      
+      let venues = await storage.getVenues();
+      
+      // Apply filters
+      if (category) {
+        venues = venues.filter(venue => venue.category.toLowerCase().includes(category.toLowerCase()));
+      }
+      if (location) {
+        venues = venues.filter(venue => venue.location.toLowerCase().includes(location.toLowerCase()));
+      }
+      
+      const total = venues.length;
+      const paginatedVenues = venues.slice(offset, offset + limit);
+      
+      const responseData = paginatedVenues.map(venue => ({
+        id: venue.id,
+        name: venue.name,
+        description: venue.description,
+        category: venue.category,
+        location: venue.location,
+        capacity: venue.capacity,
+        amenities: venue.amenities,
+        ownerId: venue.ownerId,
+        createdAt: venue.createdAt.toISOString()
+      }));
+      
+      res.json({
+        data: responseData,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit)
+        }
+      });
+    } catch (error) {
+      console.error('Public API - Venues error:', error);
+      res.status(500).json({
+        error: 'Internal server error',
+        message: 'Failed to fetch venues'
+      });
+    }
+  });
+
+  // API Key Management endpoints (for authenticated users)
+  app.post('/api/api-keys', async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Não autenticado' });
+      }
+
+      const { name, permissions, rateLimitPerHour } = req.body;
+      
+      if (!name || !permissions || !Array.isArray(permissions)) {
+        return res.status(400).json({
+          error: 'Invalid request',
+          message: 'Name and permissions array are required'
+        });
+      }
+
+      const { publicApiService } = await import('./public-api');
+      const apiKey = await publicApiService.createApiKey(
+        req.user.id,
+        name,
+        permissions,
+        rateLimitPerHour || 1000
+      );
+
+      res.status(201).json({
+        message: 'API key created successfully',
+        apiKey: {
+          id: apiKey.id,
+          name: apiKey.name,
+          key: apiKey.key,
+          permissions: apiKey.permissions,
+          rateLimitPerHour: apiKey.rateLimitPerHour,
+          createdAt: apiKey.createdAt
+        }
+      });
+    } catch (error) {
+      console.error('API key creation error:', error);
+      res.status(500).json({
+        error: 'Failed to create API key',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  app.get('/api/api-keys/usage/:keyId', async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Não autenticado' });
+      }
+
+      const keyId = req.params.keyId;
+      const period = (req.query.period as string) || 'day';
+
+      const { publicApiService } = await import('./public-api');
+      const stats = await publicApiService.getUsageStats(keyId, period as any);
+
+      res.json({
+        success: true,
+        stats
+      });
+    } catch (error) {
+      console.error('API usage stats error:', error);
+      res.status(500).json({
+        error: 'Failed to fetch usage statistics',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Apply monitoring middleware
   app.use(monitoringService.trackRequest.bind(monitoringService));
   app.use(monitoringService.trackError.bind(monitoringService));

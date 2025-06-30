@@ -60,6 +60,7 @@ import Reviews from "@/pages/reviews-simple";
 import Backup from "@/pages/backup";
 import AnalyticsAdvanced from "@/pages/analytics-advanced";
 import SplitPayments from "@/pages/split-payments";
+import PublicApi from "@/pages/public-api";
 import { useAuth } from "@/hooks/use-auth";
 
 // Analytics Wrapper Component
@@ -328,6 +329,14 @@ function Router() {
         <Layout>
           <AuthGuard>
             <SplitPayments />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/public-api">
+        <Layout>
+          <AuthGuard>
+            <PublicApi />
           </AuthGuard>
         </Layout>
       </Route>
