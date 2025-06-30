@@ -3,336 +3,316 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, MapPin, User, CheckCircle, XCircle, AlarmClock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Calendar, Clock, MapPin, User, CheckCircle, XCircle, AlarmClock, Search, Filter, ChevronLeft, ChevronRight, Plus, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { format, parseISO, startOfWeek, addDays, isSameDay } from "date-fns";
+import { format, parseISO, startOfWeek, addDays, isSameDay, addWeeks, subWeeks } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 interface AgendaEvent {
   id: number;
   title: string;
   eventDate: string;
+  startTime: string;
+  endTime: string;
   eventLocation?: string;
   status: 'scheduled' | 'confirmed' | 'completed' | 'cancelled';
-  type: 'event' | 'venue_reservation' | 'service';
+  type: 'event' | 'meeting' | 'task' | 'reminder';
   description?: string;
   clientName?: string;
   providerName?: string;
   value?: number;
+  color?: string;
+  avatar?: string;
 }
 
 export default function Agenda() {
   const { user } = useAuth();
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
+  const [currentWeek, setCurrentWeek] = useState(new Date());
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("all");
+
+  // Calcular início e fim da semana
+  const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 }); // Segunda-feira
+  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+
+  // Mock data baseado no design fornecido
+  const mockEvents: AgendaEvent[] = [
+    {
+      id: 1,
+      title: "John West",
+      eventDate: format(addDays(weekStart, 0), 'yyyy-MM-dd'),
+      startTime: "09:00",
+      endTime: "10:00",
+      status: "confirmed",
+      type: "meeting",
+      description: "Meeting with client",
+      clientName: "John West",
+      color: "bg-blue-100 text-blue-800",
+      avatar: "JW"
+    },
+    {
+      id: 2,
+      title: "Design Review",
+      eventDate: format(addDays(weekStart, 1), 'yyyy-MM-dd'),
+      startTime: "14:00",
+      endTime: "15:30",
+      status: "scheduled",
+      type: "meeting",
+      description: "Review design proposals",
+      color: "bg-purple-100 text-purple-800",
+      avatar: "DR"
+    },
+    {
+      id: 3,
+      title: "Summer Hall",
+      eventDate: format(addDays(weekStart, 2), 'yyyy-MM-dd'),
+      startTime: "10:00",
+      endTime: "11:00",
+      status: "confirmed",
+      type: "event",
+      description: "Event planning session",
+      clientName: "Summer Hall",
+      color: "bg-green-100 text-green-800",
+      avatar: "SH"
+    },
+    {
+      id: 4,
+      title: "Marketing Team",
+      eventDate: format(addDays(weekStart, 3), 'yyyy-MM-dd'),
+      startTime: "16:00",
+      endTime: "17:00",
+      status: "scheduled",
+      type: "meeting",
+      description: "Weekly marketing sync",
+      color: "bg-orange-100 text-orange-800",
+      avatar: "MT"
+    }
+  ];
 
   // Buscar eventos da agenda baseado no tipo de usuário
-  const { data: agendaEvents = [], isLoading } = useQuery<AgendaEvent[]>({
+  const { data: agendaEvents = mockEvents, isLoading } = useQuery<AgendaEvent[]>({
     queryKey: ["/api/agenda"],
     enabled: !!user,
   });
 
-  const getStatusBadge = (status: string) => {
-    const configs = {
-      scheduled: { color: "bg-blue-100 text-blue-800", icon: AlarmClock, label: "Agendado" },
-      confirmed: { color: "bg-green-100 text-green-800", icon: CheckCircle, label: "Confirmado" },
-      completed: { color: "bg-gray-100 text-gray-800", icon: CheckCircle, label: "Concluído" },
-      cancelled: { color: "bg-red-100 text-red-800", icon: XCircle, label: "Cancelado" }
-    };
-    
-    const config = configs[status as keyof typeof configs] || configs.scheduled;
-    const Icon = config.icon;
-    
-    return (
-      <Badge className={`${config.color} flex items-center gap-1`}>
-        <Icon className="h-3 w-3" />
-        {config.label}
-      </Badge>
-    );
+  // Função para navegar semanas
+  const navigateWeek = (direction: 'prev' | 'next') => {
+    setCurrentWeek(prev => direction === 'prev' ? subWeeks(prev, 1) : addWeeks(prev, 1));
   };
 
-  const getEventTypeLabel = (type: string) => {
-    switch(type) {
-      case 'event': return 'Evento';
-      case 'venue_reservation': return 'Reserva de Espaço';
-      case 'service': return 'Serviço';
-      default: return type;
-    }
-  };
-
-  const getAgendaDescription = () => {
-    switch(user?.userType) {
-      case 'prestador':
-        return 'Seus eventos aceitos e serviços agendados aparecerão aqui automaticamente.';
-      case 'contratante':
-        return 'Os eventos que você criou e serviços contratados aparecerão na sua agenda.';
-      case 'anunciante':
-        return 'As reservas confirmadas dos seus espaços aparecerão na agenda.';
-      default:
-        return 'Sua agenda de eventos e compromissos.';
-    }
-  };
-
-  const getWeekDays = () => {
-    const start = startOfWeek(selectedDate, { weekStartsOn: 0 });
-    return Array.from({ length: 7 }, (_, i) => addDays(start, i));
-  };
-
+  // Função para obter eventos de um dia específico
   const getEventsForDate = (date: Date) => {
     return agendaEvents.filter(event => 
       isSameDay(parseISO(event.eventDate), date)
     );
   };
 
+  // Função para obter eventos de um horário específico
+  const getEventsForTimeSlot = (date: Date, hour: number) => {
+    return agendaEvents.filter(event => {
+      if (!isSameDay(parseISO(event.eventDate), date)) return false;
+      const eventHour = parseInt(event.startTime.split(':')[0]);
+      return eventHour === hour;
+    });
+  };
+
+  // Gerar slots de horário (7h às 19h)
+  const timeSlots = Array.from({ length: 13 }, (_, i) => i + 7);
+
   if (isLoading) {
     return (
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-gray-500">Carregando agenda...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-black">Agenda</h1>
-          <p className="text-gray-600 mt-1">{getAgendaDescription()}</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-80 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+          <div className="p-6">
+            {/* Header da Sidebar */}
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-xl font-semibold text-gray-900">Schedule</h1>
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Week
+              </Button>
+            </div>
+
+            {/* Busca */}
+            <div className="relative mb-6">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                placeholder="Search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 border-gray-200"
+              />
+            </div>
+
+            {/* Filtros */}
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Filter className="w-4 h-4 text-gray-400" />
+                <span className="text-sm font-medium text-gray-700">Filters</span>
+              </div>
+              <div className="space-y-2">
+                {["All", "Client", "Team", "Personal"].map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setSelectedFilter(filter.toLowerCase())}
+                    className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
+                      selectedFilter === filter.toLowerCase()
+                        ? "bg-blue-50 text-blue-700 font-medium"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {filter}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Lista de próximos eventos */}
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 mb-3">Upcoming Events</h3>
+              <ScrollArea className="h-96">
+                <div className="space-y-3">
+                  {agendaEvents.slice(0, 5).map((event) => (
+                    <div key={event.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <Avatar className="w-8 h-8">
+                        <AvatarFallback className="text-xs bg-blue-100 text-blue-700">
+                          {event.avatar}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-gray-900 truncate">
+                          {event.title}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {event.startTime} - {event.endTime}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
+          </div>
         </div>
-        
-        <div className="flex items-center gap-2">
-          <Button
-            variant={viewMode === 'day' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setViewMode('day')}
-          >
-            Dia
-          </Button>
-          <Button
-            variant={viewMode === 'week' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setViewMode('week')}
-          >
-            Semana
-          </Button>
-          <Button
-            variant={viewMode === 'month' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setViewMode('month')}
-          >
-            Mês
-          </Button>
+
+        {/* Área Principal */}
+        <div className="flex-1">
+          {/* Header */}
+          <div className="bg-white border-b border-gray-200 px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => navigateWeek('prev')}>
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => navigateWeek('next')}>
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {format(weekStart, 'MMMM yyyy', { locale: ptBR })}
+                </h2>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm">
+                  Actions
+                </Button>
+                <Button variant="ghost" size="sm">
+                  <Settings className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Calendário Semanal */}
+          <div className="p-6">
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              {/* Cabeçalho dos dias */}
+              <div className="grid grid-cols-8 border-b border-gray-200">
+                <div className="p-4 text-center text-sm font-medium text-gray-500 bg-gray-50">
+                  Time
+                </div>
+                {weekDays.map((day) => {
+                  const isToday = isSameDay(day, new Date());
+                  return (
+                    <div
+                      key={day.toISOString()}
+                      className={`p-4 text-center border-l border-gray-200 ${
+                        isToday ? 'bg-blue-50' : 'bg-gray-50'
+                      }`}
+                    >
+                      <div className="text-sm font-medium text-gray-900">
+                        {format(day, 'EEE', { locale: ptBR })}
+                      </div>
+                      <div className={`text-lg font-semibold mt-1 ${
+                        isToday ? 'text-blue-600' : 'text-gray-900'
+                      }`}>
+                        {format(day, 'd')}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Grid de horários */}
+              <div className="max-h-96 overflow-y-auto">
+                {timeSlots.map((hour) => (
+                  <div key={hour} className="grid grid-cols-8 border-b border-gray-100 min-h-16">
+                    {/* Coluna de horário */}
+                    <div className="p-3 text-sm text-gray-500 bg-gray-50 border-r border-gray-200 flex items-start">
+                      {hour.toString().padStart(2, '0')}:00
+                    </div>
+
+                    {/* Colunas dos dias */}
+                    {weekDays.map((day) => {
+                      const events = getEventsForTimeSlot(day, hour);
+                      return (
+                        <div
+                          key={`${day.toISOString()}-${hour}`}
+                          className="p-2 border-l border-gray-100 relative min-h-16"
+                        >
+                          {events.map((event) => (
+                            <div
+                              key={event.id}
+                              className={`${event.color} rounded-md p-2 mb-1 text-xs font-medium shadow-sm hover:shadow-md transition-shadow cursor-pointer`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <Avatar className="w-5 h-5">
+                                  <AvatarFallback className="text-xs">
+                                    {event.avatar}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="truncate">{event.title}</span>
+                              </div>
+                              <div className="text-xs opacity-75 mt-1">
+                                {event.startTime} - {event.endTime}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Calendar View */}
-      {viewMode === 'week' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">
-              {format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-            </h2>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedDate(addDays(selectedDate, -7))}
-              >
-                ← Semana Anterior
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedDate(new Date())}
-              >
-                Hoje
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedDate(addDays(selectedDate, 7))}
-              >
-                Próxima Semana →
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-7 gap-4">
-            {getWeekDays().map((day, index) => {
-              const dayEvents = getEventsForDate(day);
-              const isToday = isSameDay(day, new Date());
-              
-              return (
-                <Card key={index} className={`${isToday ? 'ring-2 ring-[#3C5BFA]' : ''}`}>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm text-center">
-                      <div className="font-medium">
-                        {format(day, "EEE", { locale: ptBR })}
-                      </div>
-                      <div className={`text-2xl ${isToday ? 'text-[#3C5BFA] font-bold' : ''}`}>
-                        {format(day, "dd")}
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-2 min-h-[200px]">
-                      {dayEvents.map((event) => (
-                        <div
-                          key={event.id}
-                          className="p-2 bg-[#3C5BFA]/10 rounded-lg border-l-4 border-[#3C5BFA] text-xs"
-                        >
-                          <div className="font-medium truncate" title={event.title}>
-                            {event.title}
-                          </div>
-                          <div className="text-gray-600 flex items-center gap-1 mt-1">
-                            <Clock className="h-3 w-3" />
-                            {format(parseISO(event.eventDate), "HH:mm")}
-                          </div>
-                          {event.eventLocation && (
-                            <div className="text-gray-600 flex items-center gap-1 mt-1">
-                              <MapPin className="h-3 w-3" />
-                              <span className="truncate">{event.eventLocation}</span>
-                            </div>
-                          )}
-                          <div className="mt-2">
-                            {getStatusBadge(event.status)}
-                          </div>
-                        </div>
-                      ))}
-                      
-                      {dayEvents.length === 0 && (
-                        <div className="text-gray-400 text-center py-8">
-                          Nenhum evento
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* List View for Day/Month */}
-      {(viewMode === 'day' || viewMode === 'month') && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">
-              {viewMode === 'day' 
-                ? format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
-                : format(selectedDate, "MMMM 'de' yyyy", { locale: ptBR })
-              }
-            </h2>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedDate(addDays(selectedDate, viewMode === 'day' ? -1 : -30))}
-              >
-                ← {viewMode === 'day' ? 'Dia Anterior' : 'Mês Anterior'}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedDate(new Date())}
-              >
-                Hoje
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedDate(addDays(selectedDate, viewMode === 'day' ? 1 : 30))}
-              >
-                {viewMode === 'day' ? 'Próximo Dia' : 'Próximo Mês'} →
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid gap-4">
-            {agendaEvents
-              .filter(event => {
-                if (viewMode === 'day') {
-                  return isSameDay(parseISO(event.eventDate), selectedDate);
-                }
-                // Para mês, mostrar todos os eventos do mês
-                const eventDate = parseISO(event.eventDate);
-                return eventDate.getMonth() === selectedDate.getMonth() && 
-                       eventDate.getFullYear() === selectedDate.getFullYear();
-              })
-              .map((event) => (
-                <Card key={event.id}>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-start gap-4">
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-lg mb-2">{event.title}</h3>
-                            
-                            {event.description && (
-                              <p className="text-gray-600 mb-3">{event.description}</p>
-                            )}
-                            
-                            <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4" />
-                                {format(parseISO(event.eventDate), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                              </div>
-                              
-                              {event.eventLocation && (
-                                <div className="flex items-center gap-2">
-                                  <MapPin className="h-4 w-4" />
-                                  {event.eventLocation}
-                                </div>
-                              )}
-                              
-                              {(event.clientName || event.providerName) && (
-                                <div className="flex items-center gap-2">
-                                  <User className="h-4 w-4" />
-                                  {event.clientName || event.providerName}
-                                </div>
-                              )}
-                              
-                              {event.value && (
-                                <div className="flex items-center gap-2">
-                                  <span className="text-green-600 font-medium">
-                                    R$ {event.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          
-                          <div className="flex flex-col gap-2">
-                            {getStatusBadge(event.status)}
-                            <Badge variant="outline">
-                              {getEventTypeLabel(event.type)}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            
-            {agendaEvents.length === 0 && (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="font-semibold text-gray-700 mb-2">Nenhum evento na agenda</h3>
-                  <p className="text-gray-500">
-                    {getAgendaDescription()}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
