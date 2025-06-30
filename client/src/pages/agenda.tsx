@@ -20,14 +20,15 @@ interface AgendaEvent {
   startTime: string;
   endTime: string;
   eventLocation?: string;
-  status: 'scheduled' | 'confirmed' | 'completed' | 'cancelled';
-  type: 'event' | 'meeting' | 'task' | 'reminder';
+  status: 'scheduled' | 'confirmed' | 'completed' | 'cancelled' | 'reserved';
+  type: 'event' | 'meeting' | 'task' | 'reminder' | 'service' | 'reservation';
   description?: string;
   clientName?: string;
   providerName?: string;
   value?: number;
   color?: string;
   avatar?: string;
+  originalData?: any;
 }
 
 export default function Agenda() {
@@ -104,7 +105,7 @@ export default function Agenda() {
     }
 
     // ANUNCIANTE: Reservas de locais aparecem na agenda
-    if (user.userType === 'anunciante' && venueReservations) {
+    if (user.userType === 'anunciante' && venueReservations && Array.isArray(venueReservations)) {
       events = venueReservations.map((reservation: any) => ({
         id: reservation.id,
         title: `Reserva - ${reservation.venue?.name}`,
@@ -382,6 +383,7 @@ export default function Agenda() {
                           {events.map((event) => (
                             <div
                               key={event.id}
+                              onClick={() => setSelectedEvent(event)}
                               className={`${event.color} rounded-md p-2 mb-1 text-xs font-medium shadow-sm hover:shadow-md transition-shadow cursor-pointer`}
                             >
                               <div className="flex items-center gap-2">
@@ -407,6 +409,112 @@ export default function Agenda() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Detalhes do Evento */}
+      <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{selectedEvent?.title}</DialogTitle>
+          </DialogHeader>
+          {selectedEvent && (
+            <div className="space-y-4 py-4">
+              <div className="flex items-center gap-3">
+                <Calendar className="w-5 h-5 text-blue-600" />
+                <div>
+                  <p className="font-medium">Data e Horário</p>
+                  <p className="text-sm text-gray-600">
+                    {format(parseISO(selectedEvent.eventDate), 'dd/MM/yyyy', { locale: ptBR })} - {selectedEvent.startTime} às {selectedEvent.endTime}
+                  </p>
+                </div>
+              </div>
+              
+              {selectedEvent.clientName && (
+                <div className="flex items-center gap-3">
+                  <User className="w-5 h-5 text-green-600" />
+                  <div>
+                    <p className="font-medium">Cliente</p>
+                    <p className="text-sm text-gray-600">{selectedEvent.clientName}</p>
+                  </div>
+                </div>
+              )}
+
+              {selectedEvent.eventLocation && (
+                <div className="flex items-center gap-3">
+                  <MapPin className="w-5 h-5 text-red-600" />
+                  <div>
+                    <p className="font-medium">Local</p>
+                    <p className="text-sm text-gray-600">{selectedEvent.eventLocation}</p>
+                  </div>
+                </div>
+              )}
+
+              {selectedEvent.description && (
+                <div className="flex items-start gap-3">
+                  <AlarmClock className="w-5 h-5 text-purple-600 mt-1" />
+                  <div>
+                    <p className="font-medium">Descrição</p>
+                    <p className="text-sm text-gray-600">{selectedEvent.description}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-yellow-600" />
+                <div>
+                  <p className="font-medium">Status</p>
+                  <Badge 
+                    variant={selectedEvent.status === 'confirmed' ? 'default' : 'secondary'}
+                    className="text-xs"
+                  >
+                    {selectedEvent.status === 'confirmed' ? 'Confirmado' :
+                     selectedEvent.status === 'scheduled' ? 'Agendado' :
+                     selectedEvent.status === 'reserved' ? 'Reservado' :
+                     selectedEvent.status === 'cancelled' ? 'Cancelado' : 'Concluído'}
+                  </Badge>
+                </div>
+              </div>
+
+              {selectedEvent.value && (
+                <div className="flex items-center gap-3">
+                  <Clock className="w-5 h-5 text-green-600" />
+                  <div>
+                    <p className="font-medium">Valor</p>
+                    <p className="text-sm text-gray-600">R$ {selectedEvent.value.toFixed(2)}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-2 pt-4">
+                <Button 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => setSelectedEvent(null)}
+                >
+                  Fechar
+                </Button>
+                {selectedEvent.type === 'event' && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex-1"
+                  >
+                    Editar Evento
+                  </Button>
+                )}
+                {selectedEvent.type === 'service' && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex-1"
+                  >
+                    Ver Contrato
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
