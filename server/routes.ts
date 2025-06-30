@@ -27,6 +27,7 @@ import {
 } from "@shared/schema";
 import { apiLimiter, authLimiter, createLimiter, webhookLimiter } from "./rateLimiter";
 import { notificationService } from "./notifications";
+import { variableCommissionService } from "./variable-commission";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -4506,6 +4507,171 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: 'Failed to fetch usage statistics',
         message: error instanceof Error ? error.message : 'Unknown error'
       });
+    }
+  });
+
+  // =================== VARIABLE COMMISSION ENDPOINTS ===================
+
+  // Listar todas as regras de comissão
+  app.get('/api/variable-commissions/rules', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const rules = await variableCommissionService.getAllRules();
+      res.json({ success: true, rules });
+    } catch (error) {
+      console.error('Erro ao buscar regras de comissão:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Obter regra específica
+  app.get('/api/variable-commissions/rules/:id', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const rule = await variableCommissionService.getRuleById(id);
+      
+      if (!rule) {
+        return res.status(404).json({ error: 'Regra não encontrada' });
+      }
+
+      res.json({ success: true, rule });
+    } catch (error) {
+      console.error('Erro ao buscar regra de comissão:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Criar nova regra de comissão
+  app.post('/api/variable-commissions/rules', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const ruleData = req.body;
+      
+      // Validação básica
+      if (!ruleData.name || !ruleData.userType || ruleData.baseRate === undefined) {
+        return res.status(400).json({ 
+          error: 'Nome, tipo de usuário e taxa base são obrigatórios' 
+        });
+      }
+
+      const rule = await variableCommissionService.addRule(ruleData);
+      res.status(201).json({ success: true, rule });
+    } catch (error) {
+      console.error('Erro ao criar regra de comissão:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Atualizar regra de comissão
+  app.put('/api/variable-commissions/rules/:id', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      
+      const rule = await variableCommissionService.updateRule(id, updates);
+      
+      if (!rule) {
+        return res.status(404).json({ error: 'Regra não encontrada' });
+      }
+
+      res.json({ success: true, rule });
+    } catch (error) {
+      console.error('Erro ao atualizar regra de comissão:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Remover regra de comissão
+  app.delete('/api/variable-commissions/rules/:id', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const success = await variableCommissionService.deleteRule(id);
+      
+      if (!success) {
+        return res.status(404).json({ error: 'Regra não encontrada' });
+      }
+
+      res.json({ success: true, message: 'Regra removida com sucesso' });
+    } catch (error) {
+      console.error('Erro ao remover regra de comissão:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Calcular comissão para uma transação
+  app.post('/api/variable-commissions/calculate', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const { 
+        transactionAmount, 
+        userId, 
+        userType, 
+        serviceCategory, 
+        userPlan = 'free', 
+        userEventCount = 0 
+      } = req.body;
+      
+      if (!transactionAmount || !userId || !userType || !serviceCategory) {
+        return res.status(400).json({ 
+          error: 'Valor da transação, ID do usuário, tipo de usuário e categoria de serviço são obrigatórios' 
+        });
+      }
+
+      const calculation = await variableCommissionService.calculateCommission(
+        transactionAmount,
+        userId,
+        userType,
+        serviceCategory,
+        userPlan,
+        userEventCount
+      );
+
+      res.json({ success: true, calculation });
+    } catch (error) {
+      console.error('Erro ao calcular comissão:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Simular cálculo de comissão
+  app.post('/api/variable-commissions/simulate', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const { 
+        transactionAmount, 
+        userType, 
+        serviceCategory, 
+        userPlan = 'free', 
+        userEventCount = 0 
+      } = req.body;
+      
+      if (!transactionAmount || !userType || !serviceCategory) {
+        return res.status(400).json({ 
+          error: 'Valor da transação, tipo de usuário e categoria de serviço são obrigatórios' 
+        });
+      }
+
+      const simulation = await variableCommissionService.simulateCommission(
+        transactionAmount,
+        userType,
+        serviceCategory,
+        userPlan,
+        userEventCount
+      );
+
+      res.json({ success: true, ...simulation });
+    } catch (error) {
+      console.error('Erro ao simular comissão:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Obter estatísticas de comissões
+  app.get('/api/variable-commissions/stats', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const { period = 'month' } = req.query;
+      const stats = await variableCommissionService.getCommissionStats(period as 'day' | 'week' | 'month');
+      
+      res.json({ success: true, stats });
+    } catch (error) {
+      console.error('Erro ao buscar estatísticas de comissão:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
     }
   });
 
