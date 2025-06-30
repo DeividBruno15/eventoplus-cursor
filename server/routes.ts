@@ -4049,6 +4049,184 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Split Payments endpoints
+  app.post('/api/split-payments/process', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Não autenticado' });
+      }
+
+      const { splitPaymentConfigSchema } = await import('./split-payments');
+      const { splitPaymentService } = await import('./split-payments');
+      
+      const config = splitPaymentConfigSchema.parse(req.body);
+      
+      const validation = splitPaymentService.validateSplitConfig(config);
+      if (!validation.valid) {
+        return res.status(400).json({ 
+          message: 'Invalid split configuration',
+          errors: validation.errors 
+        });
+      }
+      
+      let transaction;
+      if (config.paymentMethod === 'stripe') {
+        transaction = await splitPaymentService.processStripeSplit(config);
+      } else {
+        transaction = await splitPaymentService.processPixSplit(config);
+      }
+      
+      res.status(201).json({
+        message: 'Split payment processed successfully',
+        transaction
+      });
+      
+    } catch (error) {
+      console.error('Split payment processing error:', error);
+      res.status(500).json({ 
+        message: 'Failed to process split payment',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  app.get('/api/split-payments/calculate', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Não autenticado' });
+      }
+
+      const { splitPaymentService } = await import('./split-payments');
+      
+      const config = {
+        eventId: parseInt(req.query.eventId as string),
+        totalAmount: parseFloat(req.query.totalAmount as string),
+        platformFee: req.query.platformFee ? parseFloat(req.query.platformFee as string) : undefined,
+        providerId: parseInt(req.query.providerId as string),
+        organizerId: parseInt(req.query.organizerId as string),
+        venueId: req.query.venueId ? parseInt(req.query.venueId as string) : undefined,
+        paymentMethod: req.query.paymentMethod as 'stripe' | 'pix',
+        currency: 'BRL' as const
+      };
+      
+      const validation = splitPaymentService.validateSplitConfig(config);
+      if (!validation.valid) {
+        return res.status(400).json({ 
+          message: 'Invalid parameters',
+          errors: validation.errors 
+        });
+      }
+      
+      const calculation = splitPaymentService.calculateSplit(config);
+      
+      res.json({
+        success: true,
+        calculation
+      });
+      
+    } catch (error) {
+      console.error('Split calculation error:', error);
+      res.status(500).json({ 
+        message: 'Failed to calculate split',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  app.get('/api/split-payments/history', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Não autenticado' });
+      }
+
+      const { splitPaymentService } = await import('./split-payments');
+      
+      const filters = {
+        eventId: req.query.eventId ? parseInt(req.query.eventId as string) : undefined,
+        providerId: req.query.providerId ? parseInt(req.query.providerId as string) : undefined,
+        organizerId: req.query.organizerId ? parseInt(req.query.organizerId as string) : undefined,
+        status: req.query.status as any,
+        startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
+        endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined,
+      };
+      
+      const transactions = await splitPaymentService.getTransactionHistory(filters);
+      
+      res.json({
+        success: true,
+        transactions,
+        count: transactions.length
+      });
+      
+    } catch (error) {
+      console.error('Transaction history error:', error);
+      res.status(500).json({ 
+        message: 'Failed to fetch transaction history',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  app.get('/api/split-payments/revenue-stats', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Não autenticado' });
+      }
+
+      const { splitPaymentService } = await import('./split-payments');
+      
+      const filters = {
+        startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
+        endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined,
+        providerId: req.query.providerId ? parseInt(req.query.providerId as string) : undefined,
+      };
+      
+      const stats = await splitPaymentService.getRevenueStats(filters);
+      
+      res.json({
+        success: true,
+        stats
+      });
+      
+    } catch (error) {
+      console.error('Revenue stats error:', error);
+      res.status(500).json({ 
+        message: 'Failed to fetch revenue statistics',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  app.post('/api/split-payments/refund', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Não autenticado' });
+      }
+
+      const { refundRequestSchema } = await import('./split-payments');
+      const { splitPaymentService } = await import('./split-payments');
+      
+      const refundRequest = refundRequestSchema.parse(req.body);
+      
+      const refundResult = await splitPaymentService.processRefund(
+        refundRequest.transactionId,
+        refundRequest.amount
+      );
+      
+      res.json({
+        success: true,
+        refund: refundResult
+      });
+      
+    } catch (error) {
+      console.error('Refund processing error:', error);
+      res.status(500).json({ 
+        message: 'Failed to process refund',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Apply monitoring middleware
   app.use(monitoringService.trackRequest.bind(monitoringService));
   app.use(monitoringService.trackError.bind(monitoringService));
