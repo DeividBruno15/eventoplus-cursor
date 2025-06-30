@@ -4729,6 +4729,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(monitoringService.trackRequest.bind(monitoringService));
   app.use(monitoringService.trackError.bind(monitoringService));
 
+  // ==========================================
+  // AI RECOMMENDATIONS ROUTES
+  // ==========================================
+
+  // Obter recomendações personalizadas para o usuário
+  app.get('/api/ai-recommendations/personalized', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Usuário não autenticado' });
+      }
+
+      const limit = parseInt(req.query.limit as string) || 10;
+      const { aiRecommendationService } = await import('./ai-recommendations');
+      const recommendations = await aiRecommendationService.generatePersonalizedRecommendations(req.user.id, limit);
+      
+      res.json(recommendations);
+    } catch (error) {
+      console.error('Error getting personalized recommendations:', error);
+      res.status(500).json({ error: 'Failed to get personalized recommendations' });
+    }
+  });
+
+  // Obter recomendações trending
+  app.get('/api/ai-recommendations/trending', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const { aiRecommendationService } = await import('./ai-recommendations');
+      const recommendations = await aiRecommendationService.getTrendingRecommendations(limit);
+      
+      res.json(recommendations);
+    } catch (error) {
+      console.error('Error getting trending recommendations:', error);
+      res.status(500).json({ error: 'Failed to get trending recommendations' });
+    }
+  });
+
+  // Obter insights sobre performance das recomendações
+  app.get('/api/ai-recommendations/insights', apiLimiter, async (req: Request, res: Response) => {
+    try {
+      const { aiRecommendationService } = await import('./ai-recommendations');
+      const insights = await aiRecommendationService.generateRecommendationInsights();
+      
+      res.json(insights);
+    } catch (error) {
+      console.error('Error getting recommendation insights:', error);
+      res.status(500).json({ error: 'Failed to get recommendation insights' });
+    }
+  });
+
   wss.on('connection', (ws: WebSocket) => {
     console.log('New WebSocket connection');
 
