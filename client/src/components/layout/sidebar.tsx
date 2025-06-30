@@ -67,6 +67,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: ShoppingCart, label: "Carrinho", path: "/cart" },
       { icon: FileText, label: "Contratos", path: "/contracts" },
       { icon: Code, label: "API Pública", path: "/public-api" },
+      { icon: Percent, label: "Comissões Variáveis", path: "/variable-commissions" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
     ],
     prestador: [
@@ -79,6 +80,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: Bell, label: "Notificações", path: "/notifications" },
       { icon: FileText, label: "Contratos", path: "/contracts" },
       { icon: Code, label: "API Pública", path: "/public-api" },
+      { icon: Percent, label: "Comissões Variáveis", path: "/variable-commissions" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
     ],
     anunciante: [
@@ -90,6 +92,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: MessageSquare, label: "Chat", path: "/chat" },
       { icon: Bell, label: "Notificações", path: "/notifications" },
       { icon: FileText, label: "Contratos", path: "/contracts" },
+      { icon: Percent, label: "Comissões Variáveis", path: "/variable-commissions" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
     ]
   };
