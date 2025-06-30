@@ -150,61 +150,62 @@ export default function Chat() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex">
       {/* Sidebar - Chat List */}
-      <div className="w-80 border-r border-gray-200 flex flex-col">
+      <div className="w-80 bg-white/80 backdrop-blur-lg border-r border-white/20 shadow-xl flex flex-col">
         {/* Header */}
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-6 bg-gradient-to-r from-[#3C5BFA] to-[#5B7CFF] text-white">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-[#3C5BFA] rounded-full flex items-center justify-center">
-              <MessageCircle className="w-4 h-4 text-white" />
+            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <MessageCircle className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-semibold text-gray-900">Chats</h1>
+            <h1 className="text-xl font-bold">Conversas</h1>
             <div className="ml-auto flex items-center gap-2">
-              <Badge variant="secondary" className="bg-[#3C5BFA] text-white rounded-full px-2 py-1 text-xs">
-                {filteredContacts.length}
-              </Badge>
+              <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
+                <span className="text-white text-sm font-medium">{filteredContacts.length}</span>
+              </div>
             </div>
           </div>
           
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-4 top-4 h-4 w-4 text-white/70" />
             <Input
-              placeholder="Search For Contacts or Messages"
+              placeholder="Buscar conversas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-gray-50 border-0 rounded-lg h-10"
+              className="pl-12 bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder:text-white/70 rounded-xl h-12 focus:bg-white/30 transition-all"
             />
           </div>
         </div>
 
         {/* Recent Chats Avatars */}
-        <div className="p-4">
+        <div className="p-6">
           <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-sm font-medium text-gray-700">Recent Chats</h2>
+            <h2 className="text-sm font-semibold text-gray-700">Conversas Recentes</h2>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             {filteredContacts.slice(0, 5).map((contact: ChatContact) => (
               <div
                 key={contact.id}
-                className="flex flex-col items-center cursor-pointer"
+                className="flex flex-col items-center cursor-pointer group"
                 onClick={() => setSelectedContact(contact)}
               >
                 <div className="relative">
-                  <Avatar className="w-12 h-12">
+                  <Avatar className="w-14 h-14 ring-2 ring-white shadow-lg group-hover:scale-110 transition-transform">
                     <AvatarImage src="" />
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-medium">
+                    <AvatarFallback className="bg-gradient-to-br from-[#3C5BFA] to-[#5B7CFF] text-white font-bold text-lg">
                       {contact.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   {contact.unreadCount > 0 && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="text-xs text-white font-medium">{contact.unreadCount}</span>
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-[#FFA94D] to-[#FF8A3D] rounded-full flex items-center justify-center shadow-lg">
+                      <span className="text-xs text-white font-bold">{contact.unreadCount}</span>
                     </div>
                   )}
+                  <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
                 </div>
-                <span className="text-xs text-gray-600 mt-1 text-center truncate w-12">
+                <span className="text-xs text-gray-700 mt-2 text-center truncate w-16 font-medium">
                   {contact.name.split(' ')[0]}
                 </span>
               </div>
