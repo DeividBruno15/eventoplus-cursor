@@ -350,6 +350,14 @@ function Router() {
           </AuthGuard>
         </Layout>
       </Route>
+
+      <Route path="/bi-dashboard">
+        <Layout>
+          <AuthGuard>
+            <BIDashboard />
+          </AuthGuard>
+        </Layout>
+      </Route>
       
       <Route path="/two-factor">
         <Layout>

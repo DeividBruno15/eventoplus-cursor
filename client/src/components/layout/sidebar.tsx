@@ -39,7 +39,8 @@ import {
   CalendarDays,
   QrCode,
   Code,
-  Percent
+  Percent,
+  TrendingUp
 } from "lucide-react";
 
 interface SidebarProps {
@@ -69,6 +70,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: Code, label: "API Pública", path: "/public-api" },
       { icon: Percent, label: "Comissões Variáveis", path: "/variable-commissions" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
+      { icon: TrendingUp, label: "BI Dashboard", path: "/bi-dashboard" },
     ],
     prestador: [
       { icon: Home, label: "Dashboard", path: "/dashboard" },
@@ -82,6 +84,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: Code, label: "API Pública", path: "/public-api" },
       { icon: Percent, label: "Comissões Variáveis", path: "/variable-commissions" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
+      { icon: TrendingUp, label: "BI Dashboard", path: "/bi-dashboard" },
     ],
     anunciante: [
       { icon: Home, label: "Dashboard", path: "/dashboard" },
