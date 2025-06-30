@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
       const response = await apiRequest("POST", "/api/auth/login", { email, password });
-      return response.json();
+      return await response.json();
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password, 
         userType 
       });
-      return response.json();
+      return await response.json();
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
