@@ -103,17 +103,23 @@ export default function Login() {
   const onSubmitForgotPassword = async (data: ForgotPasswordForm) => {
     setIsLoadingForgot(true);
     try {
-      const response = await apiRequest("/api/auth/forgot-password", {
+      const response = await fetch("/api/auth/forgot-password", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(data),
       });
 
-      if (response) {
+      if (response.ok) {
         toast({
           title: "Email enviado!",
           description: "Verifique seu email para redefinir sua senha.",
         });
         setLocation(`/auth/email-sent?email=${encodeURIComponent(data.email)}&type=reset`);
+      } else {
+        const error = await response.json();
+        throw new Error(error.message);
       }
     } catch (error: any) {
       toast({

@@ -269,9 +269,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/login", passport.authenticate("local"), (req, res) => {
     const user = req.user as any;
     
-    // Check if email is verified
-    if (!user.emailVerified) {
-      // Logout the user immediately
+    // In development, allow login without email verification for testing
+    if (process.env.NODE_ENV === 'production' && !user.emailVerified) {
+      // Only enforce email verification in production
       req.logout((err) => {
         if (err) {
           console.error("Erro ao fazer logout:", err);
