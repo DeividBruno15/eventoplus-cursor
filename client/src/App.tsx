@@ -61,6 +61,7 @@ import Backup from "@/pages/backup";
 import AnalyticsAdvanced from "@/pages/analytics-advanced";
 import SplitPayments from "@/pages/split-payments";
 import PublicApi from "@/pages/public-api";
+import VariableCommissions from "@/pages/variable-commissions";
 import { useAuth } from "@/hooks/use-auth";
 
 // Analytics Wrapper Component
@@ -337,6 +338,14 @@ function Router() {
         <Layout>
           <AuthGuard>
             <PublicApi />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/variable-commissions">
+        <Layout>
+          <AuthGuard>
+            <VariableCommissions />
           </AuthGuard>
         </Layout>
       </Route>

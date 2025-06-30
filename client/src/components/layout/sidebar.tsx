@@ -38,7 +38,8 @@ import {
   Bell,
   CalendarDays,
   QrCode,
-  Code
+  Code,
+  Percent
 } from "lucide-react";
 
 interface SidebarProps {
