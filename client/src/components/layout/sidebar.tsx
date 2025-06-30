@@ -77,11 +77,11 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     prestador: [
       { icon: Home, label: "Dashboard", path: "/dashboard" },
       { icon: Search, label: "Buscar", path: "/search" },
+      { icon: Brain, label: "Recomendações IA", path: "/ai-recommendations" },
       { icon: CalendarDays, label: "Eventos", path: "/events" },
       { icon: Star, label: "Gerenciar Serviços", path: "/services/manage" },
       { icon: QrCode, label: "Pagamento PIX", path: "/pix-payment" },
       { icon: MessageSquare, label: "Chat", path: "/chat" },
-      { icon: Brain, label: "Recomendações IA", path: "/ai-recommendations" },
       { icon: Bell, label: "Notificações", path: "/notifications" },
       { icon: FileText, label: "Contratos", path: "/contracts" },
       { icon: Code, label: "API Pública", path: "/public-api" },
