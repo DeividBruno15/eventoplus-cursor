@@ -150,19 +150,19 @@ export default function ModernChat() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar - Chat List */}
-      <div className="w-80 bg-white/80 backdrop-blur-lg border-r border-white/20 shadow-xl flex flex-col">
+      <div className="w-80 bg-white border-r border-gray-100 flex flex-col card-elevated">
         {/* Header */}
         <div className="p-6 bg-gradient-to-r from-[#3C5BFA] to-[#5B7CFF] text-white">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
               <MessageCircle className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold">💬 Conversas</h1>
-            <div className="ml-auto flex items-center gap-2">
-              <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
-                <span className="text-white text-sm font-medium">{filteredContacts.length}</span>
+            <h1 className="text-heading-md text-white">Conversas</h1>
+            <div className="ml-auto">
+              <div className="bg-white/20 rounded-full px-3 py-1">
+                <span className="text-white text-caption font-semibold">{filteredContacts.length}</span>
               </div>
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function ModernChat() {
               placeholder="Buscar conversas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder:text-white/70 rounded-xl h-12 focus:bg-white/30 transition-all"
+              className="input-enhanced pl-12 bg-white/20 border-white/30 text-white placeholder:text-white/70 h-12 focus:bg-white/30"
             />
           </div>
         </div>
@@ -224,28 +224,28 @@ export default function ModernChat() {
             </div>
           </div>
           
-          <ScrollArea className="h-full px-3">
+          <ScrollArea className="h-full px-4">
             {filteredContacts.length === 0 ? (
               <div className="text-center py-12 px-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-[#3C5BFA]/20 to-[#5B7CFF]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-[#3C5BFA]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <MessageCircle className="h-8 w-8 text-[#3C5BFA]" />
                 </div>
-                <p className="text-gray-500 text-sm font-medium">
+                <p className="text-body font-medium">
                   {searchTerm ? 'Nenhum contato encontrado' : 'Nenhuma conversa ainda'}
                 </p>
-                <p className="text-gray-400 text-xs mt-1">
+                <p className="text-caption mt-1">
                   Suas conversas aparecerão aqui
                 </p>
               </div>
             ) : (
-              <div className="space-y-2 py-3">
+              <div className="space-y-3 py-4">
                 {filteredContacts.map((contact: ChatContact) => (
                   <div
                     key={contact.id}
-                    className={`p-4 cursor-pointer hover:bg-white/60 transition-all duration-200 rounded-2xl group ${
+                    className={`p-4 cursor-pointer transition-all duration-200 rounded-xl ${
                       selectedContact?.id === contact.id 
-                        ? 'bg-gradient-to-r from-[#3C5BFA]/10 to-[#5B7CFF]/10 shadow-md border-l-4 border-[#3C5BFA]' 
-                        : 'hover:shadow-sm'
+                        ? 'bg-[#3C5BFA]/10 border border-[#3C5BFA]/20 shadow-md' 
+                        : 'card-interactive border-transparent'
                     }`}
                     onClick={() => setSelectedContact(contact)}
                   >
@@ -299,41 +299,41 @@ export default function ModernChat() {
         {selectedContact ? (
           <>
             {/* Chat Header */}
-            <div className="p-6 bg-white/90 backdrop-blur-lg border-b border-white/20 shadow-sm">
+            <div className="p-6 bg-white border-b border-gray-100 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <Avatar className="w-12 h-12 ring-2 ring-white shadow-lg">
+                    <Avatar className="w-12 h-12 shadow-md">
                       <AvatarImage src="" />
                       <AvatarFallback className="bg-gradient-to-br from-[#3C5BFA] to-[#5B7CFF] text-white font-bold">
                         {selectedContact.name.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
                   </div>
                   <div>
-                    <h2 className="font-bold text-gray-900 text-lg">{selectedContact.name}</h2>
+                    <h2 className="text-heading-md">{selectedContact.name}</h2>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <p className="text-sm text-green-600 font-medium">Online agora</p>
+                      <p className="text-caption text-green-600 font-semibold">Online agora</p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  <Button variant="ghost" size="sm" className="h-10 w-10 rounded-full hover:bg-[#3C5BFA]/10">
+                <div className="flex items-center gap-2">
+                  <button className="h-10 w-10 rounded-full hover:bg-[#3C5BFA]/10 flex items-center justify-center transition-all duration-200">
                     <Search className="w-5 h-5 text-[#3C5BFA]" />
-                  </Button>
-                  <Button variant="ghost" size="sm" className="h-10 w-10 rounded-full hover:bg-[#3C5BFA]/10">
+                  </button>
+                  <button className="h-10 w-10 rounded-full hover:bg-[#3C5BFA]/10 flex items-center justify-center transition-all duration-200">
                     <MessageCircle className="w-5 h-5 text-[#3C5BFA]" />
-                  </Button>
-                  <Button variant="ghost" size="sm" className="h-10 w-10 rounded-full hover:bg-[#3C5BFA]/10">
+                  </button>
+                  <button className="h-10 w-10 rounded-full hover:bg-[#3C5BFA]/10 flex items-center justify-center transition-all duration-200">
                     <svg className="w-5 h-5 text-[#3C5BFA]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <circle cx="12" cy="12" r="1"/>
                       <circle cx="19" cy="12" r="1"/>
                       <circle cx="5" cy="12" r="1"/>
                     </svg>
-                  </Button>
+                  </button>
                 </div>
               </div>
             </div>
