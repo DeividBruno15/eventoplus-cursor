@@ -266,27 +266,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/login", passport.authenticate("local"), (req, res) => {
-    const user = req.user as any;
+  app.post("/api/auth/login", (req, res, next) => {
+    console.log("Login attempt with email:", req.body.email);
     
-    // In development, allow login without email verification for testing
-    if (process.env.NODE_ENV === 'production' && !user.emailVerified) {
-      // Only enforce email verification in production
-      req.logout((err) => {
-        if (err) {
-          console.error("Erro ao fazer logout:", err);
-        }
-      });
+    passport.authenticate("local", (err, user, info) => {
+      if (err) {
+        console.error("Authentication error:", err);
+        return res.status(500).json({ message: "Erro interno do servidor" });
+      }
       
-      return res.status(403).json({ 
-        message: "E-mail não verificado. Verifique sua caixa de entrada e confirme seu e-mail antes de fazer login.",
-        emailVerificationRequired: true,
-        email: user.email
+      if (!user) {
+        console.log("Authentication failed:", info?.message || "Credenciais inválidas");
+        return res.status(401).json({ message: info?.message || "E-mail ou senha incorretos" });
+      }
+      
+      console.log("User authenticated successfully:", user.email);
+      
+      req.logIn(user, (err) => {
+        if (err) {
+          console.error("Login session error:", err);
+          return res.status(500).json({ message: "Erro ao criar sessão" });
+        }
+        
+        // In development, allow login without email verification for testing
+        if (process.env.NODE_ENV === 'production' && !user.emailVerified) {
+          console.log("Email not verified for user:", user.email);
+          req.logout((err) => {
+            if (err) {
+              console.error("Erro ao fazer logout:", err);
+            }
+          });
+          
+          return res.status(403).json({ 
+            message: "E-mail não verificado. Verifique sua caixa de entrada e confirme seu e-mail antes de fazer login.",
+            emailVerificationRequired: true,
+            email: user.email
+          });
+        }
+        
+        console.log("Login successful for user:", user.email);
+        const { password, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
       });
-    }
-    
-    const { password, ...userWithoutPassword } = user;
-    res.json(userWithoutPassword);
+    })(req, res, next);
   });
 
   app.get("/api/user", (req, res) => {
