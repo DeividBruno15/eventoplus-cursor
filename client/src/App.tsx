@@ -56,6 +56,8 @@ import Providers from "@/pages/providers";
 import Bookings from "@/pages/bookings";
 import PixPayment from "@/pages/pix-payment";
 import OfflinePage from "@/pages/offline";
+import Reviews from "@/pages/reviews-simple";
+import Backup from "@/pages/backup";
 import { useAuth } from "@/hooks/use-auth";
 
 // Analytics Wrapper Component
@@ -292,6 +294,22 @@ function Router() {
         <Layout>
           <AuthGuard>
             <Settings />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/reviews">
+        <Layout>
+          <AuthGuard>
+            <Reviews />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/backup">
+        <Layout>
+          <AuthGuard>
+            <Backup />
           </AuthGuard>
         </Layout>
       </Route>

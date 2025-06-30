@@ -3943,6 +3943,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===== BACKUP ROUTES =====
+
+  // GET /api/backup/status - Status do sistema de backup
+  app.get('/api/backup/status', async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Não autenticado' });
+      }
+
+      const { backupService } = await import('./backup-service');
+      const stats = backupService.getBackupStats();
+      const current = backupService.getCurrentBackup();
+      const history = backupService.getBackupHistory();
+      const files = backupService.getBackupFiles();
+
+      res.json({
+        stats,
+        current,
+        history: history.slice(0, 10), // Últimos 10
+        files: files.slice(0, 5), // Últimos 5 arquivos
+        healthCheck: await backupService.testBackup()
+      });
+    } catch (error) {
+      console.error('Error getting backup status:', error);
+      res.status(500).json({ message: 'Erro ao buscar status do backup' });
+    }
+  });
+
+  // POST /api/backup/create - Criar backup manual
+  app.post('/api/backup/create', async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Não autenticado' });
+      }
+
+      const { backupService } = await import('./backup-service');
+      const { description } = req.body;
+
+      const backup = await backupService.createManualBackup(description);
+      
+      res.json({
+        success: true,
+        message: 'Backup criado com sucesso',
+        backup
+      });
+    } catch (error: any) {
+      console.error('Error creating manual backup:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Erro ao criar backup',
+        error: error.message 
+      });
+    }
+  });
+
+  // POST /api/backup/restore - Restaurar backup
+  app.post('/api/backup/restore', async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Não autenticado' });
+      }
+
+      const { backupService } = await import('./backup-service');
+      const { filename } = req.body;
+
+      if (!filename) {
+        return res.status(400).json({ message: 'Nome do arquivo é obrigatório' });
+      }
+
+      await backupService.restoreBackup(filename);
+      
+      res.json({
+        success: true,
+        message: 'Backup restaurado com sucesso'
+      });
+    } catch (error: any) {
+      console.error('Error restoring backup:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Erro ao restaurar backup',
+        error: error.message 
+      });
+    }
+  });
+
+  // GET /api/backup/test - Testar sistema de backup
+  app.get('/api/backup/test', async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Não autenticado' });
+      }
+
+      const { backupService } = await import('./backup-service');
+      const result = await backupService.testBackup();
+      
+      res.json(result);
+    } catch (error: any) {
+      console.error('Error testing backup:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Erro ao testar backup',
+        error: error.message 
+      });
+    }
+  });
+
   // Apply monitoring middleware
   app.use(monitoringService.trackRequest.bind(monitoringService));
   app.use(monitoringService.trackError.bind(monitoringService));
