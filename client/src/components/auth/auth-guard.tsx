@@ -12,7 +12,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      setLocation("/login");
+      setLocation("/auth/login");
     }
   }, [user, isLoading, setLocation]);
 
