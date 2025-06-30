@@ -58,6 +58,7 @@ import PixPayment from "@/pages/pix-payment";
 import OfflinePage from "@/pages/offline";
 import Reviews from "@/pages/reviews-simple";
 import Backup from "@/pages/backup";
+import AnalyticsAdvanced from "@/pages/analytics-advanced";
 import { useAuth } from "@/hooks/use-auth";
 
 // Analytics Wrapper Component
@@ -310,6 +311,14 @@ function Router() {
         <Layout>
           <AuthGuard>
             <Backup />
+          </AuthGuard>
+        </Layout>
+      </Route>
+      
+      <Route path="/analytics-advanced">
+        <Layout>
+          <AuthGuard>
+            <AnalyticsAdvanced />
           </AuthGuard>
         </Layout>
       </Route>
