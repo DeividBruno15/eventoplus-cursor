@@ -297,10 +297,10 @@ UI Framework preference: Use shadcn/ui components library throughout the entire 
 - **3 APIs Backend Funcionais**: /personalized (recomendações do usuário), /trending (populares), /insights (analytics de performance)
 - **Interface Frontend Moderna**: Página completa com design glassmorphism, filtros por tipo/prioridade, tabs personalizadas vs trending
 - **Analytics Visuais**: Dashboard com métricas de engajamento, performance, top categorias e insights de conversão
-- **Integração Menu**: "Recomendações IA" adicionado para todos os tipos de usuário (contratante, prestador, anunciante) na sidebar
+- **Integração Menu CORRIGIDA**: "Recomendações IA" adicionado ao sidebar correto (sidebar-new.tsx) com ícone Brain para todos os tipos de usuário
 - **Dados Reais**: Sistema processando eventos, serviços e venues reais do banco de dados com scores de match calculados
 - **Design System**: Gradientes da marca (#3C5BFA, #FFA94D), ícones Brain, badges de prioridade e cards responsivos
-- **Sistema Production-Ready**: APIs testadas e funcionando, interface responsiva, dados autênticos sendo processados pela IA
+- **Sistema Production-Ready**: APIs testadas e funcionando, interface responsiva, menu visível no sidebar principal
 
 ### June 30, 2025 - FASE 2 ROADMAP COMPLETAMENTE IMPLEMENTADA ✅
 - **Split Payments ✅**: Sistema completo de divisão automática de pagamentos entre plataforma, prestadores e anunciantes com interface de calculadora e histórico

@@ -35,7 +35,8 @@ import {
   FileText,
   Shield,
   HelpCircle,
-  Headphones
+  Headphones,
+  Brain
 } from "lucide-react";
 
 interface SidebarProps {
@@ -154,6 +155,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile = false, showMob
       { href: "/dashboard", icon: Home, label: "Dashboard" },
       { href: "/agenda", icon: Calendar, label: "Agenda" },
       { href: "/chat", icon: MessageSquare, label: "Chat" },
+      { href: "/ai-recommendations", icon: Brain, label: "Recomendações IA" },
     ];
 
     switch (user.userType) {
