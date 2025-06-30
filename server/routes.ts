@@ -4515,8 +4515,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Obter métricas de negócio completas
   app.get('/api/bi-analytics/metrics', apiLimiter, async (req: Request, res: Response) => {
     try {
-      const { biAnalyticsService } = await import('./bi-analytics');
-      const metrics = await biAnalyticsService.generateBusinessMetrics();
+      const { simpleBIAnalyticsService } = await import('./bi-analytics-simple');
+      const metrics = await simpleBIAnalyticsService.generateBusinessMetrics();
       res.json(metrics);
     } catch (error) {
       console.error('Error generating BI metrics:', error);
@@ -4527,8 +4527,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Obter tendências de KPIs dos últimos 12 meses
   app.get('/api/bi-analytics/kpi-trends', apiLimiter, async (req: Request, res: Response) => {
     try {
-      const { biAnalyticsService } = await import('./bi-analytics');
-      const trends = await biAnalyticsService.generateKPITrends();
+      const { simpleBIAnalyticsService } = await import('./bi-analytics-simple');
+      const trends = await simpleBIAnalyticsService.generateKPITrends();
       res.json(trends);
     } catch (error) {
       console.error('Error generating KPI trends:', error);
@@ -4539,8 +4539,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Obter indicadores de performance
   app.get('/api/bi-analytics/performance', apiLimiter, async (req: Request, res: Response) => {
     try {
-      const { biAnalyticsService } = await import('./bi-analytics');
-      const indicators = await biAnalyticsService.calculatePerformanceIndicators();
+      const { simpleBIAnalyticsService } = await import('./bi-analytics-simple');
+      const indicators = await simpleBIAnalyticsService.calculatePerformanceIndicators();
       res.json(indicators);
     } catch (error) {
       console.error('Error calculating performance indicators:', error);
@@ -4551,8 +4551,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Obter resumo executivo
   app.get('/api/bi-analytics/executive-summary', apiLimiter, async (req: Request, res: Response) => {
     try {
-      const { biAnalyticsService } = await import('./bi-analytics');
-      const summary = await biAnalyticsService.generateExecutiveSummary();
+      const { simpleBIAnalyticsService } = await import('./bi-analytics-simple');
+      const summary = await simpleBIAnalyticsService.generateExecutiveSummary();
       res.json(summary);
     } catch (error) {
       console.error('Error generating executive summary:', error);
