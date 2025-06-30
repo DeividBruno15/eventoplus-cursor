@@ -97,6 +97,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       { icon: FileText, label: "Contratos", path: "/contracts" },
       { icon: Percent, label: "Comissões Variáveis", path: "/variable-commissions" },
       { icon: BarChart3, label: "Analytics", path: "/analytics" },
+      { icon: TrendingUp, label: "BI Dashboard", path: "/bi-dashboard" },
     ]
   };
 
