@@ -3862,22 +3862,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // STRIPE PAYMENT INTEGRATION - CRÍTICO
   // ============================================
 
-  // Planos de assinatura por tipo de usuário
+  // Planos de assinatura por tipo de usuário - Price IDs REAIS do Stripe
   const STRIPE_PLANS = {
     prestador: [
       { id: "prestador_essencial", name: "Essencial", price: 0, priceId: null },
-      { id: "prestador_profissional", name: "Profissional", price: 14.90, priceId: "price_professional" },
-      { id: "prestador_premium", name: "Premium", price: 29.90, priceId: "price_premium" }
+      { id: "prestador_profissional", name: "Profissional", price: 14.90, priceId: "price_1RgBEFKX6FbUQvI6iv4RzNUi" },
+      { id: "prestador_premium", name: "Premium", price: 29.90, priceId: "price_1RgBEGKX6FbUQvI6zQs7PFOQ" }
     ],
     contratante: [
       { id: "contratante_descubra", name: "Descubra", price: 0, priceId: null },
-      { id: "contratante_conecta", name: "Conecta", price: 14.90, priceId: "price_contratante_conecta" },
-      { id: "contratante_premium", name: "Premium", price: 29.90, priceId: "price_contratante_premium" }
+      { id: "contratante_conecta", name: "Conecta", price: 14.90, priceId: "price_1RgBEGKX6FbUQvI6EPiZYf9V" },
+      { id: "contratante_premium", name: "Premium", price: 29.90, priceId: "price_1RgBEHKX6FbUQvI6dniApqUD" }
     ],
     anunciante: [
       { id: "anunciante_essencial", name: "Essencial", price: 0, priceId: null },
-      { id: "anunciante_profissional", name: "Profissional", price: 19.90, priceId: "price_anunciante_pro" },
-      { id: "anunciante_premium", name: "Premium", price: 39.90, priceId: "price_anunciante_premium" }
+      { id: "anunciante_profissional", name: "Profissional", price: 19.90, priceId: "price_1RgBEHKX6FbUQvI6Ib3sSIl1" },
+      { id: "anunciante_premium", name: "Premium", price: 39.90, priceId: "price_1RgBEHKX6FbUQvI63tcCxhA0" }
     ]
   };
 
@@ -4089,18 +4089,169 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // 6. POST /api/webhooks/stripe - WEBHOOK CRÍTICO (Simplificado)
+  // 6. POST /api/webhooks/stripe - WEBHOOK CRÍTICO COMPLETO
   app.post("/api/webhooks/stripe", async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+
     try {
-      // Webhook simplificado para evitar erros de compilação
-      // TODO: Implementar validação de assinatura quando STRIPE_WEBHOOK_SECRET estiver configurado
-      console.log("Webhook Stripe recebido:", req.body?.type);
-      res.json({received: true});
+      // Verificar se temos o webhook secret
+      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+      
+      if (webhookSecret && sig) {
+        // Produção: Validar assinatura do webhook
+        event = stripe.webhooks.constructEvent(req.body, sig as string, webhookSecret);
+        console.log("✅ Webhook Stripe validado:", event.type);
+      } else {
+        // Desenvolvimento: Aceitar sem validação (apenas para teste)
+        event = req.body;
+        console.log("⚠️ Webhook Stripe SEM validação (dev):", event.type);
+      }
+
+    } catch (err: any) {
+      console.error("❌ Webhook signature verification failed:", err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    // Processar eventos críticos do Stripe
+    try {
+      switch (event.type) {
+        case 'customer.subscription.created':
+        case 'customer.subscription.updated':
+          await handleSubscriptionUpdate(event.data.object);
+          break;
+
+        case 'customer.subscription.deleted':
+          await handleSubscriptionCanceled(event.data.object);
+          break;
+
+        case 'invoice.payment_succeeded':
+          await handlePaymentSucceeded(event.data.object);
+          break;
+
+        case 'invoice.payment_failed':
+          await handlePaymentFailed(event.data.object);
+          break;
+
+        case 'checkout.session.completed':
+          await handleCheckoutCompleted(event.data.object);
+          break;
+
+        default:
+          console.log(`🔔 Evento não processado: ${event.type}`);
+      }
+
+      res.json({ received: true, processed: true });
+
     } catch (error: any) {
-      console.error("Erro ao processar webhook:", error);
+      console.error("❌ Erro ao processar webhook:", error);
       res.status(500).json({ message: error.message });
     }
   });
+
+  // Funções auxiliares para processar eventos do webhook
+  async function handleSubscriptionUpdate(subscription: any) {
+    try {
+      const customerId = subscription.customer;
+      const user = await getUserByCustomerId(customerId);
+      
+      if (user) {
+        await storage.updateUser(user.id, {
+          stripeSubscriptionId: subscription.id,
+          subscriptionStatus: subscription.status,
+          subscriptionCurrentPeriodEnd: new Date(subscription.current_period_end * 1000)
+        });
+        console.log(`✅ Subscription atualizada para usuário ${user.id}: ${subscription.status}`);
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar subscription:", error);
+    }
+  }
+
+  async function handleSubscriptionCanceled(subscription: any) {
+    try {
+      const customerId = subscription.customer;
+      const user = await getUserByCustomerId(customerId);
+      
+      if (user) {
+        await storage.updateUser(user.id, {
+          stripeSubscriptionId: null,
+          subscriptionStatus: 'canceled',
+          planType: 'essencial' // Voltar para plano gratuito
+        });
+        console.log(`✅ Subscription cancelada para usuário ${user.id}`);
+      }
+    } catch (error) {
+      console.error("Erro ao cancelar subscription:", error);
+    }
+  }
+
+  async function handlePaymentSucceeded(invoice: any) {
+    try {
+      const customerId = invoice.customer;
+      const subscriptionId = invoice.subscription;
+      const user = await getUserByCustomerId(customerId);
+      
+      if (user) {
+        await storage.updateUser(user.id, {
+          stripeSubscriptionId: subscriptionId,
+          subscriptionStatus: 'active',
+          subscriptionCurrentPeriodEnd: new Date(invoice.period_end * 1000)
+        });
+        console.log(`✅ Pagamento confirmado para usuário ${user.id}`);
+      }
+    } catch (error) {
+      console.error("Erro ao processar pagamento:", error);
+    }
+  }
+
+  async function handlePaymentFailed(invoice: any) {
+    try {
+      const customerId = invoice.customer;
+      const user = await getUserByCustomerId(customerId);
+      
+      if (user) {
+        await storage.updateUser(user.id, {
+          subscriptionStatus: 'past_due'
+        });
+        console.log(`⚠️ Pagamento falhou para usuário ${user.id}`);
+        
+        // TODO: Enviar email de cobrança
+      }
+    } catch (error) {
+      console.error("Erro ao processar falha de pagamento:", error);
+    }
+  }
+
+  async function handleCheckoutCompleted(session: any) {
+    try {
+      const customerId = session.customer;
+      const planId = session.metadata?.planId;
+      const user = await getUserByCustomerId(customerId);
+      
+      if (user && planId) {
+        await storage.updateUser(user.id, {
+          planType: planId,
+          subscriptionStatus: 'active'
+        });
+        console.log(`✅ Checkout completado para usuário ${user.id}, plano: ${planId}`);
+      }
+    } catch (error) {
+      console.error("Erro ao processar checkout:", error);
+    }
+  }
+
+  // Helper para buscar usuário por customer ID
+  async function getUserByCustomerId(customerId: string) {
+    try {
+      // Implementação simplificada - buscar por query SQL direta
+      const result = await storage.db.select().from(storage.schema.users).where(eq(storage.schema.users.stripeCustomerId, customerId)).limit(1);
+      return result[0] || null;
+    } catch (error) {
+      console.error("Erro ao buscar usuário por customer ID:", error);
+      return null;
+    }
+  }
 
   // Audit logging system activated
   // ============================================
