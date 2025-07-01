@@ -15,6 +15,19 @@ import {
   notifications,
   venueReservations,
   venueAvailability,
+  subscriptionPlans,
+  userSubscriptions,
+  paymentMethods,
+  transactions,
+  reviewsEnhanced,
+  userReputation,
+  digitalContracts,
+  financialRecords,
+  twoFactorAuth,
+  securityAuditLogs,
+  lgpdRequests,
+  aiMatchingPreferences,
+  chatbotConversations,
   type User, 
   type InsertUser,
   type Event,
@@ -38,7 +51,33 @@ import {
   type VenueReservation,
   type InsertVenueReservation,
   type VenueAvailability,
-  type InsertVenueAvailability
+  type InsertVenueAvailability,
+  type SubscriptionPlan,
+  type InsertSubscriptionPlan,
+  type UserSubscription,
+  type InsertUserSubscription,
+  type PaymentMethod,
+  type InsertPaymentMethod,
+  type Transaction,
+  type InsertTransaction,
+  type ReviewEnhanced,
+  type InsertReviewEnhanced,
+  type UserReputation,
+  type InsertUserReputation,
+  type DigitalContract,
+  type InsertDigitalContract,
+  type FinancialRecord,
+  type InsertFinancialRecord,
+  type TwoFactorAuth,
+  type InsertTwoFactorAuth,
+  type SecurityAuditLog,
+  type InsertSecurityAuditLog,
+  type LgpdRequest,
+  type InsertLgpdRequest,
+  type AiMatchingPreferences,
+  type InsertAiMatchingPreferences,
+  type ChatbotConversation,
+  type InsertChatbotConversation
 } from "@shared/schema";
 
 const client = postgres(process.env.DATABASE_URL!);
@@ -1181,12 +1220,14 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async processLgpdRequest(id: number, status: string): Promise<any> {
+  async processLgpdRequest(id: number, processedBy: number, responseData: string): Promise<any> {
     try {
       // Mock implementation
       return {
         id,
-        status,
+        processedBy,
+        responseData,
+        status: 'processed',
         processedAt: new Date()
       };
     } catch (error) {
@@ -1233,61 +1274,6 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error updating chatbot conversation:", error);
       throw new Error("Failed to update chatbot conversation");
-    }
-  }
-
-  // Venue Management - Métodos faltantes críticos
-  async getVenueById(id: number): Promise<any> {
-    try {
-      const result = await db.select().from(venues).where(eq(venues.id, id));
-      return result[0];
-    } catch (error) {
-      console.error("Error getting venue by ID:", error);
-      return undefined;
-    }
-  }
-
-  async updateVenue(id: number, venueData: Partial<any>): Promise<any> {
-    try {
-      const result = await db
-        .update(venues)
-        .set(venueData)
-        .where(eq(venues.id, id))
-        .returning();
-      
-      if (!result[0]) throw new Error("Venue not found");
-      return result[0];
-    } catch (error) {
-      console.error("Error updating venue:", error);
-      throw new Error("Failed to update venue");
-    }
-  }
-
-  async deleteVenue(id: number): Promise<void> {
-    try {
-      await db.delete(venues).where(eq(venues.id, id));
-    } catch (error) {
-      console.error("Error deleting venue:", error);
-      throw new Error("Failed to delete venue");
-    }
-  }
-
-  // Notifications - Métodos críticos para sistema de notificações
-  async createNotification(notificationData: any): Promise<any> {
-    try {
-      const result = await db.insert(notifications).values({
-        userId: notificationData.userId,
-        title: notificationData.title,
-        message: notificationData.message,
-        type: notificationData.type,
-        metadata: JSON.stringify(notificationData.data || {})
-      }).returning();
-      
-      if (!result[0]) throw new Error("Failed to create notification");
-      return result[0];
-    } catch (error) {
-      console.error("Error creating notification:", error);
-      throw new Error("Failed to create notification");
     }
   }
 
