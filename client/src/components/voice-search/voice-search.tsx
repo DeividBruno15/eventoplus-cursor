@@ -8,13 +8,13 @@ import {
   MicOff, 
   Volume2, 
   VolumeX, 
-  Waveform,
   Search,
   X,
   Settings,
   Languages,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  Clock
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -136,7 +136,7 @@ export default function VoiceSearch({
       let finalTranscript = "";
       let interimTranscript = "";
 
-      for (let i = event.resultIndex; i < event.results.length; i++) {
+      for (let i = event.resultIndex; i < Object.keys(event.results).length; i++) {
         const result = event.results[i];
         const resultTranscript = result[0].transcript;
         const resultConfidence = result[0].confidence;
