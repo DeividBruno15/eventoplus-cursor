@@ -132,6 +132,50 @@ export const venues = pgTable("venues", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Sistema de disponibilidade de venues - CRÍTICO para evitar double-booking
+export const venueAvailability = pgTable("venue_availability", {
+  id: serial("id").primaryKey(),
+  venueId: integer("venue_id").references(() => venues.id).notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  status: varchar("status", { length: 20 }).default("available"), // available, blocked, booked
+  bookingId: integer("booking_id"),
+  reason: text("reason"), // motivo do bloqueio
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Sistema de reservas efetivas - CRÍTICO para controle de ocupação
+export const venueBookings = pgTable("venue_bookings", {
+  id: serial("id").primaryKey(),
+  venueId: integer("venue_id").references(() => venues.id).notNull(),
+  eventId: integer("event_id").references(() => events.id),
+  bookerId: integer("booker_id").references(() => users.id).notNull(),
+  startDatetime: timestamp("start_datetime").notNull(),
+  endDatetime: timestamp("end_datetime").notNull(),
+  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
+  status: varchar("status", { length: 20 }).default("pending"), // pending, confirmed, cancelled, completed
+  paymentStatus: varchar("payment_status", { length: 20 }).default("pending"), // pending, paid, refunded
+  cancellationReason: text("cancellation_reason"),
+  specialRequests: text("special_requests"),
+  contractId: integer("contract_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Sistema de auditoria - MÉDIO mas importante para troubleshooting
+export const auditLogs = pgTable("audit_logs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  action: varchar("action", { length: 100 }).notNull(),
+  resourceType: varchar("resource_type", { length: 50 }),
+  resourceId: integer("resource_id"),
+  oldValues: text("old_values"), // JSON string
+  newValues: text("new_values"), // JSON string
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const chatMessages = pgTable("chat_messages", {
   id: serial("id").primaryKey(),
   senderId: integer("sender_id").references(() => users.id).notNull(),
@@ -211,15 +255,7 @@ export const venueReservations = pgTable("venue_reservations", {
   cancelledAt: timestamp("cancelled_at"),
 });
 
-// Disponibilidade de venues
-export const venueAvailability = pgTable("venue_availability", {
-  id: serial("id").primaryKey(),
-  venueId: integer("venue_id").references(() => venues.id).notNull(),
-  date: timestamp("date").notNull(),
-  available: boolean("available").default(true).notNull(),
-  blockedReason: text("blocked_reason"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+// Disponibilidade de venues removida - substituída por versão mais robusta
 
 // Subscription plans table
 export const subscriptionPlans = pgTable("subscription_plans", {
@@ -600,6 +636,18 @@ export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
 });
 
 export const insertReviewSchema = createInsertSchema(reviews).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Schemas para novas tabelas de correção crítica
+export const insertVenueBookingCriticalSchema = createInsertSchema(venueBookings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAuditLogCriticalSchema = createInsertSchema(auditLogs).omit({
   id: true,
   createdAt: true,
 });
