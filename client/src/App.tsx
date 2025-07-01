@@ -119,7 +119,9 @@ const queryClient = new QueryClient({
 
 function Router() {
   return (
-    <Switch>
+    <ErrorBoundaryEnhanced>
+      <Suspense fallback={<LoadingSpinner text="Carregando página..." />}>
+        <Switch>
       {/* Public Routes - No Layout */}
       <Route path="/" component={Home} />
       <Route path="/auth/login" component={Login} />
@@ -444,7 +446,9 @@ function Router() {
       
       {/* 404 */}
       <Route component={NotFound} />
-    </Switch>
+        </Switch>
+      </Suspense>
+    </ErrorBoundaryEnhanced>
   );
 }
 

@@ -1,4 +1,3 @@
-import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LoadingSpinnerProps {
@@ -9,26 +8,36 @@ interface LoadingSpinnerProps {
 
 export default function LoadingSpinner({ 
   className, 
-  size = "md",
-  text = "Carregando..."
+  size = "md", 
+  text = "Carregando..." 
 }: LoadingSpinnerProps) {
   const sizeClasses = {
-    sm: "h-4 w-4",
-    md: "h-8 w-8", 
-    lg: "h-12 w-12"
+    sm: "w-4 h-4 border-2",
+    md: "w-8 h-8 border-2",
+    lg: "w-12 h-12 border-4"
+  };
+
+  const textSizeClasses = {
+    sm: "text-sm",
+    md: "text-base",
+    lg: "text-lg"
   };
 
   return (
-    <div className={cn(
-      "flex flex-col items-center justify-center gap-2 py-8",
-      className
-    )}>
-      <Loader2 className={cn(
-        "animate-spin text-primary",
-        sizeClasses[size]
-      )} />
+    <div className={cn("flex flex-col items-center justify-center py-8", className)}>
+      <div
+        className={cn(
+          "animate-spin rounded-full border-primary border-t-transparent",
+          sizeClasses[size]
+        )}
+        role="status"
+        aria-label="Loading"
+      />
       {text && (
-        <p className="text-sm text-muted-foreground">
+        <p className={cn(
+          "mt-3 text-muted-foreground font-medium",
+          textSizeClasses[size]
+        )}>
           {text}
         </p>
       )}
