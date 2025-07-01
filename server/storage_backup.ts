@@ -992,54 +992,26 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  // WhatsApp settings - Mock implementation for stability
-  async updateUserWhatsAppSettings(userId: number, data: any): Promise<User> {
-    // Mock implementation - return basic user data
-    return {
-      id: userId,
-      username: 'user',
-      email: 'user@example.com',
-      password: '',
-      emailVerified: true,
-      firstName: null,
-      lastName: null,
-      companyName: null,
-      number: null,
-      cpf: null,
-      cnpj: null,
-      personType: null,
-      cep: null,
-      street: null,
-      neighborhood: null,
-      city: null,
-      state: null,
-      phone: null,
-      userType: 'contratante',
-      profileImage: null,
-      stripeCustomerId: null,
-      subscriptionPlan: 'free',
-      subscriptionStatus: 'active',
-      subscriptionCurrentPeriodEnd: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      whatsappNumber: null,
-      whatsappNotificationsEnabled: false,
-      whatsappNewEventNotifications: false,
-      whatsappNewChatNotifications: false,
-      whatsappVenueReservationNotifications: false,
-      whatsappApplicationNotifications: false,
-      whatsappStatusNotifications: false,
-      emailVerificationToken: null,
-      passwordResetToken: null,
-      passwordResetExpires: null,
-      apiKey: null,
-      apiKeyLastUsed: null,
-      loginAttempts: 0,
-      lockedUntil: null,
-      twoFactorSecret: null,
-      twoFactorEnabled: false,
-      lastLoginAt: null
-    };
+  // WhatsApp settings
+  async updateUserWhatsAppSettings(userId: number, data: {
+    whatsappNumber?: string | null;
+    whatsappNotificationsEnabled?: boolean;
+    whatsappNewEventNotifications?: boolean;
+    whatsappNewChatNotifications?: boolean;
+    whatsappVenueReservationNotifications?: boolean;
+    whatsappApplicationNotifications?: boolean;
+    whatsappStatusNotifications?: boolean;
+  }): Promise<User> {
+    const result = await db.update(users)
+      .set(data)
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error('Usuário não encontrado');
+    }
+    
+    return result[0];
   }
 
   // Event application status management
@@ -1053,21 +1025,16 @@ export class DatabaseStorage implements IStorage {
       updateData.rejectionReason = rejectionReason;
     }
     
-    try {
-      const result = await db.update(eventApplications)
-        .set(updateData)
-        .where(eq(eventApplications.id, applicationId))
-        .returning();
-      
-      if (result.length === 0) {
-        throw new Error('Candidatura não encontrada');
-      }
-      
-      return result[0];
-    } catch (error) {
-      console.error('Error updating application status:', error);
-      throw error;
+    const result = await db.update(eventApplications)
+      .set(updateData)
+      .where(eq(eventApplications.id, applicationId))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error('Candidatura não encontrada');
     }
+    
+    return result[0];
   }
 
   async getEventApplication(id: number): Promise<EventApplication | undefined> {
