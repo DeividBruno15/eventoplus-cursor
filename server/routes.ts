@@ -28,6 +28,7 @@ import {
 import { apiLimiter, authLimiter, createLimiter, webhookLimiter } from "./rateLimiter";
 import { notificationService } from "./notifications";
 import { variableCommissionService } from "./variable-commission";
+import { VenueBookingService } from "./venue-booking-service";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
