@@ -46,6 +46,18 @@ export const users = pgTable("users", {
   whatsappVenueReservationNotifications: boolean("whatsapp_venue_reservation_notifications").default(true),
   whatsappApplicationNotifications: boolean("whatsapp_application_notifications").default(true),
   whatsappStatusNotifications: boolean("whatsapp_status_notifications").default(true),
+  // Missing fields causing TypeScript errors in routes.ts
+  location: text("location"), // For user location updates
+  verified: boolean("verified").default(false), // For user verification status
+  affiliateCode: text("affiliate_code"), // For affiliate program
+  subscriptionPlan: varchar("subscription_plan", { length: 20 }).default("free"),
+  subscriptionStatus: varchar("subscription_status", { length: 20 }).default("active"),
+  subscriptionCurrentPeriodEnd: timestamp("subscription_current_period_end"),
+  passwordResetExpires: timestamp("password_reset_expires"),
+  loginAttempts: integer("login_attempts").default(0),
+  lockedUntil: timestamp("locked_until"),
+  lastLoginAt: timestamp("last_login_at"),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -60,6 +72,7 @@ export const events = pgTable("events", {
   guestCount: integer("guest_count"),
   organizerId: integer("organizer_id").references(() => users.id).notNull(),
   status: varchar("status", { length: 20 }).default("active"), // active, closed, cancelled
+  serviceTypes: text("service_types").array(), // Array of required service types
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
