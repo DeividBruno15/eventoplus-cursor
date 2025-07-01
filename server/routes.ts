@@ -1768,6 +1768,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint de diagnóstico para testar aplicação
+  app.post("/api/debug/event-application", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+    
+    try {
+      const rawData = {
+        eventId: 4,
+        providerId: (req.user as any).id,
+        proposal: "Teste de diagnóstico",
+        price: "1000.00"
+      };
+      
+      console.log('🔍 DEBUG: Dados originais:', JSON.stringify(rawData, null, 2));
+      
+      // Teste direto no banco usando storage
+      const result = await storage.createEventApplication(rawData);
+      
+      res.json({ success: true, result });
+    } catch (error: any) {
+      console.error('🚨 DEBUG ERROR:', error);
+      res.status(400).json({ error: error.message, stack: error.stack });
+    }
+  });
+
   app.post("/api/events/:eventId/apply", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Não autenticado" });
@@ -1776,6 +1802,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const eventId = parseInt(req.params.eventId);
       const userId = (req.user as any).id;
+      
+      console.log('🔍 APPLY: Iniciando aplicação para evento', eventId, 'usuário', userId);
       
       // Verificar se o usuário não é o organizador do evento
       const event = await storage.getEvent(eventId);
@@ -1788,38 +1816,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Verificar se já existe candidatura deste prestador para este evento
-      const existingApplications = await storage.getEventApplications();
-      const hasAlreadyApplied = existingApplications.some((app: any) => app.eventId === eventId && app.providerId === userId);
+      const existingApplications = await storage.getEventApplications(eventId);
+      const hasAlreadyApplied = existingApplications.some((app: any) => app.providerId === userId);
       
       if (hasAlreadyApplied) {
         return res.status(400).json({ message: "Você já se candidatou a este evento" });
       }
       
-      console.log('Dados recebidos:', req.body);
-      console.log('EventId:', eventId);
-      console.log('ProviderId:', userId);
-      
-      // Dados preparados antes da validação
-      const dataToValidate = {
-        ...req.body,
-        eventId,
+      // Preparar dados simples
+      const applicationData = {
+        eventId: eventId,
         providerId: userId,
+        proposal: req.body.proposal || req.body.message || "Proposta de serviço",
+        price: String(req.body.price || req.body.proposedPrice || "0")
       };
       
-      console.log('Dados preparados para validação:', JSON.stringify(dataToValidate, null, 2));
+      console.log('🔍 APPLY: Dados preparados:', JSON.stringify(applicationData, null, 2));
       
-      // Verificar se algum campo tem valor undefined
-      Object.entries(dataToValidate).forEach(([key, value]) => {
-        if (value === undefined) {
-          console.log(`⚠️  Campo com valor undefined: ${key}`);
-        }
-      });
-      
-      const validatedData = insertEventApplicationSchema.parse(dataToValidate);
-      
-      console.log('Dados validados:', JSON.stringify(validatedData, null, 2));
-      
-      const application = await storage.createEventApplication(validatedData);
+      const application = await storage.createEventApplication(applicationData);
       
       // Notificar organizador do evento via n8n
       try {
