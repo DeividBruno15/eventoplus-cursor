@@ -796,32 +796,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Notifications
-  async getNotifications(userId: number): Promise<Notification[]> {
-    return await db
-      .select()
-      .from(notifications)
-      .where(eq(notifications.userId, userId))
-      .orderBy(desc(notifications.createdAt));
-  }
-
   async createNotification(notificationData: InsertNotification): Promise<Notification> {
     const result = await db.insert(notifications).values(notificationData).returning();
     if (!result[0]) throw new Error("Failed to create notification");
     return result[0];
-  }
-
-  async markNotificationRead(id: number): Promise<void> {
-    await db
-      .update(notifications)
-      .set({ read: true })
-      .where(eq(notifications.id, id));
-  }
-
-  async markAllNotificationsRead(userId: number): Promise<void> {
-    await db
-      .update(notifications)
-      .set({ read: true })
-      .where(eq(notifications.userId, userId));
   }
 
   // Profile updates
@@ -1237,7 +1215,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Chatbot Conversation - Métodos para IA
-  async getChatbotConversation(userId: number): Promise<any> {
+  async getChatbotConversation(sessionId: string): Promise<any> {
     try {
       // Mock implementation - substituir por tabela chatbot_conversations quando disponível
       return null;
@@ -1289,6 +1267,164 @@ export class DatabaseStorage implements IStorage {
       console.error("Error getting notifications:", error);
       return [];
     }
+  }
+
+  // Subscription Plans - Mock implementations for stability
+  async getSubscriptionPlans(): Promise<any[]> {
+    return [
+      { id: 1, name: 'Free', price: 0, features: ['Basic features'] },
+      { id: 2, name: 'Pro', price: 29.99, features: ['Advanced features'] },
+      { id: 3, name: 'Premium', price: 99.99, features: ['All features'] }
+    ];
+  }
+
+  async createSubscriptionPlan(plan: any): Promise<any> {
+    return { id: Math.floor(Math.random() * 1000), ...plan };
+  }
+
+  async updateSubscriptionPlan(id: number, plan: any): Promise<any> {
+    return { id, ...plan };
+  }
+
+  async getUserSubscription(userId: number): Promise<any> {
+    return { userId, planId: 1, status: 'active' };
+  }
+
+  async createUserSubscription(subscription: any): Promise<any> {
+    return { id: Math.floor(Math.random() * 1000), ...subscription };
+  }
+
+  async updateUserSubscription(id: number, subscription: any): Promise<any> {
+    return { id, ...subscription };
+  }
+
+  // Payment Methods - Mock implementations
+  async getPaymentMethods(userId: number): Promise<any[]> {
+    return [];
+  }
+
+  async createPaymentMethod(method: any): Promise<any> {
+    return { id: Math.floor(Math.random() * 1000), ...method };
+  }
+
+  async updatePaymentMethod(id: number, method: any): Promise<any> {
+    return { id, ...method };
+  }
+
+  async deletePaymentMethod(id: number): Promise<void> {
+    // Mock implementation
+  }
+
+  // Transactions - Mock implementations
+  async getTransactions(userId: number): Promise<any[]> {
+    return [];
+  }
+
+  async createTransaction(transaction: any): Promise<any> {
+    return { id: Math.floor(Math.random() * 1000), ...transaction };
+  }
+
+  async updateTransaction(id: number, transaction: any): Promise<any> {
+    return { id, ...transaction };
+  }
+
+  // Enhanced Reviews - Mock implementations
+  async getReviewsEnhanced(reviewedId: number): Promise<any[]> {
+    return [];
+  }
+
+  async createReviewEnhanced(review: any): Promise<any> {
+    return { id: Math.floor(Math.random() * 1000), ...review };
+  }
+
+  async updateReviewEnhanced(id: number, review: any): Promise<any> {
+    return { id, ...review };
+  }
+
+  async deleteReviewEnhanced(id: number): Promise<void> {
+    // Mock implementation
+  }
+
+  async moderateReviewEnhanced(id: number, status: string, notes?: string): Promise<any> {
+    return { id, status, moderationNotes: notes };
+  }
+
+  // User Reputation - Mock implementations
+  async getUserReputation(userId: number): Promise<any> {
+    return { userId, overallRating: 4.5, totalReviews: 10 };
+  }
+
+  async updateUserReputation(userId: number, reputation: any): Promise<any> {
+    return { userId, ...reputation };
+  }
+
+  async calculateUserReputation(userId: number): Promise<any> {
+    return { userId, overallRating: 4.5, totalReviews: 10 };
+  }
+
+  // Digital Contracts - Mock implementations
+  async getDigitalContracts(userId: number): Promise<any[]> {
+    return [];
+  }
+
+  async getDigitalContract(id: number): Promise<any> {
+    return { id, status: 'draft' };
+  }
+
+  async createDigitalContract(contract: any): Promise<any> {
+    return { id: Math.floor(Math.random() * 1000), ...contract };
+  }
+
+  async updateDigitalContract(id: number, contract: any): Promise<any> {
+    return { id, ...contract };
+  }
+
+  async signDigitalContract(id: number, userId: number, signature: string): Promise<any> {
+    return { id, signed: true, signedAt: new Date() };
+  }
+
+  // Financial Records - Mock implementations
+  async getFinancialRecords(userId: number): Promise<any[]> {
+    return [];
+  }
+
+  async createFinancialRecord(record: any): Promise<any> {
+    return { id: Math.floor(Math.random() * 1000), ...record };
+  }
+
+  async updateFinancialRecord(id: number, record: any): Promise<any> {
+    return { id, ...record };
+  }
+
+  // Two Factor Auth - Mock implementations
+  async getTwoFactorAuth(userId: number): Promise<any> {
+    return { userId, enabled: false };
+  }
+
+  async createTwoFactorAuth(auth: any): Promise<any> {
+    return { id: Math.floor(Math.random() * 1000), ...auth };
+  }
+
+  async updateTwoFactorAuth(id: number, auth: any): Promise<any> {
+    return { id, ...auth };
+  }
+
+  async deleteTwoFactorAuth(id: number): Promise<void> {
+    // Mock implementation
+  }
+
+  // Security Audit Logs - Mock implementations
+  async createSecurityAuditLog(log: any): Promise<any> {
+    return { id: Math.floor(Math.random() * 1000), ...log };
+  }
+
+  // AI Matching Preferences - Mock implementations
+  async getAiMatchingPreferences(userId: number): Promise<any> {
+    return { userId, preferences: {} };
+  }
+
+  async updateAiMatchingPreferences(userId: number, preferences: any): Promise<any> {
+    return { userId, ...preferences };
   }
 
   async markNotificationRead(id: number): Promise<void> {
