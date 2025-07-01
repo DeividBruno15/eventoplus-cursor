@@ -131,7 +131,7 @@
 
   /* Modern Stat Cards - Inspired by Linear */
   .saas-stat-card {
-    @apply saas-card p-4 hover:border-primary transition-all duration-200 group;
+    @apply saas-card p-4 hover:border-primary transition-all duration-200;
   }
   
   .saas-metric {

@@ -24,7 +24,7 @@ import EmailDemo from "@/pages/test/email-demo";
 
 // Protected Pages
 import Dashboard from "@/pages/dashboard/dashboard-modern";
-import Events from "@/pages/events/events";
+import Events from "@/pages/events/events-modern";
 import CreateEvent from "@/pages/events/create-event";
 import EventDetail from "@/pages/events/event-detail";
 import EventDetails from "@/pages/events/event-details";
@@ -32,7 +32,7 @@ import ManageServices from "@/pages/services/manage-services";
 import ManageVenues from "@/pages/venues/manage-venues";
 import CreateVenue from "@/pages/venues/create-venue";
 import ManageSubscription from "@/pages/subscription/manage-subscription";
-import Chat from "@/pages/chat";
+import Chat from "@/pages/chat-modern";
 import Services from "@/pages/services/index";
 import Venues from "@/pages/venues/index";
 import Analytics from "@/pages/analytics";
