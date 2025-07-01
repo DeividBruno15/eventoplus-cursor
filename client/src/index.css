@@ -2,6 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  /* Mobile-First Touch Targets - Mínimo 44px conforme guidelines */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .touch-target-lg {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  
+  /* Espaçamento adequado entre elementos clicáveis */
+  .touch-spacing {
+    gap: 8px;
+  }
+  
+  /* Loading skeleton aprimorado */
+  .skeleton-enhanced {
+    @apply animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200;
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  /* Melhores hovers para touch devices */
+  @media (hover: hover) {
+    .hover-enhanced:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
+    }
+  }
+  
+  /* Focus states mais visíveis */
+  .focus-enhanced:focus {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
