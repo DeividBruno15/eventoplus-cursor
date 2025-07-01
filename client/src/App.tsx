@@ -3,51 +3,72 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import Layout from "@/components/layout/layout";
+import { lazy, Suspense } from "react";
+import LoadingSpinner from "@/components/ui/loading-spinner";
+import ErrorBoundaryEnhanced from "@/components/error-boundary-enhanced";
 
-// Public Pages
+// Critical public pages (loaded immediately)
 import Home from "@/pages/home-clickmax";
 import Login from "@/pages/auth/login";
-import RegisterStep1 from "@/pages/auth/register-step1";
-import RegisterStep2 from "@/pages/auth/register-step2";
-import RegisterStep3 from "@/pages/auth/register-step3";
-import EmailSent from "@/pages/auth/email-sent";
-import VerifyEmail from "@/pages/auth/verify-email";
-import EmailNotVerified from "@/pages/auth/email-not-verified";
-import ForgotPassword from "@/pages/auth/forgot-password";
-import ResetPassword from "@/pages/auth/reset-password";
-import SelectUserType from "@/pages/auth/select-user-type";
-import Pricing from "@/pages/pricing";
-import ComoFunciona from "@/pages/como-funciona";
-import QuemSomos from "@/pages/quem-somos";
-import Contato from "@/pages/contato";
-import EmailDemo from "@/pages/test/email-demo";
 
-// Protected Pages
-import Dashboard from "@/pages/dashboard/dashboard-clean";
-import Events from "@/pages/events/events";
-import CreateEvent from "@/pages/events/create-event";
-import EventDetail from "@/pages/events/event-detail";
-import EventDetails from "@/pages/events/event-details";
-import ManageServices from "@/pages/services/manage-services";
-import ManageVenues from "@/pages/venues/manage-venues";
-import CreateVenue from "@/pages/venues/create-venue";
-import ManageSubscription from "@/pages/subscription/manage-subscription";
-import Chat from "@/pages/chat";
-import Services from "@/pages/services/index";
-import Venues from "@/pages/venues/index";
-import Analytics from "@/pages/analytics";
-import Subscribe from "@/pages/subscribe";
-import SubscriptionManagement from "@/pages/subscription-management-simple";
-import Profile from "@/pages/profile";
-import Settings from "@/pages/settings";
-import SearchPage from "@/pages/search";
-import Cart from "@/pages/cart";
-import Contracts from "@/pages/contracts";
-import APIDocs from "@/pages/api-docs";
-import TwoFactor from "@/pages/two-factor";
-import Agenda from "@/pages/agenda";
-import HelpCenter from "@/pages/help-center";
-import Support from "@/pages/support";
+// Lazy loaded public pages
+const RegisterStep1 = lazy(() => import("@/pages/auth/register-step1"));
+const RegisterStep2 = lazy(() => import("@/pages/auth/register-step2"));
+const RegisterStep3 = lazy(() => import("@/pages/auth/register-step3"));
+const EmailSent = lazy(() => import("@/pages/auth/email-sent"));
+const VerifyEmail = lazy(() => import("@/pages/auth/verify-email"));
+const EmailNotVerified = lazy(() => import("@/pages/auth/email-not-verified"));
+const ForgotPassword = lazy(() => import("@/pages/auth/forgot-password"));
+const ResetPassword = lazy(() => import("@/pages/auth/reset-password"));
+const SelectUserType = lazy(() => import("@/pages/auth/select-user-type"));
+const Pricing = lazy(() => import("@/pages/pricing"));
+const ComoFunciona = lazy(() => import("@/pages/como-funciona"));
+const QuemSomos = lazy(() => import("@/pages/quem-somos"));
+const Contato = lazy(() => import("@/pages/contato"));
+const EmailDemo = lazy(() => import("@/pages/test/email-demo"));
+
+// Lazy loaded protected pages (grouped by feature)
+const Dashboard = lazy(() => import("@/pages/dashboard/dashboard-clean"));
+
+// Events module
+const Events = lazy(() => import("@/pages/events/events"));
+const CreateEvent = lazy(() => import("@/pages/events/create-event"));
+const EventDetail = lazy(() => import("@/pages/events/event-detail"));
+const EventDetails = lazy(() => import("@/pages/events/event-details"));
+
+// Services module
+const ManageServices = lazy(() => import("@/pages/services/manage-services"));
+const Services = lazy(() => import("@/pages/services/index"));
+
+// Venues module
+const ManageVenues = lazy(() => import("@/pages/venues/manage-venues"));
+const CreateVenue = lazy(() => import("@/pages/venues/create-venue"));
+const Venues = lazy(() => import("@/pages/venues/index"));
+
+// Chat and Communication
+const Chat = lazy(() => import("@/pages/chat"));
+
+// Analytics and Business Intelligence
+const Analytics = lazy(() => import("@/pages/analytics"));
+
+// Subscription and Payments
+const ManageSubscription = lazy(() => import("@/pages/subscription/manage-subscription"));
+const Subscribe = lazy(() => import("@/pages/subscribe"));
+const SubscriptionManagement = lazy(() => import("@/pages/subscription-management-simple"));
+
+// User Management
+const Profile = lazy(() => import("@/pages/profile"));
+const Settings = lazy(() => import("@/pages/settings"));
+const TwoFactor = lazy(() => import("@/pages/two-factor"));
+
+// Additional Features
+const SearchPage = lazy(() => import("@/pages/search"));
+const Cart = lazy(() => import("@/pages/cart"));
+const Contracts = lazy(() => import("@/pages/contracts"));
+const APIDocs = lazy(() => import("@/pages/api-docs"));
+const Agenda = lazy(() => import("@/pages/agenda"));
+const HelpCenter = lazy(() => import("@/pages/help-center"));
+const Support = lazy(() => import("@/pages/support"));
 import NotificationsPage from "@/pages/notifications";
 import AdvertiserAnalytics from "@/pages/analytics-advertiser";
 import AuthGuard from "@/components/auth/auth-guard";
