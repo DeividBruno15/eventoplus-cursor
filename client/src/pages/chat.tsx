@@ -42,40 +42,63 @@ export default function ModernChat() {
   useEffect(() => {
     if (!user) return;
 
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
-    const ws = new WebSocket(wsUrl);
+    // Configuração robusta para WebSocket em diferentes ambientes
+    const isHttps = window.location.protocol === "https:";
+    const protocol = isHttps ? "wss:" : "ws:";
+    const host = window.location.hostname;
+    
+    // Lógica especial para Replit que usa porta 5000 em desenvolvimento
+    let wsUrl: string;
+    if (host.includes('.replit.dev') || host.includes('.replit.app')) {
+      // Ambiente Replit - usar a mesma URL base
+      wsUrl = `${protocol}//${window.location.host}/ws`;
+    } else {
+      // Ambiente local ou produção
+      const port = window.location.port || (isHttps ? "443" : "80");
+      wsUrl = `${protocol}//${host}:${port}/ws`;
+    }
+    
+    console.log("Connecting to WebSocket:", wsUrl);
+    
+    try {
+      const ws = new WebSocket(wsUrl);
 
-    ws.onopen = () => {
-      console.log("Connected to WebSocket");
-      setSocket(ws);
-    };
+      ws.onopen = () => {
+        console.log("Connected to WebSocket");
+        setSocket(ws);
+      };
 
-    ws.onmessage = (event) => {
-      try {
-        const message = JSON.parse(event.data);
-        if (message.type === 'chat_message') {
-          // Atualizar mensagens em tempo real
-          queryClient.invalidateQueries({ queryKey: ["/api/chat/messages"] });
-          queryClient.invalidateQueries({ queryKey: ["/api/chat/contacts"] });
+      ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          if (message.type === 'chat_message') {
+            // Atualizar mensagens em tempo real
+            queryClient.invalidateQueries({ queryKey: ["/api/chat/messages"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/chat/contacts"] });
+          }
+        } catch (error) {
+          console.error("Error parsing WebSocket message:", error);
         }
-      } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
-      }
-    };
+      };
 
-    ws.onclose = () => {
-      console.log("Disconnected from WebSocket");
-      setSocket(null);
-    };
+      ws.onclose = () => {
+        console.log("Disconnected from WebSocket");
+        setSocket(null);
+      };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        setSocket(null);
+      };
 
-    return () => {
-      ws.close();
-    };
+      return () => {
+        ws.close();
+      };
+      
+    } catch (error) {
+      console.error("Failed to create WebSocket connection:", error);
+      // Graceful fallback - chat ainda funciona sem WebSocket
+    }
   }, [user, queryClient]);
 
   // Buscar contatos de chat
