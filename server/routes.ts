@@ -2844,11 +2844,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const filteredVenues = venues.filter(venue => {
           if (q && !venue.name.toLowerCase().includes((q as string).toLowerCase()) && 
                   !venue.description.toLowerCase().includes((q as string).toLowerCase())) return false;
-          if (category && venue.venueType !== category) return false;
-          if (location && !venue.address.toLowerCase().includes((location as string).toLowerCase())) return false;
-          if (minPrice && venue.basePrice && parseFloat(venue.basePrice) < parseFloat(minPrice as string)) return false;
-          if (maxPrice && venue.basePrice && parseFloat(venue.basePrice) > parseFloat(maxPrice as string)) return false;
-          if (rating && venue.rating && parseFloat(venue.rating) < parseFloat(rating as string)) return false;
+          if (category && venue.category !== category) return false;
+          if (location && !venue.location.toLowerCase().includes((location as string).toLowerCase())) return false;
+          // TODO: Implementar campos basePrice e rating no schema venues
+          // if (minPrice && venue.basePrice && parseFloat(venue.basePrice) < parseFloat(minPrice as string)) return false;
+          // if (maxPrice && venue.basePrice && parseFloat(venue.basePrice) > parseFloat(maxPrice as string)) return false;
+          // if (rating && venue.rating && parseFloat(venue.rating) < parseFloat(rating as string)) return false;
           return true;
         });
         
@@ -2911,9 +2912,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If approved, create contract
       if (status === 'approved' && contractTerms) {
         const contract = await storage.createContract({
-          eventId: application.eventId,
           providerId: application.providerId,
-          organizerId: user.id,
+          clientId: user.id,
           terms: contractTerms,
           amount: application.price,
           status: 'pending_signature'
@@ -2933,7 +2933,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         type: 'application_status',
         title: `Candidatura ${statusText}`,
         message: `Sua candidatura para "${event?.title}" foi ${statusText}`,
-        metadata: JSON.stringify({ eventId: application.eventId, applicationId, status })
       });
 
       res.json(updatedApplication);
@@ -2969,9 +2968,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If approved, create contract
       if (status === 'approved' && contractTerms) {
         const contract = await storage.createContract({
-          eventId: application.eventId,
           providerId: application.providerId,
-          organizerId: user.id,
+          clientId: user.id,
           terms: contractTerms,
           amount: application.price,
           status: 'pending_signature'
@@ -2991,7 +2989,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         type: 'application_status',
         title: `Candidatura ${statusText}`,
         message: `Sua candidatura para "${event?.title}" foi ${statusText}`,
-        metadata: JSON.stringify({ eventId: application.eventId, applicationId, status })
       });
 
       res.json(updatedApplication);
