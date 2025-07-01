@@ -29,6 +29,8 @@ import {
 import { apiLimiter, authLimiter, createLimiter, webhookLimiter } from "./rateLimiter";
 import { notificationService } from "./notifications";
 import { whatsappService as newWhatsappService } from "./whatsapp-service";
+import { advancedAnalyticsService } from "./advanced-analytics";
+import { healthMonitoringService } from "./health-monitoring";
 import { variableCommissionService } from "./variable-commission";
 
 
@@ -4329,6 +4331,286 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         error: "Erro no teste", 
         message: error.message 
+      });
+    }
+  });
+
+  // ============================================
+  // ADVANCED ANALYTICS & MONITORING - CRÍTICO
+  // ============================================
+
+  // Métricas principais da plataforma
+  app.get("/api/analytics/platform-metrics", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const metrics = await advancedAnalyticsService.getPlatformMetrics();
+      res.json({
+        success: true,
+        data: metrics,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Erro ao obter métricas:", error);
+      res.status(500).json({ 
+        error: "Erro ao processar métricas",
+        message: error.message 
+      });
+    }
+  });
+
+  // Insights de performance com IA
+  app.get("/api/analytics/performance-insights", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const insights = await advancedAnalyticsService.generatePerformanceInsights();
+      res.json({
+        success: true,
+        data: insights,
+        count: insights.length,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Erro ao gerar insights:", error);
+      res.status(500).json({ 
+        error: "Erro ao gerar insights",
+        message: error.message 
+      });
+    }
+  });
+
+  // Alertas em tempo real
+  app.get("/api/analytics/realtime-alerts", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const activeAlerts = advancedAnalyticsService.getActiveAlerts();
+      const newAlerts = await advancedAnalyticsService.checkForAlerts();
+      
+      res.json({
+        success: true,
+        data: {
+          active: activeAlerts,
+          new: newAlerts,
+          total: activeAlerts.length + newAlerts.length
+        },
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Erro ao obter alertas:", error);
+      res.status(500).json({ 
+        error: "Erro ao processar alertas",
+        message: error.message 
+      });
+    }
+  });
+
+  // Relatório executivo
+  app.get("/api/analytics/executive-report", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const report = await advancedAnalyticsService.generateExecutiveReport();
+      res.json({
+        success: true,
+        data: report,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Erro ao gerar relatório:", error);
+      res.status(500).json({ 
+        error: "Erro ao gerar relatório executivo",
+        message: error.message 
+      });
+    }
+  });
+
+  // Resolver alerta
+  app.post("/api/analytics/resolve-alert/:alertId", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const { alertId } = req.params;
+      const resolved = advancedAnalyticsService.resolveAlert(alertId);
+      
+      res.json({
+        success: resolved,
+        message: resolved ? 'Alerta resolvido com sucesso' : 'Alerta não encontrado',
+        alertId
+      });
+    } catch (error: any) {
+      console.error("Erro ao resolver alerta:", error);
+      res.status(500).json({ 
+        error: "Erro ao resolver alerta",
+        message: error.message 
+      });
+    }
+  });
+
+  // ============================================
+  // HEALTH MONITORING & SYSTEM ALERTS - CRÍTICO
+  // ============================================
+
+  // Status geral do sistema
+  app.get("/api/health/system-status", async (req, res) => {
+    try {
+      const systemStatus = healthMonitoringService.getSystemStatus();
+      res.json({
+        success: true,
+        data: systemStatus,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Erro ao obter status do sistema:", error);
+      res.status(500).json({ 
+        error: "Erro ao processar status do sistema",
+        message: error.message 
+      });
+    }
+  });
+
+  // Health checks detalhados
+  app.get("/api/health/checks", async (req, res) => {
+    try {
+      const healthChecks = await healthMonitoringService.performHealthChecks();
+      res.json({
+        success: true,
+        data: healthChecks,
+        count: healthChecks.length,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Erro ao executar health checks:", error);
+      res.status(500).json({ 
+        error: "Erro ao executar health checks",
+        message: error.message 
+      });
+    }
+  });
+
+  // Alertas do sistema
+  app.get("/api/health/alerts", async (req, res) => {
+    try {
+      const { severity } = req.query;
+      
+      let alerts;
+      if (severity && typeof severity === 'string') {
+        alerts = healthMonitoringService.getAlertsBySeverity(severity as any);
+      } else {
+        const systemStatus = healthMonitoringService.getSystemStatus();
+        alerts = systemStatus.alerts;
+      }
+
+      res.json({
+        success: true,
+        data: alerts,
+        count: alerts.length,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Erro ao obter alertas:", error);
+      res.status(500).json({ 
+        error: "Erro ao processar alertas",
+        message: error.message 
+      });
+    }
+  });
+
+  // Estatísticas de uptime
+  app.get("/api/health/uptime", async (req, res) => {
+    try {
+      const uptimeStats = healthMonitoringService.getUptimeStats();
+      res.json({
+        success: true,
+        data: uptimeStats,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Erro ao obter estatísticas de uptime:", error);
+      res.status(500).json({ 
+        error: "Erro ao processar estatísticas de uptime",
+        message: error.message 
+      });
+    }
+  });
+
+  // Health check específico
+  app.get("/api/health/check/:service", async (req, res) => {
+    try {
+      const { service } = req.params;
+      const healthCheck = healthMonitoringService.getHealthCheck(service);
+      
+      if (!healthCheck) {
+        return res.status(404).json({
+          success: false,
+          error: "Serviço não encontrado",
+          service
+        });
+      }
+
+      res.json({
+        success: true,
+        data: healthCheck,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Erro ao obter health check específico:", error);
+      res.status(500).json({ 
+        error: "Erro ao processar health check",
+        message: error.message 
+      });
+    }
+  });
+
+  // Resolver alerta
+  app.post("/api/health/resolve-alert/:alertId", async (req, res) => {
+    try {
+      const { alertId } = req.params;
+      const resolved = healthMonitoringService.resolveAlert(alertId);
+      
+      res.json({
+        success: resolved,
+        message: resolved ? 'Alerta resolvido com sucesso' : 'Alerta não encontrado',
+        alertId
+      });
+    } catch (error: any) {
+      console.error("Erro ao resolver alerta de saúde:", error);
+      res.status(500).json({ 
+        error: "Erro ao resolver alerta",
+        message: error.message 
+      });
+    }
+  });
+
+  // Endpoint público de health check (para load balancers)
+  app.get("/health", async (req, res) => {
+    try {
+      const systemStatus = healthMonitoringService.getSystemStatus();
+      const statusCode = systemStatus.status === 'critical' ? 503 : 200;
+      
+      res.status(statusCode).json({
+        status: systemStatus.status,
+        uptime: systemStatus.uptime,
+        timestamp: systemStatus.lastUpdate,
+        services: systemStatus.services.length,
+        criticalAlerts: systemStatus.alerts.filter(a => a.severity === 'critical').length
+      });
+    } catch (error: any) {
+      res.status(503).json({
+        status: 'critical',
+        error: error.message,
+        timestamp: new Date().toISOString()
       });
     }
   });
