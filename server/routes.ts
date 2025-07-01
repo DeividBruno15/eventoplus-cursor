@@ -1622,6 +1622,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get events by user (contratante events)
+  app.get("/api/events/user", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const events = await storage.getEventsByOrganizer(userId);
+      res.json(events);
+    } catch (error: any) {
+      console.error("Error getting user events:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Get specific event by ID (COM TIMEOUT OTIMIZADO)
   app.get("/api/events/:id", async (req, res) => {
     if (!req.isAuthenticated()) {
