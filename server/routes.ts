@@ -28,6 +28,7 @@ import {
 } from "@shared/schema";
 import { apiLimiter, authLimiter, createLimiter, webhookLimiter } from "./rateLimiter";
 import { notificationService } from "./notifications";
+import { whatsappService as newWhatsappService } from "./whatsapp-service";
 import { variableCommissionService } from "./variable-commission";
 
 
