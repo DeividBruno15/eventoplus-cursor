@@ -986,7 +986,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get user venues endpoint
+  // Get venues by user (must come before generic /api/venues route)
+  app.get("/api/venues/user", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const userId = (req.user as any).id;
+      const venues = await storage.getVenues();
+      // Filter venues by owner
+      const userVenues = venues.filter(venue => venue.ownerId === userId);
+      res.json(userVenues);
+    } catch (error: any) {
+      console.error("Error getting user venues:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   app.get("/api/venues", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Não autenticado" });
