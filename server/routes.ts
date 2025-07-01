@@ -4258,5 +4258,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Audit logging system activated
   // ============================================
 
+  // ============================================
+  // WHATSAPP INTEGRATION & DIAGNOSTICS - CRÍTICO
+  // ============================================
+
+  // Endpoint de diagnóstico WhatsApp/n8n
+  app.get("/api/diagnostics/whatsapp", async (req, res) => {
+    try {
+      // Teste de conectividade n8n
+      const connectionTest = await newWhatsappService.testConnection();
+      
+      // Estatísticas de usuários WhatsApp
+      const stats = await newWhatsappService.getWhatsAppStats();
+      
+      const diagnostics = {
+        service: {
+          status: newWhatsappService['isEnabled'] ? 'enabled' : 'disabled',
+          webhookConfigured: !!process.env.N8N_WEBHOOK_URL,
+          webhookUrl: process.env.N8N_WEBHOOK_URL ? 
+            process.env.N8N_WEBHOOK_URL.substring(0, 50) + '...' : 'not_configured'
+        },
+        connectivity: connectionTest,
+        userStats: stats || {
+          totalUsers: 0,
+          usersWithWhatsapp: 0,
+          usersWithNotificationsEnabled: 0,
+          coverage: 0,
+          optInRate: 0
+        },
+        timestamp: new Date().toISOString()
+      };
+
+      res.json(diagnostics);
+    } catch (error: any) {
+      console.error("Erro no diagnóstico WhatsApp:", error);
+      res.status(500).json({ 
+        error: "Erro interno no diagnóstico", 
+        message: error.message 
+      });
+    }
+  });
+
+  // Endpoint para testar envio de notificação WhatsApp
+  app.post("/api/test/whatsapp-notification", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const user = req.user as any;
+      const { type = 'test', message = 'Teste de notificação WhatsApp' } = req.body;
+      
+      const result = await newWhatsappService.sendNotification({
+        type: 'new_chat',
+        userId: user.id,
+        title: 'Teste de Notificação',
+        message: message,
+        data: { testMode: true }
+      });
+
+      res.json({
+        success: result,
+        message: result ? 'Notificação enviada com sucesso' : 'Falha ao enviar notificação',
+        userId: user.id,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error: any) {
+      console.error("Erro no teste de notificação:", error);
+      res.status(500).json({ 
+        error: "Erro no teste", 
+        message: error.message 
+      });
+    }
+  });
+
   return httpServer;
 }
