@@ -20,28 +20,14 @@ import {
   Building,
   Settings,
   MessageSquare,
-  Search,
-  PlusCircle,
   BarChart3,
-  Bell,
-  HelpCircle,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
   User,
   LogOut,
   CreditCard,
-  Shield,
-  Briefcase,
-  Star,
-  ShoppingCart,
-  FileText,
-  Activity,
-  Zap,
-  Brain,
-  Percent,
-  Split,
-  Key
+  Briefcase
 } from "lucide-react";
 import eventoLogo from "@assets/logo evennto_1750165135991.png";
 
@@ -85,7 +71,6 @@ export default function SidebarModern({
         items: [
           { label: "Dashboard", href: "/dashboard", icon: Home },
           { label: "Mensagens", href: "/chat", icon: MessageSquare },
-          { label: "Buscar", href: "/search", icon: Search },
           { label: "Agenda", href: "/agenda", icon: Calendar },
         ]
       }
@@ -97,8 +82,8 @@ export default function SidebarModern({
           section: "Serviços",
           items: [
             { label: "Meus Serviços", href: "/services/manage", icon: Briefcase },
-            { label: "Novo Serviço", href: "/services/create", icon: PlusCircle },
             { label: "Eventos", href: "/events", icon: Calendar },
+            { label: "Analytics", href: "/analytics", icon: BarChart3 },
           ]
         }
       ],
@@ -107,8 +92,8 @@ export default function SidebarModern({
           section: "Eventos",
           items: [
             { label: "Meus Eventos", href: "/events", icon: Calendar },
-            { label: "Criar Evento", href: "/events/create", icon: PlusCircle },
             { label: "Prestadores", href: "/services", icon: Users },
+            { label: "Analytics", href: "/analytics", icon: BarChart3 },
           ]
         }
       ],
@@ -117,53 +102,19 @@ export default function SidebarModern({
           section: "Espaços",
           items: [
             { label: "Meus Espaços", href: "/venues/manage", icon: Building },
-            { label: "Novo Espaço", href: "/venues/create", icon: PlusCircle },
             { label: "Locais", href: "/venues", icon: Building },
+            { label: "Analytics", href: "/analytics", icon: BarChart3 },
           ]
         }
       ]
     };
 
-    const analyticsSection = [
-      {
-        section: "Analytics",
-        items: [
-          { label: "Analytics", href: "/analytics", icon: BarChart3 },
-          { label: "Recomendações IA", href: "/ai-recommendations", icon: Brain },
-        ]
-      }
-    ];
-
-    const businessSection = [
-      {
-        section: "Negócios",
-        items: [
-          { label: "Split Payments", href: "/split-payments", icon: Split },
-          { label: "Comissões Variáveis", href: "/variable-commissions", icon: Percent },
-          { label: "API Pública", href: "/api-management", icon: Key },
-        ]
-      }
-    ];
-
     const otherSections = [
       {
-        section: "Outros",
+        section: "Configurações",
         items: [
-          { label: "Avaliações", href: "/reviews", icon: Star },
-          { label: "Carrinho", href: "/cart", icon: ShoppingCart },
-          { label: "Contratos", href: "/contracts", icon: FileText },
+          { label: "Perfil", href: "/profile", icon: User },
           { label: "Assinatura", href: "/subscription", icon: CreditCard },
-          { label: "Autenticação 2FA", href: "/two-factor", icon: Shield },
-          { label: "PIX Payment", href: "/pix-payment", icon: Zap },
-          { label: "Notificações", href: "/notifications", icon: Bell },
-          { label: "API Docs", href: "/api-docs", icon: Activity },
-        ]
-      },
-      {
-        section: "Suporte",
-        items: [
-          { label: "Central de Ajuda", href: "/help-center", icon: HelpCircle },
-          { label: "Suporte", href: "/support", icon: MessageSquare },
           { label: "Configurações", href: "/settings", icon: Settings },
         ]
       }
@@ -172,8 +123,6 @@ export default function SidebarModern({
     return [
       ...commonItems,
       ...(userSpecificItems[user.userType as keyof typeof userSpecificItems] || []),
-      ...analyticsSection,
-      ...businessSection,
       ...otherSections
     ];
   };

@@ -276,7 +276,7 @@ export default function DashboardModern() {
                         <span className="saas-caption">• {stat.description}</span>
                       </div>
                     </div>
-                    <div className="p-2 bg-accent/50 rounded-lg group-hover:bg-accent transition-colors">
+                    <div className="p-2 bg-muted rounded-lg hover:bg-accent transition-colors">
                       <IconComponent className="h-5 w-5 text-muted-foreground" />
                     </div>
                   </div>

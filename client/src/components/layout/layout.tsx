@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import Sidebar from "./sidebar-modern";
-import Topbar from "./topbar";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -41,37 +40,24 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile overlay */}
-      {isMobile && showMobileSidebar && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-30"
-          onClick={() => setShowMobileSidebar(false)}
+    <div className="saas-page">
+      <div className="flex h-screen">
+        <Sidebar 
+          collapsed={sidebarCollapsed}
+          onToggle={handleSidebarToggle}
+          isMobile={isMobile}
+          showMobile={showMobileSidebar}
+          onMobileToggle={() => setShowMobileSidebar(!showMobileSidebar)}
         />
-      )}
-      
-      <Sidebar 
-        collapsed={isMobile ? false : sidebarCollapsed} 
-        onToggle={handleSidebarToggle}
-        isMobile={isMobile}
-        showMobile={showMobileSidebar}
-      />
-      <Topbar 
-        sidebarCollapsed={sidebarCollapsed} 
-        onMobileMenuToggle={() => setShowMobileSidebar(!showMobileSidebar)}
-        isMobile={isMobile}
-      />
-      <main className={`pt-16 transition-all duration-300 ${
-        isMobile 
-          ? 'ml-0' 
-          : sidebarCollapsed 
-            ? 'ml-16' 
-            : 'ml-64'
-      }`}>
-        <div className="p-3 md:p-6">
-          {children}
+        
+        <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${
+          isMobile ? 'ml-0' : sidebarCollapsed ? 'ml-16' : 'ml-64'
+        }`}>
+          <main className="flex-1 overflow-y-auto">
+            {children}
+          </main>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
