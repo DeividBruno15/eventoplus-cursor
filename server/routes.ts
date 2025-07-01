@@ -31,6 +31,7 @@ import { notificationService } from "./notifications";
 import { whatsappService as newWhatsappService } from "./whatsapp-service";
 import { advancedAnalyticsService } from "./advanced-analytics";
 import { healthMonitoringService } from "./health-monitoring";
+import { cacheService, queryCache, apiCache, userCache } from "./cache-service";
 import { variableCommissionService } from "./variable-commission";
 
 
@@ -4611,6 +4612,195 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'critical',
         error: error.message,
         timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // ============================================
+  // CACHE MANAGEMENT & PERFORMANCE - CRÍTICO
+  // ============================================
+
+  // Estatísticas de cache
+  app.get("/api/cache/stats", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const stats = {
+        main: cacheService.getStats(),
+        query: queryCache.getStats(),
+        api: apiCache.getStats(),
+        user: userCache.getStats()
+      };
+
+      res.json({
+        success: true,
+        data: stats,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Erro ao obter estatísticas de cache:", error);
+      res.status(500).json({ 
+        error: "Erro ao processar estatísticas de cache",
+        message: error.message 
+      });
+    }
+  });
+
+  // Limpar cache específico
+  app.post("/api/cache/clear/:type", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const { type } = req.params;
+      let cleared = false;
+
+      switch (type) {
+        case 'main':
+          cacheService.clear();
+          cleared = true;
+          break;
+        case 'query':
+          queryCache.clear();
+          cleared = true;
+          break;
+        case 'api':
+          apiCache.clear();
+          cleared = true;
+          break;
+        case 'user':
+          userCache.clear();
+          cleared = true;
+          break;
+        case 'all':
+          cacheService.clear();
+          queryCache.clear();
+          apiCache.clear();
+          userCache.clear();
+          cleared = true;
+          break;
+        default:
+          return res.status(400).json({
+            success: false,
+            error: "Tipo de cache inválido",
+            validTypes: ['main', 'query', 'api', 'user', 'all']
+          });
+      }
+
+      res.json({
+        success: cleared,
+        message: `Cache ${type} limpo com sucesso`,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Erro ao limpar cache:", error);
+      res.status(500).json({ 
+        error: "Erro ao limpar cache",
+        message: error.message 
+      });
+    }
+  });
+
+  // Invalidar cache por padrão
+  app.post("/api/cache/invalidate", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const { pattern, type = 'main' } = req.body;
+      
+      if (!pattern) {
+        return res.status(400).json({
+          success: false,
+          error: "Padrão de invalidação é obrigatório"
+        });
+      }
+
+      let count = 0;
+      
+      switch (type) {
+        case 'main':
+          count = cacheService.invalidatePattern(pattern);
+          break;
+        case 'query':
+          count = queryCache.invalidatePattern(pattern);
+          break;
+        case 'api':
+          count = apiCache.invalidatePattern(pattern);
+          break;
+        case 'user':
+          count = userCache.invalidatePattern(pattern);
+          break;
+        default:
+          return res.status(400).json({
+            success: false,
+            error: "Tipo de cache inválido"
+          });
+      }
+
+      res.json({
+        success: true,
+        invalidated: count,
+        pattern,
+        type,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Erro ao invalidar cache:", error);
+      res.status(500).json({ 
+        error: "Erro ao invalidar cache",
+        message: error.message 
+      });
+    }
+  });
+
+  // Entradas populares do cache
+  app.get("/api/cache/popular/:type", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const { type } = req.params;
+      const limit = parseInt(req.query.limit as string) || 10;
+      
+      let popular: any[] = [];
+
+      switch (type) {
+        case 'main':
+          popular = cacheService.getPopularEntries(limit);
+          break;
+        case 'query':
+          popular = queryCache.getPopularEntries(limit);
+          break;
+        case 'api':
+          popular = apiCache.getPopularEntries(limit);
+          break;
+        case 'user':
+          popular = userCache.getPopularEntries(limit);
+          break;
+        default:
+          return res.status(400).json({
+            success: false,
+            error: "Tipo de cache inválido"
+          });
+      }
+
+      res.json({
+        success: true,
+        data: popular,
+        count: popular.length,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Erro ao obter entradas populares:", error);
+      res.status(500).json({ 
+        error: "Erro ao processar entradas populares",
+        message: error.message 
       });
     }
   });
