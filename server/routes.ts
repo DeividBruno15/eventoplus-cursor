@@ -1860,8 +1860,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           organizerId: event.organizerId,
           eventTitle: event.title,
           providerName: `${provider?.firstName} ${provider?.lastName}`.trim() || provider?.companyName || 'Prestador',
-          serviceCategory: validatedData.proposal || 'Serviço',
-          proposedPrice: validatedData.price.toString(),
+          serviceCategory: applicationData.proposal || 'Serviço',
+          proposedPrice: applicationData.price.toString(),
           eventId: event.id,
           baseUrl
         });

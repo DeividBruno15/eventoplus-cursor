@@ -362,6 +362,12 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(events);
   }
 
+  async getEventsByOrganizer(organizerId: number): Promise<Event[]> {
+    return await db.select().from(events)
+      .where(eq(events.organizerId, organizerId))
+      .orderBy(events.createdAt);
+  }
+
   async getEvent(id: number): Promise<Event | undefined> {
     const result = await db.select().from(events).where(eq(events.id, id)).limit(1);
     return result[0];
