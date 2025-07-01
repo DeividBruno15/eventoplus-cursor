@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import Stripe from "stripe";
@@ -3854,6 +3855,348 @@ export async function registerRoutes(app: Express): Promise<Server> {
         clearedAt: new Date()
       });
     } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ============================================
+  // STRIPE PAYMENT INTEGRATION - CRÍTICO
+  // ============================================
+
+  // Planos de assinatura por tipo de usuário
+  const STRIPE_PLANS = {
+    prestador: [
+      { id: "prestador_essencial", name: "Essencial", price: 0, priceId: null },
+      { id: "prestador_profissional", name: "Profissional", price: 14.90, priceId: "price_professional" },
+      { id: "prestador_premium", name: "Premium", price: 29.90, priceId: "price_premium" }
+    ],
+    contratante: [
+      { id: "contratante_descubra", name: "Descubra", price: 0, priceId: null },
+      { id: "contratante_conecta", name: "Conecta", price: 14.90, priceId: "price_contratante_conecta" },
+      { id: "contratante_premium", name: "Premium", price: 29.90, priceId: "price_contratante_premium" }
+    ],
+    anunciante: [
+      { id: "anunciante_essencial", name: "Essencial", price: 0, priceId: null },
+      { id: "anunciante_profissional", name: "Profissional", price: 19.90, priceId: "price_anunciante_pro" },
+      { id: "anunciante_premium", name: "Premium", price: 39.90, priceId: "price_anunciante_premium" }
+    ]
+  };
+
+  // 1. GET /api/stripe/plans - Listar planos disponíveis
+  app.get("/api/stripe/plans", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const user = req.user as any;
+      const userType = user.userType as keyof typeof STRIPE_PLANS;
+      const plans = STRIPE_PLANS[userType] || [];
+      
+      res.json({
+        plans,
+        currentPlan: user.planType || "essencial",
+        userType
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // 2. POST /api/stripe/create-customer - Criar customer no Stripe
+  app.post("/api/stripe/create-customer", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const user = req.user as any;
+      
+      // Verificar se já tem customer
+      if (user.stripeCustomerId) {
+        return res.json({ customerId: user.stripeCustomerId });
+      }
+
+      // Criar customer no Stripe
+      const customer = await stripe.customers.create({
+        email: user.email,
+        name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username,
+        metadata: {
+          userId: user.id.toString(),
+          userType: user.userType
+        }
+      });
+
+      // Salvar ID do customer no banco
+      await storage.updateUser(user.id, {
+        stripeCustomerId: customer.id
+      });
+
+      res.json({ customerId: customer.id });
+    } catch (error: any) {
+      console.error("Erro ao criar customer:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // 3. POST /api/get-or-create-subscription - CRÍTICO (Frontend esperando)
+  app.post("/api/get-or-create-subscription", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const user = req.user as any;
+      const { planId, priceId } = req.body;
+
+      // Criar customer se não existir
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username,
+          metadata: { userId: user.id.toString(), userType: user.userType }
+        });
+        customerId = customer.id;
+        await storage.updateUser(user.id, { stripeCustomerId: customerId });
+      }
+
+      // Para planos gratuitos, apenas atualizar no banco
+      if (!priceId || priceId === "free") {
+        await storage.updateUser(user.id, {
+          planType: planId || "essencial",
+          subscriptionStatus: "active"
+        });
+        
+        return res.json({
+          success: true,
+          message: "Plano gratuito ativado",
+          planType: planId || "essencial"
+        });
+      }
+
+      // Criar sessão de checkout para planos pagos
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ['card'],
+        line_items: [{
+          price: priceId,
+          quantity: 1,
+        }],
+        mode: 'subscription',
+        success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/subscription/manage`,
+        metadata: {
+          userId: user.id.toString(),
+          planId: planId
+        }
+      });
+
+      res.json({
+        clientSecret: session.client_secret,
+        sessionId: session.id,
+        url: session.url
+      });
+
+    } catch (error: any) {
+      console.error("Erro ao criar subscription:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // 4. POST /api/stripe/create-checkout - Sessão de checkout
+  app.post("/api/stripe/create-checkout", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const user = req.user as any;
+      const { priceId, planId } = req.body;
+
+      if (!priceId) {
+        return res.status(400).json({ message: "priceId é obrigatório" });
+      }
+
+      // Criar customer se não existir
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username,
+          metadata: { userId: user.id.toString(), userType: user.userType }
+        });
+        customerId = customer.id;
+        await storage.updateUser(user.id, { stripeCustomerId: customerId });
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ['card'],
+        line_items: [{
+          price: priceId,
+          quantity: 1,
+        }],
+        mode: 'subscription',
+        success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/subscription/manage`,
+        metadata: {
+          userId: user.id.toString(),
+          planId: planId
+        }
+      });
+
+      res.json({
+        sessionId: session.id,
+        url: session.url,
+        clientSecret: session.client_secret
+      });
+
+    } catch (error: any) {
+      console.error("Erro ao criar checkout:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // 5. GET /api/stripe/subscriptions/:customerId - Listar assinaturas
+  app.get("/api/stripe/subscriptions/:customerId", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    try {
+      const { customerId } = req.params;
+      const user = req.user as any;
+
+      // Verificar se o customer pertence ao usuário
+      if (user.stripeCustomerId !== customerId) {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      const subscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: 'all',
+        expand: ['data.default_payment_method']
+      });
+
+      res.json({
+        subscriptions: subscriptions.data,
+        hasActiveSubscription: subscriptions.data.some(sub => sub.status === 'active')
+      });
+
+    } catch (error: any) {
+      console.error("Erro ao buscar subscriptions:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // 6. POST /api/webhooks/stripe - WEBHOOK CRÍTICO
+  app.post("/api/webhooks/stripe", async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+
+    try {
+      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+      if (!webhookSecret) {
+        console.error("STRIPE_WEBHOOK_SECRET não configurado");
+        return res.status(400).send("Webhook secret not configured");
+      }
+
+      event = stripe.webhooks.constructEvent(req.body, sig as string, webhookSecret);
+    } catch (err: any) {
+      console.error("Webhook signature verification failed:", err.message);
+      return res.status(400).send(`Webhook signature verification failed: ${err.message}`);
+    }
+
+    try {
+      switch (event.type) {
+        case 'invoice.payment_succeeded':
+          {
+            const invoice = event.data.object as any;
+            const customerId = invoice.customer;
+            const subscriptionId = invoice.subscription;
+
+            // Buscar usuário pelo customer ID usando query direta
+            const users = await storage.getCustomers();
+            const user = users.find((u: any) => u.stripeCustomerId === customerId);
+
+            if (user) {
+              await storage.updateUser(user.id, {
+                stripeSubscriptionId: subscriptionId,
+                subscriptionStatus: 'active',
+                subscriptionCurrentPeriodEnd: new Date(invoice.period_end * 1000)
+              });
+
+              console.log(`Assinatura ativada para usuário ${user.id}`);
+            }
+          }
+          break;
+
+        case 'invoice.payment_failed':
+          {
+            const invoice = event.data.object as any;
+            const customerId = invoice.customer;
+
+            const users = await storage.getAllUsers();
+            const user = users.find(u => u.stripeCustomerId === customerId);
+
+            if (user) {
+              await storage.updateUser(user.id, {
+                subscriptionStatus: 'past_due'
+              });
+
+              console.log(`Pagamento falhou para usuário ${user.id}`);
+            }
+          }
+          break;
+
+        case 'customer.subscription.deleted':
+          {
+            const subscription = event.data.object as any;
+            const customerId = subscription.customer;
+
+            const users = await storage.getAllUsers();
+            const user = users.find(u => u.stripeCustomerId === customerId);
+
+            if (user) {
+              await storage.updateUser(user.id, {
+                stripeSubscriptionId: null,
+                subscriptionStatus: 'canceled',
+                planType: 'essencial'
+              });
+
+              console.log(`Assinatura cancelada para usuário ${user.id}`);
+            }
+          }
+          break;
+
+        case 'checkout.session.completed':
+          {
+            const session = event.data.object as any;
+            const customerId = session.customer;
+            const planId = session.metadata?.planId;
+
+            const users = await storage.getAllUsers();
+            const user = users.find(u => u.stripeCustomerId === customerId);
+
+            if (user && planId) {
+              await storage.updateUser(user.id, {
+                planType: planId,
+                subscriptionStatus: 'active'
+              });
+
+              console.log(`Checkout completado para usuário ${user.id}, plano: ${planId}`);
+            }
+          }
+          break;
+
+        default:
+          console.log(`Unhandled event type: ${event.type}`);
+      }
+
+      res.json({received: true});
+    } catch (error: any) {
+      console.error("Erro ao processar webhook:", error);
       res.status(500).json({ message: error.message });
     }
   });
