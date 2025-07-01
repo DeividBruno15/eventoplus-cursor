@@ -468,58 +468,5 @@ export default function DashboardClean() {
         </div>
       </div>
     </div>
-                    <span className="text-body flex-1">Serviço "DJ Profissional" visualizado 15 vezes</span>
-                    <span className="text-caption">1 dia</span>
-                  </div>
-                  <div className="flex items-center space-x-4 p-4 bg-yellow-50 rounded-lg border border-yellow-100">
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Nova avaliação recebida: 5 estrelas</span>
-                    <span className="text-caption">2 dias</span>
-                  </div>
-                </>
-              )}
-              {user.userType === "contratante" && (
-                <>
-                  <div className="flex items-center space-x-4 p-4 bg-green-50 rounded-lg border border-green-100">
-                    <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Evento "Aniversário João" criado com sucesso</span>
-                    <span className="text-caption">1h atrás</span>
-                  </div>
-                  <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">3 prestadores se candidataram ao seu evento</span>
-                    <span className="text-caption">3h atrás</span>
-                  </div>
-                  <div className="flex items-center space-x-4 p-4 bg-purple-50 rounded-lg border border-purple-100">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Pagamento de R$ 500 processado</span>
-                    <span className="text-caption">1 dia</span>
-                  </div>
-                </>
-              )}
-              {user.userType === "anunciante" && (
-                <>
-                  <div className="flex items-center space-x-4 p-4 bg-green-50 rounded-lg border border-green-100">
-                    <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Nova reserva confirmada para "Salão Primavera"</span>
-                    <span className="text-caption">30min</span>
-                  </div>
-                  <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Espaço visualizado 45 vezes esta semana</span>
-                    <span className="text-caption">2h atrás</span>
-                  </div>
-                  <div className="flex items-center space-x-4 p-4 bg-yellow-50 rounded-lg border border-yellow-100">
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Fotos do espaço atualizadas</span>
-                    <span className="text-caption">1 dia</span>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
