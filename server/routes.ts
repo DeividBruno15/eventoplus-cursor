@@ -2915,7 +2915,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           providerId: application.providerId,
           clientId: user.id,
           terms: contractTerms,
-          amount: application.price,
+          value: application.price.toString(),
           status: 'pending_signature'
         });
 
@@ -2971,7 +2971,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           providerId: application.providerId,
           clientId: user.id,
           terms: contractTerms,
-          amount: application.price,
+          value: application.price.toString(),
           status: 'pending_signature'
         });
 
