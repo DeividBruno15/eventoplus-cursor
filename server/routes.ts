@@ -2933,7 +2933,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         type: 'application_status',
         title: `Candidatura ${statusText}`,
         message: `Sua candidatura para "${event?.title}" foi ${statusText}`,
-        data: { eventId: application.eventId, applicationId, status }
+        metadata: JSON.stringify({ eventId: application.eventId, applicationId, status })
       });
 
       res.json(updatedApplication);
@@ -2991,7 +2991,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         type: 'application_status',
         title: `Candidatura ${statusText}`,
         message: `Sua candidatura para "${event?.title}" foi ${statusText}`,
-        data: { eventId: application.eventId, applicationId, status }
+        metadata: JSON.stringify({ eventId: application.eventId, applicationId, status })
       });
 
       res.json(updatedApplication);
@@ -3200,7 +3200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         type: 'verification_request',
         title: 'Nova solicitação de verificação',
         message: `${user.username} enviou documentos para verificação`,
-        data: { userId: user.id, documents, certificatesUrl, businessInfo }
+        metadata: JSON.stringify({ userId: user.id, documents, certificatesUrl, businessInfo })
       });
 
       res.json({
@@ -3240,7 +3240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: status === 'approved' 
           ? 'Sua conta foi verificada com sucesso! Agora você possui o selo de prestador verificado.'
           : `Sua solicitação de verificação foi rejeitada. Motivo: ${notes}`,
-        data: { status, notes }
+        metadata: JSON.stringify({ status, notes })
       });
 
       res.json({ success: true, user: updatedUser });
