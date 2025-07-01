@@ -292,7 +292,7 @@ export default function DashboardClean() {
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {dashboardData.actions.map((action, index) => {
+              {dashboardData.quickActions.map((action, index) => {
                 const IconComponent = action.icon;
                 return (
                   <Link key={index} href={action.href}>
