@@ -29,7 +29,7 @@ import {
   BarChart3
 } from "lucide-react";
 
-export default function DashboardClean() {
+export default function DashboardProfessional() {
   const { user } = useAuth();
 
   const { data: stats = {}, isLoading } = useQuery({
@@ -244,140 +244,199 @@ export default function DashboardClean() {
   const dashboardData = getDashboardContent();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100 py-8 px-6">
-        <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-background">
+      {/* Modern Header Section */}
+      <div className="border-b bg-gradient-to-r from-background to-muted/20">
+        <div className="saas-container py-8">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{dashboardData.greeting}</h1>
-              <p className="text-gray-600 mt-2">{dashboardData.subtitle}</p>
+            <div className="space-y-1">
+              <h1 className="saas-section-title">{dashboardData.greeting}</h1>
+              <p className="saas-section-subtitle">{dashboardData.subtitle}</p>
             </div>
-            <Badge variant="secondary">
-              {user.userType === "prestador" && "Prestador"}
-              {user.userType === "contratante" && "Organizador"}
-              {user.userType === "anunciante" && "Anunciante"}
-            </Badge>
+            <div className="flex items-center space-x-4">
+              <Badge variant="secondary" className="text-sm font-medium">
+                {user.userType === "prestador" && "Prestador de Serviços"}
+                {user.userType === "contratante" && "Organizador de Eventos"}
+                {user.userType === "anunciante" && "Anunciante de Espaços"}
+              </Badge>
+              <Avatar>
+                <AvatarImage src="" />
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {user.username?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto py-8 px-6">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="saas-container py-8 space-y-8">
+        {/* Professional Stats Grid */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {dashboardData.stats.map((stat, index) => {
             const IconComponent = stat.icon;
+            const isPositive = stat.trendDirection === "up";
+            const isNeutral = stat.trendDirection === "neutral";
+            
             return (
-              <div key={index} className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-500 mb-2">{stat.label}</p>
-                    <p className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</p>
-                    <p className="text-xs text-green-600 font-medium">{stat.trend}</p>
+              <Card key={index} className="saas-stat-card group">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    {stat.label}
+                  </CardTitle>
+                  <div className={`${stat.bgColor} p-2 rounded-lg transition-transform group-hover:scale-110`}>
+                    <IconComponent className={`h-5 w-5 ${stat.color}`} />
                   </div>
-                  <div className="ml-4 p-3 bg-gray-100 rounded-lg">
-                    <IconComponent className="w-6 h-6 text-gray-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="saas-metric-small">{stat.value}</div>
+                    <div className="flex items-center space-x-2">
+                      <div className={`flex items-center space-x-1 ${
+                        isPositive ? 'saas-trend-positive' :
+                        isNeutral ? 'saas-trend-neutral' : 'saas-trend-negative'
+                      }`}>
+                        {isPositive && <ArrowUpRight className="h-3 w-3" />}
+                        {!isPositive && !isNeutral && <ArrowDownRight className="h-3 w-3" />}
+                        <span className="text-xs font-medium">{stat.trend}</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">{stat.description}</span>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             );
           })}
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-          <div className="p-6 border-b border-gray-100">
-            <h3 className="text-xl font-semibold text-gray-900">Ações Rápidas</h3>
-            <p className="text-gray-600 mt-1">Principais funcionalidades da sua conta</p>
-          </div>
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {dashboardData.actions.map((action, index) => {
+        {/* Quick Actions Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Activity className="h-5 w-5 text-primary" />
+              <span>Ações Rápidas</span>
+            </CardTitle>
+            <CardDescription>
+              Acesse rapidamente as funcionalidades mais importantes
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {dashboardData.quickActions.map((action, index) => {
                 const IconComponent = action.icon;
                 return (
                   <Link key={index} href={action.href}>
-                    <button 
-                      className={`w-full h-16 flex items-center justify-start space-x-3 ${
-                        index === 0 ? "btn-primary-enhanced" : "btn-secondary-enhanced"
-                      }`}
+                    <Button 
+                      variant={action.variant as any} 
+                      className="w-full justify-start h-auto p-4 text-left"
                     >
-                      <IconComponent className="w-5 h-5" />
-                      <span className="font-semibold">{action.label}</span>
-                    </button>
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0">
+                          <IconComponent className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <div className="font-medium">{action.label}</div>
+                        </div>
+                      </div>
+                    </Button>
                   </Link>
                 );
               })}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        {/* Recent Activity */}
-        <div className="mt-12 card-elevated">
-          <div className="p-6 border-b border-gray-50">
-            <h3 className="text-heading-md">Atividades Recentes</h3>
-            <p className="text-body-sm mt-1">Últimas atualizações da sua conta</p>
-          </div>
-          <div className="p-6">
-            <div className="space-y-5">
-              {user.userType === "prestador" && (
-                <>
-                  <div className="flex items-center space-x-4 p-4 bg-green-50 rounded-lg border border-green-100">
-                    <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Nova candidatura aprovada para "Casamento Silva"</span>
-                    <span className="text-caption">2h atrás</span>
+        {/* Recent Activity with Better Design */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Clock className="h-5 w-5 text-primary" />
+                <span>Atividades Recentes</span>
+              </CardTitle>
+              <CardDescription>
+                Acompanhe as últimas interações na plataforma
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {[
+                {
+                  icon: CheckCircle,
+                  iconColor: "text-green-600",
+                  iconBg: "bg-green-50",
+                  title: "Nova candidatura aprovada",
+                  description: "Evento: Casamento em Jardim Botânico",
+                  time: "2 horas atrás"
+                },
+                {
+                  icon: MessageSquare,
+                  iconColor: "text-blue-600",
+                  iconBg: "bg-blue-50",
+                  title: "Mensagem recebida",
+                  description: "De: João Silva - Sobre orçamento",
+                  time: "4 horas atrás"
+                },
+                {
+                  icon: Star,
+                  iconColor: "text-yellow-600",
+                  iconBg: "bg-yellow-50",
+                  title: "Nova avaliação recebida",
+                  description: "5 estrelas - Excelente trabalho!",
+                  time: "1 dia atrás"
+                }
+              ].map((activity, index) => (
+                <div key={index} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-muted/30 transition-colors">
+                  <div className={`${activity.iconBg} p-2 rounded-full flex-shrink-0`}>
+                    <activity.icon className={`h-4 w-4 ${activity.iconColor}`} />
                   </div>
-                  <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Serviço "DJ Profissional" visualizado 15 vezes</span>
-                    <span className="text-caption">1 dia</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm text-foreground">{activity.title}</p>
+                    <p className="text-sm text-muted-foreground truncate">{activity.description}</p>
                   </div>
-                  <div className="flex items-center space-x-4 p-4 bg-yellow-50 rounded-lg border border-yellow-100">
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Nova avaliação recebida: 5 estrelas</span>
-                    <span className="text-caption">2 dias</span>
-                  </div>
-                </>
-              )}
-              {user.userType === "contratante" && (
-                <>
-                  <div className="flex items-center space-x-4 p-4 bg-green-50 rounded-lg border border-green-100">
-                    <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Evento "Aniversário João" criado com sucesso</span>
-                    <span className="text-caption">1h atrás</span>
-                  </div>
-                  <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">3 prestadores se candidataram ao seu evento</span>
-                    <span className="text-caption">3h atrás</span>
-                  </div>
-                  <div className="flex items-center space-x-4 p-4 bg-purple-50 rounded-lg border border-purple-100">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Pagamento de R$ 500 processado</span>
-                    <span className="text-caption">1 dia</span>
-                  </div>
-                </>
-              )}
-              {user.userType === "anunciante" && (
-                <>
-                  <div className="flex items-center space-x-4 p-4 bg-green-50 rounded-lg border border-green-100">
-                    <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Nova reserva confirmada para "Salão Primavera"</span>
-                    <span className="text-caption">30min</span>
-                  </div>
-                  <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Espaço visualizado 45 vezes esta semana</span>
-                    <span className="text-caption">2h atrás</span>
-                  </div>
-                  <div className="flex items-center space-x-4 p-4 bg-yellow-50 rounded-lg border border-yellow-100">
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-body flex-1">Fotos do espaço atualizadas</span>
-                    <span className="text-caption">1 dia</span>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
+                  <span className="text-xs text-muted-foreground flex-shrink-0">{activity.time}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Performance Overview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                <span>Visão Geral</span>
+              </CardTitle>
+              <CardDescription>
+                Resumo da sua performance na plataforma
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Perfil Completo</span>
+                  <span className="font-medium">85%</span>
+                </div>
+                <Progress value={85} className="h-2" />
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Resposta Média</span>
+                  <Badge variant="outline" className="saas-badge-success">2h</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Taxa de Conversão</span>
+                  <Badge variant="outline" className="saas-badge-success">92%</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Satisfação</span>
+                  <Badge variant="outline" className="saas-badge-success">4.8/5</Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

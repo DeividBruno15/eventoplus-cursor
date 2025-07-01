@@ -23,7 +23,7 @@ import Contato from "@/pages/contato";
 import EmailDemo from "@/pages/test/email-demo";
 
 // Protected Pages
-import Dashboard from "@/pages/dashboard/dashboard-clean";
+import Dashboard from "@/pages/dashboard/dashboard-professional";
 import Events from "@/pages/events/events";
 import CreateEvent from "@/pages/events/create-event";
 import EventDetail from "@/pages/events/event-detail";
