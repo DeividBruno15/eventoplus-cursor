@@ -13,6 +13,7 @@ import speakeasy from "speakeasy";
 import qrcode from "qrcode";
 import crypto from "crypto";
 import { storage } from "./storage";
+import { eq } from "drizzle-orm";
 import { pixService } from "./pix";
 import { aiMatchingService } from "./ai-matching";
 import { monitoringService } from "./monitoring";
@@ -4244,9 +4245,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Helper para buscar usuário por customer ID
   async function getUserByCustomerId(customerId: string) {
     try {
-      // Implementação simplificada - buscar por query SQL direta
-      const result = await storage.db.select().from(storage.schema.users).where(eq(storage.schema.users.stripeCustomerId, customerId)).limit(1);
-      return result[0] || null;
+      // Buscar usuário via método do storage
+      const users = await storage.getUsers();
+      return users.find((user: any) => user.stripeCustomerId === customerId) || null;
     } catch (error) {
       console.error("Erro ao buscar usuário por customer ID:", error);
       return null;
