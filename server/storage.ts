@@ -1309,7 +1309,7 @@ export class DatabaseStorage implements IStorage {
     try {
       await db
         .update(notifications)
-        .set({ readAt: new Date() })
+        .set({ read: true })
         .where(eq(notifications.id, id));
     } catch (error) {
       console.error("Error marking notification as read:", error);
@@ -1320,7 +1320,7 @@ export class DatabaseStorage implements IStorage {
     try {
       await db
         .update(notifications)
-        .set({ readAt: new Date() })
+        .set({ read: true })
         .where(eq(notifications.userId, userId));
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
