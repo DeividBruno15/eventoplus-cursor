@@ -122,16 +122,16 @@
   }
   
   .saas-card-simple {
-    @apply bg-card border rounded-lg p-4 hover:bg-accent/30 transition-colors cursor-pointer;
+    @apply bg-card border rounded-lg p-4 hover:bg-accent transition-colors cursor-pointer;
   }
   
   .saas-card-minimal {
-    @apply bg-accent/30 border-0 rounded-lg p-3 hover:bg-accent/50 transition-colors;
+    @apply bg-muted border-0 rounded-lg p-3 hover:bg-accent transition-colors;
   }
 
   /* Modern Stat Cards - Inspired by Linear */
   .saas-stat-card {
-    @apply saas-card p-4 hover:border-primary/20 transition-all duration-200 group;
+    @apply saas-card p-4 hover:border-primary transition-all duration-200 group;
   }
   
   .saas-metric {
@@ -144,11 +144,11 @@
 
   /* Modern Sidebar - Inspired by Notion */
   .saas-sidebar {
-    @apply bg-background/95 backdrop-blur-sm border-r border-border/50;
+    @apply bg-background border-r border-border;
   }
   
   .saas-sidebar-item {
-    @apply flex items-center gap-2 px-2 py-1.5 text-sm font-medium text-muted-foreground hover:bg-accent/50 hover:text-foreground rounded-md transition-all duration-200 cursor-pointer;
+    @apply flex items-center gap-2 px-2 py-1.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground rounded-md transition-all duration-200 cursor-pointer;
   }
   
   .saas-sidebar-item.active {
@@ -220,7 +220,7 @@
 
   /* Modern Interactive Elements */
   .saas-interactive {
-    @apply hover:bg-accent/50 cursor-pointer transition-colors rounded-md;
+    @apply hover:bg-accent cursor-pointer transition-colors rounded-md;
   }
   
   .saas-clickable {
@@ -229,7 +229,7 @@
 
   /* Modern Form System */
   .saas-form-section {
-    @apply space-y-4 p-4 bg-accent/20 border rounded-lg;
+    @apply space-y-4 p-4 bg-muted border rounded-lg;
   }
   
   .saas-form-group {
@@ -263,7 +263,7 @@
   }
   
   .saas-nav-item:not(.active) {
-    @apply text-muted-foreground hover:text-foreground hover:bg-accent/50;
+    @apply text-muted-foreground hover:text-foreground hover:bg-accent;
   }
   
   .saas-nav-item.active {
@@ -285,16 +285,16 @@
 
   /* Modern List Items */
   .saas-list-item {
-    @apply flex items-center justify-between p-3 hover:bg-accent/30 rounded-lg transition-colors;
+    @apply flex items-center justify-between p-3 hover:bg-accent rounded-lg transition-colors;
   }
   
   .saas-list-item-simple {
-    @apply flex items-center gap-3 p-2 hover:bg-accent/30 rounded-md transition-colors;
+    @apply flex items-center gap-3 p-2 hover:bg-accent rounded-md transition-colors;
   }
 
   /* Modern Header System */
   .saas-header {
-    @apply border-b bg-background/95 backdrop-blur-sm sticky top-0 z-40;
+    @apply border-b bg-background sticky top-0 z-40;
   }
   
   .saas-header-content {
@@ -307,7 +307,7 @@
   }
   
   .saas-secondary-content {
-    @apply w-80 border-l bg-muted/50;
+    @apply w-80 border-l bg-muted;
   }
 
   /* Modern Empty States */
