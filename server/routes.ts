@@ -2066,8 +2066,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         whatsappStatusNotifications
       } = req.body;
 
-      // Validar número de WhatsApp se fornecido
-      if (whatsappNumber && !whatsappService.validateWhatsAppNumber(whatsappNumber)) {
+      // Validar número de WhatsApp se fornecido (validação básica)
+      if (whatsappNumber && !/^\+\d{13,15}$/.test(whatsappNumber)) {
         return res.status(400).json({ 
           message: "Número de WhatsApp inválido. Use o formato: +5511999999999" 
         });
