@@ -463,10 +463,40 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createEventApplication(applicationData: InsertEventApplication): Promise<EventApplication> {
-    const result = await db.insert(eventApplications).values({
-      ...applicationData,
+    console.log('Storage: createEventApplication - dados recebidos:', JSON.stringify(applicationData, null, 2));
+    
+    // Preparar dados para inserção, removendo undefined values
+    const cleanData: any = {
+      eventId: applicationData.eventId,
+      providerId: applicationData.providerId,
+      proposal: applicationData.proposal,
+      price: String(applicationData.price), // Garantir que price é string
       status: "pending"
-    }).returning();
+    };
+    
+    // Adicionar campos opcionais apenas se não forem undefined
+    if (applicationData.serviceId !== undefined) {
+      cleanData.serviceId = applicationData.serviceId;
+    }
+    if (applicationData.estimatedHours !== undefined) {
+      cleanData.estimatedHours = applicationData.estimatedHours;
+    }
+    if (applicationData.availableDate !== undefined) {
+      cleanData.availableDate = applicationData.availableDate;
+    }
+    if (applicationData.portfolio !== undefined) {
+      cleanData.portfolio = applicationData.portfolio;
+    }
+    if (applicationData.rejectionReason !== undefined) {
+      cleanData.rejectionReason = applicationData.rejectionReason;
+    }
+    if (applicationData.contractId !== undefined) {
+      cleanData.contractId = applicationData.contractId;
+    }
+    
+    console.log('Storage: createEventApplication - dados limpos para inserção:', JSON.stringify(cleanData, null, 2));
+    
+    const result = await db.insert(eventApplications).values(cleanData).returning();
     return result[0];
   }
 

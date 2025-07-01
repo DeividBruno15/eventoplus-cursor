@@ -1799,13 +1799,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('EventId:', eventId);
       console.log('ProviderId:', userId);
       
-      const validatedData = insertEventApplicationSchema.parse({
+      // Dados preparados antes da validação
+      const dataToValidate = {
         ...req.body,
         eventId,
         providerId: userId,
+      };
+      
+      console.log('Dados preparados para validação:', JSON.stringify(dataToValidate, null, 2));
+      
+      // Verificar se algum campo tem valor undefined
+      Object.entries(dataToValidate).forEach(([key, value]) => {
+        if (value === undefined) {
+          console.log(`⚠️  Campo com valor undefined: ${key}`);
+        }
       });
       
-      console.log('Dados validados:', validatedData);
+      const validatedData = insertEventApplicationSchema.parse(dataToValidate);
+      
+      console.log('Dados validados:', JSON.stringify(validatedData, null, 2));
       
       const application = await storage.createEventApplication(validatedData);
       
