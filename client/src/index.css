@@ -72,110 +72,259 @@
   }
 }
 
-/* Professional SaaS Design System */
+/* Modern SaaS Design System - Inspired by Linear, Vercel, Notion */
 @layer components {
+  /* Layout System */
   .saas-container {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto max-w-6xl px-4 sm:px-6 lg:px-8;
   }
   
-  .saas-card {
-    @apply bg-card border rounded-lg shadow-sm transition-all duration-200 hover:shadow-md;
+  .saas-page {
+    @apply min-h-screen bg-background;
   }
   
-  .saas-card-header {
-    @apply flex flex-col space-y-1.5 p-6 pb-3;
+  .saas-content {
+    @apply saas-container py-6 space-y-6;
+  }
+
+  /* Modern Typography - Smaller, cleaner */
+  .saas-title-xl {
+    @apply text-2xl font-semibold tracking-tight text-foreground;
   }
   
-  .saas-card-title {
-    @apply text-2xl font-semibold leading-none tracking-tight;
+  .saas-title-lg {
+    @apply text-xl font-semibold tracking-tight text-foreground;
   }
   
-  .saas-card-description {
+  .saas-title-md {
+    @apply text-lg font-medium text-foreground;
+  }
+  
+  .saas-title-sm {
+    @apply text-base font-medium text-foreground;
+  }
+  
+  .saas-body {
+    @apply text-sm text-foreground;
+  }
+  
+  .saas-body-secondary {
     @apply text-sm text-muted-foreground;
   }
   
-  .saas-card-content {
-    @apply p-6 pt-0;
+  .saas-caption {
+    @apply text-xs text-muted-foreground;
+  }
+
+  /* Modern Card System - Clean and minimal */
+  .saas-card {
+    @apply bg-card border rounded-xl shadow-sm hover:shadow-md transition-all duration-200;
   }
   
+  .saas-card-simple {
+    @apply bg-card border rounded-lg p-4 hover:bg-accent/30 transition-colors cursor-pointer;
+  }
+  
+  .saas-card-minimal {
+    @apply bg-accent/30 border-0 rounded-lg p-3 hover:bg-accent/50 transition-colors;
+  }
+
+  /* Modern Stat Cards - Inspired by Linear */
   .saas-stat-card {
-    @apply saas-card hover:bg-slate-50/50 cursor-pointer border-l-4 border-l-transparent hover:border-l-primary transition-colors;
+    @apply saas-card p-4 hover:border-primary/20 transition-all duration-200 group;
   }
   
-  .saas-button-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+  .saas-metric {
+    @apply text-2xl font-semibold text-foreground mb-1;
   }
   
-  .saas-section-title {
-    @apply text-3xl font-bold tracking-tight text-foreground sm:text-4xl;
+  .saas-metric-label {
+    @apply text-xs font-medium text-muted-foreground uppercase tracking-wide;
+  }
+
+  /* Modern Sidebar - Inspired by Notion */
+  .saas-sidebar {
+    @apply bg-background/95 backdrop-blur-sm border-r border-border/50;
   }
   
-  .saas-section-subtitle {
-    @apply mt-3 text-xl text-muted-foreground sm:mt-4;
+  .saas-sidebar-item {
+    @apply flex items-center gap-2 px-2 py-1.5 text-sm font-medium text-muted-foreground hover:bg-accent/50 hover:text-foreground rounded-md transition-all duration-200 cursor-pointer;
   }
   
-  .saas-metric-large {
-    @apply text-4xl font-bold text-foreground;
+  .saas-sidebar-item.active {
+    @apply bg-accent text-foreground;
   }
   
-  .saas-metric-small {
-    @apply text-2xl font-semibold text-foreground;
+  .saas-sidebar-section {
+    @apply px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide;
+  }
+
+  /* Modern Status System */
+  .saas-status-dot {
+    @apply w-2 h-2 rounded-full flex-shrink-0;
   }
   
+  .saas-status-success {
+    @apply bg-emerald-500;
+  }
+  
+  .saas-status-warning {
+    @apply bg-amber-500;
+  }
+  
+  .saas-status-error {
+    @apply bg-red-500;
+  }
+  
+  .saas-status-info {
+    @apply bg-blue-500;
+  }
+
+  /* Modern Trends - Minimal design */
   .saas-trend-positive {
-    @apply text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full text-xs font-medium;
+    @apply text-emerald-600 font-medium;
   }
   
   .saas-trend-negative {
-    @apply text-red-600 bg-red-50 px-2 py-1 rounded-full text-xs font-medium;
+    @apply text-red-600 font-medium;
   }
   
   .saas-trend-neutral {
-    @apply text-slate-600 bg-slate-50 px-2 py-1 rounded-full text-xs font-medium;
+    @apply text-muted-foreground font-medium;
   }
-  
-  .saas-sidebar {
-    @apply bg-card border-r border-border transition-all duration-300 ease-in-out;
-  }
-  
-  .saas-nav-item {
-    @apply flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground;
-  }
-  
-  .saas-nav-item-active {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90;
-  }
-  
-  .saas-avatar-stack {
-    @apply flex -space-x-2;
-  }
-  
-  .saas-avatar-stack > * {
-    @apply ring-2 ring-background;
-  }
-  
-  .saas-form-section {
-    @apply space-y-6 py-6;
-  }
-  
-  .saas-form-field {
-    @apply space-y-2;
+
+  /* Modern Badge System - Subtle */
+  .saas-badge {
+    @apply inline-flex items-center px-2 py-1 rounded-md text-xs font-medium;
   }
   
   .saas-badge-success {
-    @apply bg-emerald-50 text-emerald-700 ring-emerald-600/20;
+    @apply saas-badge bg-emerald-50 text-emerald-700 border border-emerald-200;
   }
   
   .saas-badge-warning {
-    @apply bg-amber-50 text-amber-700 ring-amber-600/20;
+    @apply saas-badge bg-amber-50 text-amber-700 border border-amber-200;
   }
   
   .saas-badge-error {
-    @apply bg-red-50 text-red-700 ring-red-600/20;
+    @apply saas-badge bg-red-50 text-red-700 border border-red-200;
   }
   
   .saas-badge-info {
-    @apply bg-blue-50 text-blue-700 ring-blue-600/20;
+    @apply saas-badge bg-blue-50 text-blue-700 border border-blue-200;
+  }
+  
+  .saas-badge-neutral {
+    @apply saas-badge bg-gray-50 text-gray-700 border border-gray-200;
+  }
+
+  /* Modern Interactive Elements */
+  .saas-interactive {
+    @apply hover:bg-accent/50 cursor-pointer transition-colors rounded-md;
+  }
+  
+  .saas-clickable {
+    @apply hover:bg-accent cursor-pointer transition-all duration-200 rounded-md active:scale-95;
+  }
+
+  /* Modern Form System */
+  .saas-form-section {
+    @apply space-y-4 p-4 bg-accent/20 border rounded-lg;
+  }
+  
+  .saas-form-group {
+    @apply space-y-2;
+  }
+  
+  .saas-form-header {
+    @apply pb-3 border-b;
+  }
+
+  /* Modern Button System */
+  .saas-button-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 font-medium text-sm px-4 py-2 rounded-lg transition-colors;
+  }
+  
+  .saas-button-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 font-medium text-sm px-4 py-2 rounded-lg transition-colors;
+  }
+  
+  .saas-button-ghost {
+    @apply hover:bg-accent hover:text-accent-foreground font-medium text-sm px-4 py-2 rounded-lg transition-colors;
+  }
+
+  /* Modern Navigation */
+  .saas-nav {
+    @apply flex items-center space-x-1;
+  }
+  
+  .saas-nav-item {
+    @apply px-3 py-2 text-sm font-medium rounded-md transition-colors;
+  }
+  
+  .saas-nav-item:not(.active) {
+    @apply text-muted-foreground hover:text-foreground hover:bg-accent/50;
+  }
+  
+  .saas-nav-item.active {
+    @apply text-foreground bg-accent;
+  }
+
+  /* Modern Spacing */
+  .saas-space-section {
+    @apply space-y-6;
+  }
+  
+  .saas-space-content {
+    @apply space-y-4;
+  }
+  
+  .saas-space-tight {
+    @apply space-y-2;
+  }
+
+  /* Modern List Items */
+  .saas-list-item {
+    @apply flex items-center justify-between p-3 hover:bg-accent/30 rounded-lg transition-colors;
+  }
+  
+  .saas-list-item-simple {
+    @apply flex items-center gap-3 p-2 hover:bg-accent/30 rounded-md transition-colors;
+  }
+
+  /* Modern Header System */
+  .saas-header {
+    @apply border-b bg-background/95 backdrop-blur-sm sticky top-0 z-40;
+  }
+  
+  .saas-header-content {
+    @apply saas-container py-4 flex items-center justify-between;
+  }
+
+  /* Modern Content Areas */
+  .saas-main-content {
+    @apply flex-1 overflow-hidden;
+  }
+  
+  .saas-secondary-content {
+    @apply w-80 border-l bg-muted/50;
+  }
+
+  /* Modern Empty States */
+  .saas-empty-state {
+    @apply text-center py-12 px-4;
+  }
+  
+  .saas-empty-state-icon {
+    @apply w-12 h-12 mx-auto mb-4 text-muted-foreground;
+  }
+  
+  .saas-empty-state-title {
+    @apply saas-title-md mb-2;
+  }
+  
+  .saas-empty-state-description {
+    @apply saas-body-secondary mb-6;
   }
 }
 

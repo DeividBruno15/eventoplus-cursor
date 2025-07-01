@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import Sidebar from "./sidebar-new";
+import Sidebar from "./sidebar-modern";
 import Topbar from "./topbar";
 
 interface LayoutProps {
