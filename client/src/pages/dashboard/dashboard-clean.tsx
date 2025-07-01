@@ -50,21 +50,21 @@ export default function DashboardClean() {
 
   if (isLoading) {
     return (
-      <div className="space-y-8 p-8">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-[300px]" />
-          <Skeleton className="h-4 w-[200px]" />
+      <div className="space-system-4 p-system-4">
+        <div className="space-system-1">
+          <Skeleton className="skeleton-enhanced h-8 w-[300px]" />
+          <Skeleton className="skeleton-enhanced h-4 w-[200px]" />
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-system-3 md:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i}>
+            <Card key={i} className="hover-enhanced">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <Skeleton className="h-4 w-[120px]" />
-                <Skeleton className="h-4 w-4" />
+                <Skeleton className="skeleton-enhanced h-4 w-[120px]" />
+                <Skeleton className="skeleton-enhanced h-4 w-4" />
               </CardHeader>
-              <CardContent>
-                <Skeleton className="h-8 w-[80px] mb-2" />
-                <Skeleton className="h-3 w-[100px]" />
+              <CardContent className="p-system-2">
+                <Skeleton className="skeleton-enhanced h-8 w-[80px] mb-2" />
+                <Skeleton className="skeleton-enhanced h-3 w-[100px]" />
               </CardContent>
             </Card>
           ))}
@@ -245,15 +245,15 @@ export default function DashboardClean() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100 py-8 px-6">
+      {/* Header - Aplicando hierarquia tipográfica */}
+      <div className="bg-white border-b border-gray-100 py-system-4 px-system-3">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{dashboardData.greeting}</h1>
-              <p className="text-gray-600 mt-2">{dashboardData.subtitle}</p>
+            <div className="space-system-1">
+              <h1 className="text-display-xl">{dashboardData.greeting}</h1>
+              <p className="text-body-md text-muted-foreground">{dashboardData.subtitle}</p>
             </div>
-            <Badge variant="secondary">
+            <Badge variant="secondary" className="touch-target">
               {user.userType === "prestador" && "Prestador"}
               {user.userType === "contratante" && "Organizador"}
               {user.userType === "anunciante" && "Anunciante"}
@@ -262,54 +262,55 @@ export default function DashboardClean() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto py-8 px-6">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="max-w-7xl mx-auto py-system-4 px-system-3">
+        {/* Stats Grid - Aplicando sistema 8pt */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-system-3 mb-system-4">
           {dashboardData.stats.map((stat, index) => {
             const IconComponent = stat.icon;
             return (
-              <div key={index} className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-500 mb-2">{stat.label}</p>
-                    <p className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</p>
-                    <p className="text-xs text-green-600 font-medium">{stat.trend}</p>
+              <Card key={index} className="hover-enhanced focus-enhanced touch-target">
+                <CardContent className="p-system-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 space-system-1">
+                      <p className="text-body-sm">{stat.label}</p>
+                      <p className="text-display-md">{stat.value}</p>
+                      <p className="text-body-xs text-green-600 font-medium">{stat.trend}</p>
+                    </div>
+                    <div className="ml-system-2 p-system-1 bg-muted rounded-lg">
+                      <IconComponent className="w-6 h-6 text-muted-foreground" />
+                    </div>
                   </div>
-                  <div className="ml-4 p-3 bg-gray-100 rounded-lg">
-                    <IconComponent className="w-6 h-6 text-gray-600" />
-                  </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             );
           })}
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-          <div className="p-6 border-b border-gray-100">
-            <h3 className="text-xl font-semibold text-gray-900">Ações Rápidas</h3>
-            <p className="text-gray-600 mt-1">Principais funcionalidades da sua conta</p>
-          </div>
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Quick Actions - Hierarquia melhorada */}
+        <Card className="shadow-sm">
+          <CardHeader className="border-b border-gray-100 p-system-3">
+            <CardTitle className="text-display-md">Ações Rápidas</CardTitle>
+            <CardDescription className="text-body-sm">Principais funcionalidades da sua conta</CardDescription>
+          </CardHeader>
+          <CardContent className="p-system-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-system-2">
               {dashboardData.quickActions.map((action, index) => {
                 const IconComponent = action.icon;
                 return (
                   <Link key={index} href={action.href}>
-                    <button 
-                      className={`w-full h-16 flex items-center justify-start space-x-3 ${
-                        index === 0 ? "btn-primary-enhanced" : "btn-secondary-enhanced"
-                      }`}
+                    <Button 
+                      variant={index === 0 ? "default" : "outline"}
+                      className="w-full h-16 flex items-center justify-start space-x-3 touch-target hover-enhanced focus-enhanced"
                     >
                       <IconComponent className="w-5 h-5" />
-                      <span className="font-semibold">{action.label}</span>
-                    </button>
+                      <span className="font-medium">{action.label}</span>
+                    </Button>
                   </Link>
                 );
               })}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Recent Activity */}
         <div className="mt-12 card-elevated">

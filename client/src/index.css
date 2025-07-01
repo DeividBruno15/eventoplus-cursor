@@ -60,7 +60,7 @@
     --secondary: 210 40% 96%;
     --secondary-foreground: 222.2 84% 4.9%;
     --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted-foreground: 215.4 16.3% 40.9%; /* Improved contrast: 5.2:1 */
     --accent: 210 40% 96%;
     --accent-foreground: 222.2 84% 4.9%;
     --destructive: 0 84.2% 60.2%;
@@ -119,7 +119,40 @@
 
 /* Modern SaaS Design System - Inspired by Linear, Vercel, Notion */
 @layer components {
-  /* Layout System */
+  /* 8PT GRID SYSTEM - PADRÃO DA INDÚSTRIA */
+  .space-system-1 { @apply space-y-2; }   /* 8px */
+  .space-system-2 { @apply space-y-4; }   /* 16px */
+  .space-system-3 { @apply space-y-6; }   /* 24px */
+  .space-system-4 { @apply space-y-8; }   /* 32px */
+  .space-system-6 { @apply space-y-12; }  /* 48px */
+  .space-system-8 { @apply space-y-16; }  /* 64px */
+  
+  .gap-system-1 { @apply gap-2; }         /* 8px */
+  .gap-system-2 { @apply gap-4; }         /* 16px */
+  .gap-system-3 { @apply gap-6; }         /* 24px */
+  .gap-system-4 { @apply gap-8; }         /* 32px */
+  
+  .p-system-1 { @apply p-2; }             /* 8px */
+  .p-system-2 { @apply p-4; }             /* 16px */
+  .p-system-3 { @apply p-6; }             /* 24px */
+  .p-system-4 { @apply p-8; }             /* 32px */
+  
+  .py-system-1 { @apply py-2; }           /* 8px vertical */
+  .py-system-2 { @apply py-4; }           /* 16px vertical */
+  .py-system-3 { @apply py-6; }           /* 24px vertical */
+  .py-system-4 { @apply py-8; }           /* 32px vertical */
+  
+  .px-system-1 { @apply px-2; }           /* 8px horizontal */
+  .px-system-2 { @apply px-4; }           /* 16px horizontal */
+  .px-system-3 { @apply px-6; }           /* 24px horizontal */
+  .px-system-4 { @apply px-8; }           /* 32px horizontal */
+  
+  .ml-system-1 { @apply ml-2; }           /* 8px margin left */
+  .ml-system-2 { @apply ml-4; }           /* 16px margin left */
+  .ml-system-3 { @apply ml-6; }           /* 24px margin left */
+  .ml-system-4 { @apply ml-8; }           /* 32px margin left */
+
+  /* Layout System Atualizado */
   .saas-container {
     @apply mx-auto max-w-6xl px-4 sm:px-6 lg:px-8;
   }
@@ -129,24 +162,57 @@
   }
   
   .saas-content {
-    @apply saas-container py-6 space-y-6;
+    @apply saas-container py-system-3 space-system-3;
   }
 
-  /* Modern Typography - Smaller, cleaner */
-  .saas-title-xl {
+  /* SISTEMA TIPOGRÁFICO PADRONIZADO - HIERARQUIA CLARA */
+  .text-display-2xl {
+    @apply text-4xl font-bold tracking-tight text-foreground;
+  }
+  
+  .text-display-xl {
+    @apply text-3xl font-bold tracking-tight text-foreground;
+  }
+  
+  .text-display-lg {
     @apply text-2xl font-semibold tracking-tight text-foreground;
   }
   
-  .saas-title-lg {
+  .text-display-md {
     @apply text-xl font-semibold tracking-tight text-foreground;
   }
   
+  .text-body-lg {
+    @apply text-lg font-normal leading-7 text-foreground;
+  }
+  
+  .text-body-md {
+    @apply text-base font-normal leading-6 text-foreground;
+  }
+  
+  .text-body-sm {
+    @apply text-sm font-normal leading-5 text-muted-foreground;
+  }
+  
+  .text-body-xs {
+    @apply text-xs font-normal leading-4 text-muted-foreground;
+  }
+  
+  /* LEGACY SUPPORT - Gradualmente migrar */
+  .saas-title-xl {
+    @apply text-display-lg;
+  }
+  
+  .saas-title-lg {
+    @apply text-display-md;
+  }
+  
   .saas-title-md {
-    @apply text-lg font-medium text-foreground;
+    @apply text-body-lg font-medium;
   }
   
   .saas-title-sm {
-    @apply text-base font-medium text-foreground;
+    @apply text-body-md font-medium;
   }
   
   .saas-body {
