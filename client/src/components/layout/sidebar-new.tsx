@@ -149,47 +149,87 @@ export default function Sidebar({ collapsed, onToggle, isMobile = false, showMob
     }
   };
 
-  // Diferentes menus baseados no tipo de usuário
-  const getMenuItems = () => {
-    const commonItems = [
-      { href: "/dashboard", icon: Home, label: "Dashboard" },
-      { href: "/agenda", icon: Calendar, label: "Agenda" },
-      { href: "/chat", icon: MessageSquare, label: "Chat" },
-      { href: "/ai-recommendations", icon: Brain, label: "Recomendações IA" },
+  // Menu reorganizado em categorias lógicas
+  const getMenuCategories = () => {
+    const baseCategories = [
+      {
+        title: "Principal",
+        items: [
+          { href: "/dashboard", icon: Home, label: "Dashboard" },
+          { href: "/ai-recommendations", icon: Brain, label: "Recomendações IA" },
+        ]
+      },
+      {
+        title: "Comunicação",
+        items: [
+          { href: "/chat", icon: MessageSquare, label: "Chat" },
+          { href: "/agenda", icon: Calendar, label: "Agenda" },
+        ]
+      }
     ];
 
     switch (user.userType) {
       case "prestador":
         return [
-          ...commonItems,
-          { href: "/events", icon: Calendar, label: "Oportunidades" },
-          { href: "/services", icon: CreditCard, label: "Meus Serviços" },
-          { href: "/analytics", icon: BarChart3, label: "Análises" },
-          { href: "/contracts", icon: FileText, label: "Contratos" },
+          ...baseCategories,
+          {
+            title: "Trabalho",
+            items: [
+              { href: "/events", icon: Calendar, label: "Oportunidades" },
+              { href: "/services", icon: CreditCard, label: "Meus Serviços" },
+              { href: "/contracts", icon: FileText, label: "Contratos" },
+            ]
+          },
+          {
+            title: "Analytics",
+            items: [
+              { href: "/analytics", icon: BarChart3, label: "Análises" },
+            ]
+          }
         ];
       
       case "contratante":
         return [
-          ...commonItems,
-          { href: "/events", icon: Calendar, label: "Meus Eventos" },
-          { href: "/search", icon: Search, label: "Buscar Prestadores" },
-          { href: "/venues", icon: MapPin, label: "Buscar Espaços" },
-          { href: "/contracts", icon: FileText, label: "Contratos" },
+          ...baseCategories,
+          {
+            title: "Eventos",
+            items: [
+              { href: "/events", icon: Calendar, label: "Meus Eventos" },
+              { href: "/search", icon: Search, label: "Buscar Prestadores" },
+              { href: "/contracts", icon: FileText, label: "Contratos" },
+            ]
+          },
+          {
+            title: "Locais",
+            items: [
+              { href: "/venues", icon: MapPin, label: "Buscar Espaços" },
+            ]
+          }
         ];
       
       case "anunciante":
         return [
-          ...commonItems,
-          { href: "/venues", icon: MapPin, label: "Meus Espaços" },
-          { href: "/analytics", icon: BarChart3, label: "Análises" },
+          ...baseCategories,
+          {
+            title: "Espaços",
+            items: [
+              { href: "/venues", icon: MapPin, label: "Meus Espaços" },
+            ]
+          },
+          {
+            title: "Analytics",
+            items: [
+              { href: "/analytics", icon: BarChart3, label: "Análises" },
+            ]
+          }
         ];
       
       default:
-        return commonItems;
+        return baseCategories;
     }
   };
 
-  const menuItems = getMenuItems();
+  const menuCategories = getMenuCategories();
 
   return (
     <div className={`${isMobile ? 'fixed' : 'fixed'} left-0 top-0 h-full bg-white border-r border-gray-200 transition-all duration-300 z-40 ${
@@ -349,25 +389,38 @@ export default function Sidebar({ collapsed, onToggle, isMobile = false, showMob
           </div>
         </div>
 
-        {/* Menu Items */}
-        <div className="flex-1 p-2 space-y-1">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location === item.href;
-            
-            return (
-              <Link key={item.href} href={item.href}>
-                <div className={`flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer ${
-                  isActive 
-                    ? "bg-[#3C5BFA] text-white" 
-                    : "text-gray-600 hover:bg-gray-100"
-                } ${collapsed ? 'justify-center' : ''}`}>
-                  <Icon className="h-5 w-5" />
-                  {!collapsed && <span className="font-medium">{item.label}</span>}
+        {/* Menu Items por Categoria */}
+        <div className="flex-1 p-2 space-y-4 overflow-y-auto">
+          {menuCategories.map((category, categoryIndex) => (
+            <div key={category.title}>
+              {!collapsed && (
+                <div className="px-3 mb-2">
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    {category.title}
+                  </h3>
                 </div>
-              </Link>
-            );
-          })}
+              )}
+              <div className="space-y-1">
+                {category.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location === item.href;
+                  
+                  return (
+                    <Link key={item.href} href={item.href}>
+                      <div className={`flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer ${
+                        isActive 
+                          ? "bg-[#3C5BFA] text-white" 
+                          : "text-gray-600 hover:bg-gray-100"
+                      } ${collapsed ? 'justify-center' : ''}`}>
+                        <Icon className="h-5 w-5" />
+                        {!collapsed && <span className="font-medium">{item.label}</span>}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
 
         <Separator />
