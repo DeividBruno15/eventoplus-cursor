@@ -15,21 +15,7 @@ import { mobileApi } from '../../utils/api';
 
 const { width } = Dimensions.get('window');
 
-interface PIXPaymentProps {
-  route: {
-    params: {
-      plan: {
-        id: string;
-        name: string;
-        price: number;
-      };
-      amount: number;
-    };
-  };
-  navigation: any;
-}
-
-const PIXPaymentScreen: React.FC<PIXPaymentProps> = ({ route, navigation }) => {
+const PIXPaymentScreen = ({ route, navigation }: any) => {
   const { plan, amount } = route.params;
   const { user } = useAuth();
   const [pixCode, setPixCode] = useState<string>('');

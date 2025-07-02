@@ -65,6 +65,12 @@ function TabNavigator() {
             iconName = 'chat';
           } else if (route.name === 'Profile') {
             iconName = 'person';
+          } else if (route.name === 'Notifications') {
+            iconName = 'notifications';
+          } else if (route.name === 'Cart') {
+            iconName = 'shopping-cart';
+          } else if (route.name === 'Subscription') {
+            iconName = 'payment';
           }
 
           return <Icon name={iconName} size={size} color={color} />;
@@ -83,7 +89,10 @@ function TabNavigator() {
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       
       {user?.userType === 'contratante' && (
-        <Tab.Screen name="Events" component={EventsScreen} />
+        <>
+          <Tab.Screen name="Events" component={EventsScreen} />
+          <Tab.Screen name="Cart" component={CartScreen} />
+        </>
       )}
       
       {user?.userType === 'anunciante' && (
@@ -94,6 +103,7 @@ function TabNavigator() {
         <Tab.Screen name="Services" component={ServicesScreen} />
       )}
       
+      <Tab.Screen name="Notifications" component={NotificationsScreen} />
       <Tab.Screen name="Chat" component={ChatScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
@@ -127,8 +137,29 @@ function MainStack() {
         component={TabNavigator} 
         options={{ headerShown: false }} 
       />
-      <Stack.Screen name="CreateEvent" component={CreateEventScreen} />
-      <Stack.Screen name="CreateVenue" component={CreateVenueScreen} />
+      {/* Event & Venue Creation */}
+      <Stack.Screen 
+        name="CreateEvent" 
+        component={CreateEventScreen}
+        options={{ title: 'Criar Evento' }}
+      />
+      <Stack.Screen 
+        name="CreateVenue" 
+        component={CreateVenueScreen}
+        options={{ title: 'Criar Espaço' }}
+      />
+      
+      {/* Payment Screens */}
+      <Stack.Screen 
+        name="Subscription" 
+        component={SubscriptionScreen}
+        options={{ title: 'Planos de Assinatura' }}
+      />
+      <Stack.Screen 
+        name="PIXPayment" 
+        component={PIXPaymentScreen}
+        options={{ title: 'Pagamento PIX' }}
+      />
     </Stack.Navigator>
   );
 }

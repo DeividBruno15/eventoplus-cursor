@@ -173,6 +173,13 @@ export const mobileApi = {
   getAnalytics: (timeframe: string) => apiRequest(`/api/analytics/dashboard?timeframe=${timeframe}`),
   getReviews: (targetId: number, targetType: string) => 
     apiRequest(`/api/reviews?targetId=${targetId}&targetType=${targetType}`),
+  
+  // Global Search
+  globalSearch: (searchParams: any) =>
+    apiRequest('/api/search/global', {
+      method: 'POST',
+      body: searchParams,
+    }),
 };
 
 // Axios-like API client for easier migration
