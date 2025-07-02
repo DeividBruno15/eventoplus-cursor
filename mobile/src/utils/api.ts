@@ -144,4 +144,42 @@ export const mobileApi = {
 
     return await response.json();
   },
+
+  // Subscription & Payments
+  getSubscriptionPlans: () => apiRequest('/api/subscription/plans'),
+  getCurrentSubscription: () => apiRequest('/api/subscription/current'),
+  createCheckoutSession: (priceId: string) =>
+    apiRequest('/api/subscription/create-checkout', {
+      method: 'POST',
+      body: { 
+        priceId,
+        successUrl: 'evento://subscription/success',
+        cancelUrl: 'evento://subscription/cancel'
+      },
+    }),
+
+  // PIX Payments
+  generatePIX: (amount: number, description: string, planId?: string) =>
+    apiRequest('/api/payments/pix/generate', {
+      method: 'POST',
+      body: { amount, description, planId },
+    }),
+  
+  checkPIXStatus: (transactionId: string) =>
+    apiRequest(`/api/payments/pix/status/${transactionId}`),
+
+  // Advanced features
+  getRecommendations: () => apiRequest('/api/ai-recommendations/personalized'),
+  getAnalytics: (timeframe: string) => apiRequest(`/api/analytics/dashboard?timeframe=${timeframe}`),
+  getReviews: (targetId: number, targetType: string) => 
+    apiRequest(`/api/reviews?targetId=${targetId}&targetType=${targetType}`),
+};
+
+// Axios-like API client for easier migration
+export const api = {
+  get: (url: string) => apiRequest(url),
+  post: (url: string, data?: any) => apiRequest(url, { method: 'POST', body: data }),
+  put: (url: string, data?: any) => apiRequest(url, { method: 'PUT', body: data }),
+  patch: (url: string, data?: any) => apiRequest(url, { method: 'PATCH', body: data }),
+  delete: (url: string) => apiRequest(url, { method: 'DELETE' }),
 };
