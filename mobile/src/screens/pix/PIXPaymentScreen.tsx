@@ -61,8 +61,8 @@ const PIXPaymentScreen: React.FC<PIXPaymentProps> = ({ route, navigation }) => {
     queryKey: ['pix-status', transactionId],
     queryFn: async () => {
       if (!transactionId) return null;
-      const response = await api.get(`/api/payments/pix/status/${transactionId}`);
-      return response.data;
+      const response = await mobileApi.checkPIXStatus(transactionId);
+      return response;
     },
     enabled: !!transactionId,
     refetchInterval: 3000, // Verificar a cada 3 segundos
@@ -163,12 +163,13 @@ const PIXPaymentScreen: React.FC<PIXPaymentProps> = ({ route, navigation }) => {
             <Text style={styles.qrTitle}>Escaneie o QR Code</Text>
             
             <View style={styles.qrContainer}>
-              <QRCode
-                value={pixCode}
-                size={width - 120}
-                backgroundColor="white"
-                color="black"
-              />
+              <View style={styles.qrPlaceholder}>
+                <Text style={styles.qrPlaceholderText}>📱</Text>
+                <Text style={styles.qrPlaceholderSubtext}>QR Code PIX</Text>
+                <Text style={styles.qrPlaceholderNote}>
+                  Use o código abaixo no seu app bancário
+                </Text>
+              </View>
             </View>
 
             <Text style={styles.instructions}>
@@ -323,6 +324,31 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 16,
     elevation: 1,
+  },
+  qrPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 200,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+  },
+  qrPlaceholderText: {
+    fontSize: 48,
+    marginBottom: 8,
+  },
+  qrPlaceholderSubtext: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  qrPlaceholderNote: {
+    fontSize: 12,
+    color: '#6B7280',
+    textAlign: 'center',
   },
   instructions: {
     fontSize: 14,

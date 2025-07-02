@@ -10,7 +10,7 @@ import {
 import { Card, Button, Surface, ActivityIndicator } from 'react-native-paper';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../context/AuthContext';
-import { api } from '../../utils/api';
+import { mobileApi } from '../../utils/api';
 
 interface Plan {
   id: string;
@@ -31,8 +31,8 @@ const SubscriptionScreen = ({ navigation }: any) => {
   const { data: plans, isLoading } = useQuery({
     queryKey: ['subscription-plans', user?.userType],
     queryFn: async () => {
-      const response = await api.get('/api/subscription/plans');
-      return response.data.filter((plan: Plan) => 
+      const response = await mobileApi.getSubscriptionPlans();
+      return response.filter((plan: Plan) => 
         plan.userType === user?.userType || plan.userType === 'all'
       );
     },
@@ -41,8 +41,8 @@ const SubscriptionScreen = ({ navigation }: any) => {
   const { data: currentSubscription } = useQuery({
     queryKey: ['current-subscription'],
     queryFn: async () => {
-      const response = await api.get('/api/subscription/current');
-      return response.data;
+      const response = await mobileApi.getCurrentSubscription();
+      return response;
     },
   });
 

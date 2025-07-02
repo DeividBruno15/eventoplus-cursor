@@ -20,6 +20,12 @@ import ServicesScreen from './src/screens/services/ServicesScreen';
 import ChatScreen from './src/screens/chat/ChatScreen';
 import ProfileScreen from './src/screens/profile/ProfileScreen';
 
+// New screens - Phase 1 implementation
+import SubscriptionScreen from './src/screens/subscription/SubscriptionScreen';
+import PIXPaymentScreen from './src/screens/pix/PIXPaymentScreen';
+import CartScreen from './src/screens/cart/CartScreen';
+import NotificationsScreen from './src/screens/notifications/NotificationsScreen';
+
 // Context
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 
